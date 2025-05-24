@@ -1,9 +1,18 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
-const io = require('socket.io')(http);
-
 const apiRoutes = require('./routes/api');
 const app = express();
+
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors : {
+        origin: '*',
+        methods: ['GET', 'POST'],
+    },
+});
+
 const PORT = 3000;
 
 app.use('/api', apiRoutes);
