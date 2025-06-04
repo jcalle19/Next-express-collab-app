@@ -21,11 +21,7 @@ app.use('/api', apiRoutes);
 app.use(cors());
 
 socket_functions(io);
-/*
-io.on('connection', function (socket) {
-    console.log('a user has connected');
-})
-*/
+
 server.listen(PORT, () => {
     console.log(`Server is listening at http://localhost:${PORT}`);
 })
