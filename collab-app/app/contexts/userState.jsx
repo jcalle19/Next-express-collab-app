@@ -33,6 +33,7 @@ export const StateProvider = ({children}) => {
 
         return () => {
         if (socketRef.current) {
+            socketRef.current.removeAllListeners();
             socketRef.current.disconnect();
         }
     };
@@ -44,10 +45,9 @@ export const StateProvider = ({children}) => {
             userObj.current.id = id;
             userObj.current.roomId = newRoom;
             socketRef.current.emit('user-joined', userObj.current);
-            console.log(userObj.current, 'hello');
         }
     }
-    
+
     const removeUser = (user) => {
         roomUsers.current.delete(user);
     };
