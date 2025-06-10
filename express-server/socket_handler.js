@@ -15,8 +15,11 @@ const socket_functions = (io) => {
         })
         
         socket.on('update-room', (userObj) => {
-            console.log(userObj);
             io.to(userObj.roomId).emit('update-room', userObj);
+        });
+
+        socket.on('broadcast-msg', (userObj, msg) => {
+            io.to(userObj.roomId).emit('new-msg', userObj, msg);
         });
     });
 }

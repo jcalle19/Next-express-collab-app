@@ -1,5 +1,23 @@
-.main-window {
-    width: 75vw;
+.window-container {
+    width: 100vw;
     height: 75vh;
+    border: 2px solid blue;
+}
+
+.cursor-window {
     cursor: none;
+}
+
+.chat-window {
+    background-color: black;
+    z-index: 1;
+}
+
+.chat-window input {
+    color: black;
+}
+
+#msg-field {
+    border: 2px solid yellow;
+    height: 80%;
 }

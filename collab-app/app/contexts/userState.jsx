@@ -11,6 +11,8 @@ export const StateProvider = ({children}) => {
     const userObj = useRef({id: '', user: '', roomId: '', xCoord: '', yCoord: ''});
     const roomUsers = useRef(new Map()); //Holding player data, will constantly update
     const socketRef = useRef(null);
+    const [roomUsersKeys, updateKeys] = useState(null);
+    const [chatMessages, updateMessages] = useState([]);
 
 
     
@@ -28,7 +30,12 @@ export const StateProvider = ({children}) => {
         
         socketRef.current.on('update-room', (userInfo) => {
             roomUsers.current.set(userInfo.user, userInfo);
-            console.log(roomUsers.current.get(userInfo.user));
+        });
+
+        socketRef.current.on('new-msg', (userInfo, message) => {
+            //receive new message
+            console.log(`received: ${message}`)
+            addMessage(userInfo, message);
         });
 
         return () => {
@@ -50,14 +57,21 @@ export const StateProvider = ({children}) => {
 
     const removeUser = (user) => {
         roomUsers.current.delete(user);
+        updateKeys(roomUsers.current.keys());
     };
 
     const addUser = (userInfo) => {
         roomUsers.current.set(userInfo.user, userInfo);
+        updateKeys(roomUsers.current.keys());
         console.log(`added user: ${userInfo.user}`);
     }
 
-    const randomId= () => {
+    const addMessage = (user, msg) => {
+        //Functional update to add to most current message list
+        updateMessages(prevMessages => [...prevMessages, {msgId: randomId(), username: user.user, content: msg}]);
+    }
+
+    const randomId = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
         for (let i = 0; i < 16; i++) {
@@ -71,9 +85,12 @@ export const StateProvider = ({children}) => {
         userObj,
         roomUsers,
         socketRef,
+        roomUsersKeys,
+        chatMessages,
         joinRoom,
         removeUser,
         addUser,
+        addMessage,
     }
 
     return <stateContext.Provider value={state}>
