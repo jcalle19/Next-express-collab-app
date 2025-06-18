@@ -7,20 +7,22 @@ import '../css/roomPage.css'
 
 const ChatBox = () => {
     const [chatMsg, updateMsg] = useState('');
-    const { userObj, socketRef, roomUsersKeys, chatMessages, addMessage } = useStateContext();
+    const { userObj, socketRef, roomUsersKeys, chatMessages, chatMessagesRef, addMessage } = useStateContext();
 
     const handleSubmit = () => {
-        //addMessage(userObj.current, chatMsg);
-        console.log(chatMessages);
         socketRef.current.emit('broadcast-msg', userObj.current, chatMsg);
         updateMsg('');
     }
-    //{chatMessages.map((chat) => (<Message key={chat.msgId} user={chat.username} message={chat.content}/>))}
+    
     return (
     <div className='chat-window col-start-5'>
-        <div id='users-drop-down'>Create username drop down here</div>
+        <div id='users-drop-down'>Create username drop down here
+            {roomUsersKeys.map((user) => (<div key={user.key}>{user.user}</div>))}
+        </div>
         <div id='msg-field'>
-            {chatMessages.map((chat) => (<Message key={chat.msgId} user={chat.username} message={chat.content}/>))}
+            {
+                chatMessages.length > 0 ? chatMessages.map((chat) => (<Message key={chat.key} user={chat.username} message={chat.content}/>)) : ''
+            }
         </div>
         <form>
             <input

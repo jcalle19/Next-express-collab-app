@@ -1,15 +1,17 @@
 .window-container {
     width: 100vw;
-    height: 75vh;
+    height: 100vh;
     border: 2px solid blue;
 }
 
 .cursor-window {
     cursor: none;
+    height: 100%;
 }
 
 .chat-window {
     background-color: black;
+    height: 70vh;
     z-index: 1;
 }
 
@@ -17,7 +19,11 @@
     color: black;
 }
 
+.room-panel {
+    border: 2px solid green;
+}
+
 #msg-field {
     border: 2px solid yellow;
-    height: 80%;
+    height: 95%;
 }
