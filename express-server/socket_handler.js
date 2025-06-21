@@ -7,7 +7,7 @@ const socket_functions = (io) => {
         socket.on('user-joined', async (userObj) => {
             console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
             socket.join(userObj.roomId);
-            io.to(userObj.roomId).emit('add-user', userObj); //might remove
+            //io.to(userObj.roomId).emit('add-user', userObj);
 
             //get all sockets in room
             const socketIds = await io.in(userObj.roomId).allSockets();
@@ -19,7 +19,8 @@ const socket_functions = (io) => {
 
                 if (firstSocket) {
                     console.log(`syncing room ${userObj.roomId} with host`);
-                    firstSocket.emit('sync-request'); 
+                    firstSocket.to(userObj.roomId).emit('add-user', userObj);
+                    firstSocket.emit('sync-request', userObj); 
                 }
             }
         })
@@ -40,9 +41,9 @@ const socket_functions = (io) => {
             socket.leave(room);
         });
 
-        socket.on('sync-host-out', (roomId, roomUsers, chatHistory) => {
+        socket.on('sync-host-out', (roomId, roomUsersMap, chatHistory) => {
             //Send to every socket except self
-            socket.to(roomId).emit('sync-host-in', roomUsers, chatHistory);
+            socket.to(roomId).emit('sync-host-in', roomUsersMap, chatHistory);
         });
     });
 }

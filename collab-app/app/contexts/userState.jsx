@@ -34,7 +34,8 @@ export const StateProvider = ({children}) => {
         });
 
         socketRef.current.on('remove-user', (userInfo) => {
-            removeUser(userInfo.user);
+            console.log('removing user ', userInfo.user);
+            removeUser(userInfo);
         });
         
         socketRef.current.on('update-room', (userInfo) => {
@@ -47,14 +48,17 @@ export const StateProvider = ({children}) => {
             addMessage(userInfo, message);
         });
 
-        socketRef.current.on('sync-request', () => {
-            socketRef.current.emit('sync-host-out', userObj.current.roomId, Object.fromEntries(roomUsers.current), chatMessagesRef.current);
+        socketRef.current.on('sync-request', (userInfo) => {
+            addUser(userInfo);
+            console.log('Syncing with room', roomUsersRef.current);
+            socketRef.current.emit('sync-host-out', userObj.current.roomId, {roomMap: Object.fromEntries(roomUsers.current), keys: roomUsersRef.current}, chatMessagesRef.current);
         });
 
         socketRef.current.on('sync-host-in', (roomInfo, chatHist) => {
             console.log('syncing from host');
-            roomUsers.current = new Map(Object.entries(roomInfo));
+            roomUsers.current = new Map(Object.entries(roomInfo.roomMap));
             updateMessages(chatHist);
+            updateKeys([...roomInfo.keys]);
         });
 
         //stuff to do on unmount
@@ -65,7 +69,7 @@ export const StateProvider = ({children}) => {
                     socketRefReady.current = false;
                     return false;
                 });
-                socketRef.current.emit('user-left', userObj.current);
+                //socketRef.current.emit('user-left', userObj.current);
                 socketRef.current.removeAllListeners();
                 socketRef.current.disconnect();
             }
@@ -74,12 +78,14 @@ export const StateProvider = ({children}) => {
 
     useEffect(() => {
         roomUsersRef.current = roomUsersKeys;
-        localStorage.setItem('roomUsersKeys', JSON.stringify(roomUsersRef.current));
+        console.log('New list of users: ', roomUsersRef.current);
+        sessionStorage.setItem('roomUsersKeys', JSON.stringify(roomUsersRef.current));
     }, [roomUsersKeys]);
 
     useEffect(() => {
         chatMessagesRef.current = chatMessages;
-        localStorage.setItem('chatMessages', JSON.stringify(chatMessagesRef.current));
+        console.log('New list of chat messages: ', chatMessagesRef.current);
+        sessionStorage.setItem('chatMessages', JSON.stringify(chatMessagesRef.current));
     }, [chatMessages]);
 
     const joinRoom = (newRoom) => {
@@ -87,7 +93,7 @@ export const StateProvider = ({children}) => {
             let id = randomId();
             userObj.current.id = id;
             userObj.current.roomId = newRoom;
-            localStorage.setItem('userObj', JSON.stringify(userObj.current));
+            sessionStorage.setItem('userObj', JSON.stringify(userObj.current));
             socketRef.current.emit('user-joined', userObj.current);
         }
     }
@@ -100,20 +106,21 @@ export const StateProvider = ({children}) => {
             roomUsers.current = new Map();
             updateKeys([]);
             updateMessages([]);
-            //localStorage.clear();
+            sessionStorage.clear();
         }
     }
 
-    const removeUser = (user) => {
-        roomUsers.current.delete(user);
-        updateKeys([...roomUsers.current.keys()]);
-        console.log('New user list: ', [...roomUsers.current.keys()], roomUsersRef);
+    const removeUser = (userInfo) => {
+        roomUsers.current.delete(userInfo.user);
+        roomUsersRef.current = roomUsersRef.current.filter(obj => obj.user !== userInfo.user);
+        updateKeys([...roomUsersRef.current]);
+        console.log('New user list: ', [...roomUsersRef.current]);
     };
 
     const addUser = (userInfo) => {
         roomUsers.current.set(userInfo.user, userInfo);
         updateKeys(currUsers => [...currUsers, {key: randomId(), user: userInfo.user}]);
-        console.log(`added user: ${userInfo.user}`, roomUsersKeys);
+        console.log(`added user: ${userInfo.user}`, roomUsersRef.current);
     }
 
     const addMessage = (user, msg) => {
@@ -123,12 +130,14 @@ export const StateProvider = ({children}) => {
     }
 
     const loadRoomState = (roomId) => {
-        const storedInfo = JSON.parse(localStorage.getItem('userObj'));
+        const storedInfo = JSON.parse(sessionStorage.getItem('userObj'));
         if (userObj.current.roomId === '' && roomId === storedInfo.roomId) {
             userObj.current = storedInfo;
-            updateKeys(JSON.parse(localStorage.getItem('roomUsersKeys')));
-            updateMessages(JSON.parse(localStorage.getItem('chatMessages')));
+            updateKeys(JSON.parse(sessionStorage.getItem('roomUsersKeys')));
+            updateMessages(JSON.parse(sessionStorage.getItem('chatMessages')));
+            socketRef.current.emit('user-left', userObj.current);
             socketRef.current.emit('user-joined', userObj.current);
+            console.log(userObj.current);
         }
         /*for debugging, dont need rn
         console.log("All LocalStorage contents:");
