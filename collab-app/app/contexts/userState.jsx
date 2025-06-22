@@ -15,6 +15,7 @@ export const StateProvider = ({children}) => {
     const [socketReady, updateSocketStatus] = useState(false);
     const roomUsersRef = useRef([]);
     const chatMessagesRef = useRef([]);
+    const syncFlag = useRef(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
     
@@ -30,6 +31,7 @@ export const StateProvider = ({children}) => {
         });
 
         socketRef.current.on('add-user', (userInfo) => {
+            syncFlag.current = true;
             addUser(userInfo);
         });
 
@@ -48,8 +50,7 @@ export const StateProvider = ({children}) => {
             addMessage(userInfo, message);
         });
 
-        socketRef.current.on('sync-request', (userInfo) => {
-            addUser(userInfo);
+        socketRef.current.on('sync-request', () => {
             console.log('Syncing with room', roomUsersRef.current);
             socketRef.current.emit('sync-host-out', userObj.current.roomId, {roomMap: Object.fromEntries(roomUsers.current), keys: roomUsersRef.current}, chatMessagesRef.current);
         });
@@ -80,6 +81,10 @@ export const StateProvider = ({children}) => {
         roomUsersRef.current = roomUsersKeys;
         console.log('New list of users: ', roomUsersRef.current);
         sessionStorage.setItem('roomUsersKeys', JSON.stringify(roomUsersRef.current));
+        if (syncFlag.current) {
+            socketRef.current.emit('sync-host-out', userObj.current.roomId, {roomMap: Object.fromEntries(roomUsers.current), keys: roomUsersRef.current}, chatMessagesRef.current);
+        }
+        syncFlag.current = false;
     }, [roomUsersKeys]);
 
     useEffect(() => {
