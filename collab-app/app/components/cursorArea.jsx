@@ -15,7 +15,7 @@ const CursorArea = ({id}) => {
   useEffect(()=>{
     const interval = setInterval(() => {
       takeSnapshot(new Map(roomUsers.current));
-    }, 100);
+    }, 50);
 
     return () => clearInterval(interval);
   }, []);
@@ -33,8 +33,9 @@ const CursorArea = ({id}) => {
   return (
     <div onMouseMove={getMouseLocation} className="test-border cursor-window col-span-4">
       <UserIcon x={coords[0]} y={coords[1]}/>
-      {[...mapSnapshot].slice(1).map(([user, userObj]) => 
-        <UserIcon key={userObj.id} x={userObj.xCoord} y={userObj.yCoord}/>)
+      {[...mapSnapshot].map(([user, userInfo]) => 
+          userInfo.id != userObj.current.id ? <UserIcon key={userInfo.id} x={userInfo.xCoord} y={userInfo.yCoord}/> : ''
+        )
       }
       <h1>Post ID: {id}</h1>
     </div>
