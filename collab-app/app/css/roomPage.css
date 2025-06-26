@@ -5,8 +5,14 @@
 }
 
 .cursor-window {
-    cursor: none;
     height: 100%;
+}
+
+#canvas-window {
+    background-color: transparent;
+    border: 2px dashed orange;
+    height: 100%;
+    width: 100%;
 }
 
 .chat-window {

@@ -144,13 +144,6 @@ export const StateProvider = ({children}) => {
             socketRef.current.emit('user-joined', userObj.current);
             console.log(userObj.current);
         }
-        /*for debugging, dont need rn
-        console.log("All LocalStorage contents:");
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            console.log(key, localStorage.getItem(key));
-        }
-        */
     }
 
     const randomId = () => {

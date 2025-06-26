@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useStateContext } from '../contexts/userState.jsx'
 import UserIcon from './userIcons.jsx';
+import Canvas from './canvas.jsx';
 import '../css/roomPage.css';
 
 const CursorArea = ({id}) => {
@@ -12,7 +13,8 @@ const CursorArea = ({id}) => {
   const {userObj, socketRef, roomUsers } = useStateContext();
 
   //Rendering snapshot of current user locations
-  useEffect(()=>{
+  useEffect(() => {
+    //refreshing to display updated roomInfo
     const interval = setInterval(() => {
       takeSnapshot(new Map(roomUsers.current));
     }, 50);
@@ -37,7 +39,7 @@ const CursorArea = ({id}) => {
           userInfo.id != userObj.current.id ? <UserIcon key={userInfo.id} x={userInfo.xCoord} y={userInfo.yCoord}/> : ''
         )
       }
-      <h1>Post ID: {id}</h1>
+      <Canvas/>
     </div>
   );
 }
