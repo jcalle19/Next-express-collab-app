@@ -20,17 +20,22 @@ const Canvas = () => {
         sizeRef.current.x = rect.left;
         sizeRef.current.y = rect.top;
         ctxRef.current = canvas.getContext('2d');
+
+        canvas.style.height = `${Math.floor(rect.height)}px`;
+        canvas.style.width = `${Math.floor(rect.width)}px`;
+        console.log("CSS size:", canvas.getBoundingClientRect());
+        console.log("Internal size:", canvas.width, canvas.height);
     }, []);
 
     const handleMouseDown = (e) => {
         e.preventDefault();
         drawingRef.current = true;
-        prevRef.current = { x: e.clientX, y: e.clientY };
+        prevRef.current = { x: e.clientX - sizeRef.current.x, y: e.clientY - sizeRef.current.y };
     };
 
     const handleMouseMove = (e) => {
         if (!drawingRef.current) return;
-        newRef.current = { x: e.clientX - sizeRef.current.x, y: e.clientY - sizeRef.current.y};
+        newRef.current = { x: e.clientX - sizeRef.current.x, y: e.clientY - sizeRef.current.y };
         drawLine(prevRef.current, newRef.current, ctxRef.current); // local drawing
         //socket.emit('draw-line', { from: prevPos, to: newPos }); // send to others
         prevRef.current = newRef.current;
@@ -53,7 +58,7 @@ const Canvas = () => {
     };
 
     return (
-        <canvas ref={canvasRef} id='canvas-window' onMouseMove={handleMouseMove} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}></canvas>
+        <canvas ref={canvasRef} style={{width: '100%', height: '100%',}}id='canvas-window' onMouseMove={handleMouseMove} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}></canvas>
     )
 }
 
