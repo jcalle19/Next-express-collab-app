@@ -13,7 +13,7 @@ const RoomInfoPanel = () => {
     }
 
     return (
-        <div className='col-start-5 row-start-2 room-panel'>
+        <div className='room-panel'>
             <div>{userObj.current.roomId}</div>
             <button onClick={handleLeave}>Leave Room</button>
         </div>

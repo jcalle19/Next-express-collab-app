@@ -33,7 +33,7 @@ const CursorArea = ({id}) => {
   }
   
   return (
-    <div onMouseMove={getMouseLocation} className="test-border cursor-window col-span-4">
+    <div onMouseMove={getMouseLocation} className="test-border cursor-window">
       <UserIcon x={coords[0]} y={coords[1]}/>
       {[...mapSnapshot].map(([user, userInfo]) => 
           userInfo.id != userObj.current.id ? <UserIcon key={userInfo.id} x={userInfo.xCoord} y={userInfo.yCoord}/> : ''

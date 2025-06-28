@@ -6,6 +6,7 @@ import { useStateContext } from '../../contexts/userState.jsx';
 import CursorArea from '../../components/cursorArea.jsx';
 import ChatBox from '../../components/chatBox.jsx';
 import RoomInfoPanel from '../../components/roomInfoPanel.jsx';
+import ToolBar from '../../components/toolBar.jsx';
 import '../../css/roomPage.css';
 
 export default function RoomPage() {
@@ -22,16 +23,14 @@ export default function RoomPage() {
       console.log('Socket not ready');
     }
   }, [socketReady]);
-  /*
-  useEffect(() => {
-    loadRoomState(String(id));
-  }, []);
-  */
+
+
   return (
-    <div className='window-container grid grid-cols-5'>
+    <div className='window-container'>
       <CursorArea id={id}/>
       <ChatBox/>
       <RoomInfoPanel/>
+      <ToolBar/>
     </div>
   );
 }

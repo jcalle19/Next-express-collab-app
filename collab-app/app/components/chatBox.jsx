@@ -15,7 +15,7 @@ const ChatBox = () => {
     }
     
     return (
-    <div className='chat-window col-start-5'>
+    <div className='chat-window'>
         <div id='users-drop-down'>
             {roomUsersKeys.map((user) => (<div key={user.key}>{user.user}</div>))}
         </div>
