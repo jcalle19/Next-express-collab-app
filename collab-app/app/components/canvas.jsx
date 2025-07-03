@@ -21,10 +21,7 @@ const Canvas = () => {
         canvas.height = 1000;
         ctxRef.current = canvas.getContext('2d');
 
-        canvas.style.height = '40vw';
-        canvas.style.width = '40vw';
-        scaleXRef.current = canvas.width / canvas.clientWidth;
-        scaleYRef.current = canvas.height / canvas.clientHeight;
+        changeWindowSize(window.innerWidth);
         window.addEventListener('resize', windowResize);
     }, []);
 
