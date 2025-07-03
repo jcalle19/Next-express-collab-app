@@ -9,10 +9,10 @@ const ToolBar = () => {
     }
 
     return (
-        <>
-            <div className={expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-content'}></div>
-            <div className={expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-close'} onClick={handleToggleClick}></div>
-        </>
+        <div id='tool-bar-container'>
+            <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-content'}></div>
+            <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-close'} onClick={handleToggleClick}></div>
+        </div>
     )
 }
 
