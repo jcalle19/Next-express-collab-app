@@ -8,11 +8,12 @@ const Canvas = () => {
     const newRef = useRef(null);
     const drawingRef = useRef(false);
     const lineStorageRef = useRef([]);
+    const removedLineRef = useRef([]);
     const currentLineRef = useRef([]);
     const scaleXRef = useRef(1);
     const scaleYRef = useRef(1);
     const [windowSizeX, changeWindowSize] = useState(0);
-    const { userObj, socketRef, roomUsers} = useStateContext();
+    const { undoFlag, redoFlag } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -34,6 +35,22 @@ const Canvas = () => {
         scaleXRef.current = canvas.width / canvas.clientWidth;
         scaleYRef.current = canvas.height / canvas.clientHeight;
     },[windowSizeX]);
+
+    useEffect(()=> {
+        let last = lineStorageRef.current.pop();
+        if (last) {
+            removedLineRef.current.push(last);
+        }
+        redrawCanvas();
+    },[undoFlag]);
+
+    useEffect (()=> {
+        let last = removedLineRef.current.pop();
+        if (last) {
+            lineStorageRef.current.push(last);
+        }
+        redrawCanvas();
+    },[redoFlag]);
 
     const windowResize = () => {
         changeWindowSize(window.innerWidth);
@@ -57,7 +74,6 @@ const Canvas = () => {
         e.preventDefault();
         drawingRef.current = false;
         lineStorageRef.current.push(currentLineRef.current);
-        console.log(currentLineRef.current);
         currentLineRef.current = [];
     };
 
@@ -74,8 +90,15 @@ const Canvas = () => {
     };
 
     const redrawCanvas = () => {
-        lineStorageRef.foreach(line => line.foreach(path => drawLine(path.prev, path.new, ctxRef.current)));
+        clearCanvas();
+        lineStorageRef.current.forEach(line => line.forEach(path => drawLine(path.prev, path.new, ctxRef.current)));
     }
+
+    //AI function, keep an eye on this one
+    const clearCanvas = () => {
+        if (!ctxRef.current || !canvasRef.current) return;
+            ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    };
 
     return (
         <canvas ref={canvasRef} style={{width: `${8.5 / 11 * 70}vw`, height: '70vw',}}id='canvas-window' onMouseMove={handleMouseMove} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}></canvas>

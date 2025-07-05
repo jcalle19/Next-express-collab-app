@@ -12,10 +12,13 @@ export const StateProvider = ({children}) => {
     const roomUsers = useRef(new Map()); //Holding player data, will constantly update
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
-    const [socketReady, updateSocketStatus] = useState(false);
     const roomUsersRef = useRef([]);
     const chatMessagesRef = useRef([]);
     const syncFlag = useRef(false);
+    const [undoFlag, updateUndo] = useState(false);
+    const [redoFlag, updateRedo] = useState(false);
+    const [clearFlag, updateClear] = useState(false);
+     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
     
@@ -146,6 +149,14 @@ export const StateProvider = ({children}) => {
         }
     }
 
+    const triggerUndo = () => {
+        updateUndo(!undoFlag);
+    }
+
+    const triggerRedo = () => {
+        updateRedo(!redoFlag);
+    }
+
     const randomId = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
@@ -166,12 +177,16 @@ export const StateProvider = ({children}) => {
         chatMessages,
         roomUsersRef,
         chatMessagesRef,
+        undoFlag,
+        redoFlag,
         joinRoom,
         leaveRoom,
         removeUser,
         addUser,
         addMessage,
         loadRoomState,
+        triggerUndo,
+        triggerRedo,
     }
 
     return <stateContext.Provider value={state}>

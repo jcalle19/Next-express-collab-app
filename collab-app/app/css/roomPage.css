@@ -95,6 +95,7 @@
     border: 2px dashed red;
     border-radius: 50px;
     transition: width .5s, height .5s, left .5s, transform .5s, border-radius .5s;
+    overflow: hidden;
 }
 
 .tool-bar-close {
@@ -119,6 +120,19 @@
     border-radius: 25px;
 }
 
+#tool-grid {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 90%;
+    width: 80%;
+    transition: opacity .5s;
+}
+
+.grid-box {
+    border: 2px solid red;
+}
 #users-drop-down {
     border: 2px dashed white;
     border-radius: 25px;
