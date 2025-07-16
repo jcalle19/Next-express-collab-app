@@ -110,24 +110,26 @@
 .tool-bar-expand {
     width: 3vw;
     height: 45vh;
+    min-height: calc(fit-content + 2vh);
     left: 0%;
 }
 
 .tool-bar-content {
     background-color: var(--window-bg-color);
-    width: 200px;
-    height: 45vh;
+    width: 250px;
+    height: 60vh;
     border-radius: 25px;
 }
 
 #tool-grid {
     position: relative;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    height: 90%;
+    transform: translateX(-50%);
+    height: 50%;
     width: 80%;
-    transition: opacity .5s;
+    padding-top: 3vh;
+    padding-bottom: 3vh;
+    transition: opacity .5s, padding-top .5s;
 }
 
 .grid-box {

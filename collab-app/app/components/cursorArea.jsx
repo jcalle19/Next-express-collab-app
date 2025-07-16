@@ -31,7 +31,6 @@ const CursorArea = ({id}) => {
       socketRef.current.emit('update-room', userObj.current);
     }
   }
-  
   return (
     <div onMouseMove={getMouseLocation} className="test-border cursor-window">
       <UserIcon x={coords[0]} y={coords[1]}/>
