@@ -15,10 +15,11 @@ export const StateProvider = ({children}) => {
     const roomUsersRef = useRef([]);
     const chatMessagesRef = useRef([]);
     const syncFlag = useRef(false);
+    const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const [undoFlag, updateUndo] = useState(false);
     const [redoFlag, updateRedo] = useState(false);
     const [clearFlag, updateClear] = useState(false);
-     const [socketReady, updateSocketStatus] = useState(false);
+    const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
     
@@ -179,6 +180,7 @@ export const StateProvider = ({children}) => {
         chatMessagesRef,
         undoFlag,
         redoFlag,
+        penInfoRef,
         joinRoom,
         leaveRoom,
         removeUser,

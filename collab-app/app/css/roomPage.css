@@ -1,5 +1,6 @@
 :root {
     --window-bg-color: transparent;
+    --current-theme-border: 2px dashed white;
 }
 
 .window-container {
@@ -92,7 +93,7 @@
     position: absolute;
     margin: 0px;
     min-width: 45px;
-    border: 2px dashed red;
+    border: var(--current-theme-border);
     border-radius: 50px;
     transition: width .5s, height .5s, left .5s, transform .5s, border-radius .5s;
     overflow: hidden;
@@ -136,7 +137,7 @@
     border: 2px solid red;
 }
 #users-drop-down {
-    border: 2px dashed white;
+    border: var(--current-theme-border);
     border-radius: 25px;
     height: 5vh;
 }
@@ -150,7 +151,7 @@
 }
 
 #msg-field {
-    border: 2px dashed white;
+    border: var(--current-theme-border);
     background-color: transparent;
     border-radius: 25px;
     width: 100%;
@@ -170,4 +171,35 @@
 
 #msg-submit {
     background-color: white;
+}
+
+#width-slider {
+    --slider-thumb-bg: radial-gradient(white 0px,white 2px, transparent 2px, transparent 100%);
+    position: relative;
+    appearance: none;
+    background: none;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+#width-slider::-webkit-slider-runnable-track {
+    position: relative;
+    background-color: transparent;
+    border: 1px dashed white;
+    height: 8px;
+    border-radius: 25px;
+}
+
+#width-slider::-webkit-slider-thumb{
+    position: relative;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    background: var(--slider-thumb-bg);
+    border: 1px dashed white;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
 }

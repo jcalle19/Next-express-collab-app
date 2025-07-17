@@ -13,7 +13,7 @@ const Canvas = () => {
     const scaleXRef = useRef(1);
     const scaleYRef = useRef(1);
     const [windowSizeX, changeWindowSize] = useState(0);
-    const { undoFlag, redoFlag } = useStateContext();
+    const { undoFlag, redoFlag, penInfoRef } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -34,6 +34,8 @@ const Canvas = () => {
         canvas.style.height = `${windowSizeX * .70}px`;
         scaleXRef.current = canvas.width / canvas.clientWidth;
         scaleYRef.current = canvas.height / canvas.clientHeight;
+        penInfoRef.current.scale = canvas.clientHeight / canvas.height;
+        console.log(penInfoRef.current.scale);
     },[windowSizeX]);
 
     useEffect(()=> {
@@ -79,9 +81,10 @@ const Canvas = () => {
 
     const drawLine = (from, to, ctx) => {
         if (!ctx) return;
-        
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = penInfoRef.current.color;
+        ctx.lineWidth = penInfoRef.current.size;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
