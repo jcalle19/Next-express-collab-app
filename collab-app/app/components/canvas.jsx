@@ -14,7 +14,7 @@ const Canvas = () => {
     const scaleYRef = useRef(1);
     const [windowSizeX, changeWindowSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { undoFlag, redoFlag, highlightFlag, clearFlag, penInfoRef } = useStateContext();
+    const { undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -84,7 +84,7 @@ const Canvas = () => {
     };
 
     const handleMouseMove = (e) => {
-        if (!drawingRef.current || highlightFlag) return; //only draw line from point a to b if highlighting, otherwise, draw wherever mouse is
+        if (!drawingRef.current || highlightFlag || lineFlag) return; //only draw line from point a to b if highlighting, otherwise, draw wherever mouse is
         newRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
         drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current); // local drawing
         //socket.emit('draw-line', { from: prevPos, to: newPos }); // send to others
@@ -95,9 +95,10 @@ const Canvas = () => {
         e.preventDefault();
         drawingRef.current = false;
 
-        if (highlightFlag) {
+        if (highlightFlag || lineFlag) {
+            let lineScale = highlightFlag ? 10 : 1; //10 times size if highlight, regular if line tool
             newRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
-            drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size * 10, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current);
+            drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size * lineScale, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current);
             prevRef.current = newRef.current;
         }
 

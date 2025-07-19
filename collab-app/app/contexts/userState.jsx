@@ -16,6 +16,7 @@ export const StateProvider = ({children}) => {
     const chatMessagesRef = useRef([]);
     const syncFlag = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
+    const [lineFlag, updateLineFlag] = useState(false);
     const [highlightFlag, updateHighlight] = useState(false);
     const [undoFlag, updateUndo] = useState(false);
     const [redoFlag, updateRedo] = useState(false);
@@ -162,6 +163,12 @@ export const StateProvider = ({children}) => {
 
     const triggerHighlight = () => {
         updateHighlight(!highlightFlag);
+        updateLineFlag(false);
+    }
+
+    const triggerLineTool = () => {
+        updateLineFlag(!lineFlag);
+        updateHighlight(false);
     }
 
     const triggerClear = () => {
@@ -195,6 +202,7 @@ export const StateProvider = ({children}) => {
         undoFlag,
         redoFlag,
         highlightFlag,
+        lineFlag,
         clearFlag,
         sliderThumbColor,
         penInfoRef,
@@ -207,6 +215,7 @@ export const StateProvider = ({children}) => {
         triggerUndo,
         triggerRedo,
         triggerHighlight,
+        triggerLineTool,
         triggerClear,
         newSliderColor,
     }

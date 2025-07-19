@@ -6,7 +6,7 @@ const ToolBar = () => {
     const [expanded, changeSize] = useState(false);
     const [sliderValue, changeSlider] = useState('0');
     const sliderPxRef = useRef(2);
-    const { triggerUndo, triggerRedo, triggerHighlight, triggerClear, sliderThumbColor, penInfoRef } = useStateContext();
+    const { triggerUndo, triggerRedo, triggerLineTool, triggerHighlight, triggerClear, sliderThumbColor, penInfoRef } = useStateContext();
 
     const minSize = 1;
     const maxSize = 7;
@@ -53,7 +53,7 @@ const ToolBar = () => {
                     <div className='grid grid-cols-2 grid-rows-3'>
                         <div className="grid-box" onClick={triggerHighlight}>highlight</div>
                         <div className="grid-box" onClick={triggerClear}>clear</div>
-                        <div className="grid-box row-start-2">line</div>
+                        <div className="grid-box row-start-2" onClick={triggerLineTool}>line</div>
                         <div className="grid-box row-start-2">text</div>
                         <div className="grid-box row-start-3" onClick={triggerUndo}>undo</div>
                         <div className="grid-box row-start-3" onClick={triggerRedo}>redo</div>
