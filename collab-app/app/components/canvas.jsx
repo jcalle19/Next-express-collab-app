@@ -67,11 +67,12 @@ const Canvas = () => {
     },[highlightFlag]);
 
     useEffect (()=> {
-
+        lineStorageRef.current.map((line) => {removedLineRef.current.push(line)});
+        clearCanvas();
     },[clearFlag]);
 
     /*-------------------------------*/
-    
+
     const windowResize = () => {
         changeWindowSize(window.innerWidth);
     }

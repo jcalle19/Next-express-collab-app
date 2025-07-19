@@ -52,7 +52,7 @@ const ToolBar = () => {
                     </div>
                     <div className='grid grid-cols-2 grid-rows-3'>
                         <div className="grid-box" onClick={triggerHighlight}>highlight</div>
-                        <div className="grid-box">clear</div>
+                        <div className="grid-box" onClick={triggerClear}>clear</div>
                         <div className="grid-box row-start-2">line</div>
                         <div className="grid-box row-start-2">text</div>
                         <div className="grid-box row-start-3" onClick={triggerUndo}>undo</div>
