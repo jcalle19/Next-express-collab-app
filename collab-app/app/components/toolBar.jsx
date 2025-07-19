@@ -5,10 +5,8 @@ import ColorPicker from './colorPicker.jsx';
 const ToolBar = () => {
     const [expanded, changeSize] = useState(false);
     const [sliderValue, changeSlider] = useState('0');
-    const [sliderThumbColor, changeSliderColor] = useState('white');
-    const [sliderThumbBg, changeSliderBg] = useState('');
     const sliderPxRef = useRef(2);
-    const { triggerUndo, triggerRedo, penInfoRef } = useStateContext();
+    const { triggerUndo, triggerRedo, triggerHighlight, triggerClear, sliderThumbColor, penInfoRef } = useStateContext();
 
     const minSize = 1;
     const maxSize = 7;
@@ -16,7 +14,6 @@ const ToolBar = () => {
 
     useEffect(() => {
         penInfoRef.current.size = sliderPxRef.current * 2; //multiplying by 2 to account for symmetry of radial gradient to make more accurate
-        penInfoRef.current.color = sliderThumbColor;
     },[sliderValue, sliderThumbColor]);
 
     const handleToggleClick = (e) => {
@@ -33,7 +30,7 @@ const ToolBar = () => {
     }
 
     return (
-        <div id='tool-bar-container'>
+        <div id='tool-bar-container' className='grid grid-cols-[4fr_1fr]'>
             <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-content'}>
                 <div id='tool-grid' className={!expanded ? "transparent" : ""}>
                     <div className='grid grid-cols-[1fr_3fr]'>
@@ -45,8 +42,8 @@ const ToolBar = () => {
                                 max="100" value={sliderValue} 
                                 onChange={(e) => handleSliderChange(e.target.value)}
                                 style={{'--slider-thumb-bg' : 
-                                            `radial-gradient(${sliderThumbColor} 0px, 
-                                            ${sliderThumbColor} ${sliderPxRef.current}px, 
+                                            `radial-gradient(${penInfoRef.current.color} 0px, 
+                                            ${penInfoRef.current.color} ${sliderPxRef.current}px, 
                                             transparent  ${sliderPxRef.current}px, 
                                             transparent 100%)`
                                         }}
@@ -54,7 +51,7 @@ const ToolBar = () => {
                         </div>
                     </div>
                     <div className='grid grid-cols-2 grid-rows-3'>
-                        <div className="grid-box">highlight</div>
+                        <div className="grid-box" onClick={triggerHighlight}>highlight</div>
                         <div className="grid-box">clear</div>
                         <div className="grid-box row-start-2">line</div>
                         <div className="grid-box row-start-2">text</div>
@@ -63,9 +60,8 @@ const ToolBar = () => {
                     </div>
 
                 </div>
-                <ColorPicker/>
+                <ColorPicker expanded={expanded}/>
             </div>
-            
             <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-close'} onClick={handleToggleClick}></div>
         </div>
     )

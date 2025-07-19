@@ -13,7 +13,8 @@ const Canvas = () => {
     const scaleXRef = useRef(1);
     const scaleYRef = useRef(1);
     const [windowSizeX, changeWindowSize] = useState(0);
-    const { undoFlag, redoFlag, penInfoRef } = useStateContext();
+    const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
+    const { undoFlag, redoFlag, highlightFlag, clearFlag, penInfoRef } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -30,30 +31,47 @@ const Canvas = () => {
     useEffect(()=>{
         const canvas = canvasRef.current;
         ctxRef.current = canvas.getContext('2d');
+        ctxRef.current.lineCap = 'round';
+        ctxRef.current.lineJoin = 'round';
         canvas.style.width = `${windowSizeX * (8.5 / 11) * .70}px`;
         canvas.style.height = `${windowSizeX * .70}px`;
         scaleXRef.current = canvas.width / canvas.clientWidth;
         scaleYRef.current = canvas.height / canvas.clientHeight;
         penInfoRef.current.scale = canvas.clientHeight / canvas.height;
-        console.log(penInfoRef.current.scale);
     },[windowSizeX]);
 
+    /*----- Menu Button Effects -----*/
     useEffect(()=> {
         let last = lineStorageRef.current.pop();
+        
         if (last) {
             removedLineRef.current.push(last);
+            console.log(`LS: ${lineStorageRef.current.length} RS:${removedLineRef.current.length}`);
+            redrawCanvas();
         }
-        redrawCanvas();
     },[undoFlag]);
 
     useEffect (()=> {
         let last = removedLineRef.current.pop();
         if (last) {
             lineStorageRef.current.push(last);
+            console.log(`LS: ${lineStorageRef.current.length} RS:${removedLineRef.current.length}`);
+            redrawCanvas();
         }
-        redrawCanvas();
     },[redoFlag]);
 
+    useEffect (() => {
+        ctxRef.current.globalAlpha *= highlightFlag ? highLightFactors.opacityFactor :  1 / highLightFactors.opacityFactor;
+        ctxRef.current.lineJoin = highlightFlag ? 'butt' : 'round';
+        ctxRef.current.lineCap = highlightFlag ? 'butt' : 'round';
+    },[highlightFlag]);
+
+    useEffect (()=> {
+
+    },[clearFlag]);
+
+    /*-------------------------------*/
+    
     const windowResize = () => {
         changeWindowSize(window.innerWidth);
     }
@@ -65,9 +83,9 @@ const Canvas = () => {
     };
 
     const handleMouseMove = (e) => {
-        if (!drawingRef.current) return;
+        if (!drawingRef.current || highlightFlag) return; //only draw line from point a to b if highlighting, otherwise, draw wherever mouse is
         newRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
-        drawLine(prevRef.current, newRef.current, ctxRef.current); // local drawing
+        drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current); // local drawing
         //socket.emit('draw-line', { from: prevPos, to: newPos }); // send to others
         prevRef.current = newRef.current;
     };
@@ -75,26 +93,39 @@ const Canvas = () => {
     const handleMouseUp = (e) => {
         e.preventDefault();
         drawingRef.current = false;
+
+        if (highlightFlag) {
+            newRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
+            drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size * 10, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current);
+            prevRef.current = newRef.current;
+        }
+
         lineStorageRef.current.push(currentLineRef.current);
+        console.log(lineStorageRef.current.length);
         currentLineRef.current = [];
     };
 
-    const drawLine = (from, to, ctx) => {
+    const drawLine = (from, to, color, size, join, cap, alpha, ctx) => {
         if (!ctx) return;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = penInfoRef.current.color;
-        ctx.lineWidth = penInfoRef.current.size;
+        ctx.strokeStyle = color; //penInfoRef.current.color;
+        ctx.lineWidth = size; //penInfoRef.current.size;
+        ctx.lineJoin = join;
+        ctx.lineCap = cap;
+        ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
         ctx.stroke();
-        currentLineRef.current.push({prev: from, new: to});
+        currentLineRef.current.push({prev: from, new: to, color: color, size: size, join: join, cap: cap, alpha: alpha});
     };
 
     const redrawCanvas = () => {
         clearCanvas();
-        lineStorageRef.current.forEach(line => line.forEach(path => drawLine(path.prev, path.new, ctxRef.current)));
+        console.log(`redraw LS: ${lineStorageRef.current.length} RS:${removedLineRef.current.length}`);
+        lineStorageRef.current.forEach(line => line.forEach(path => {
+            drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current);
+            currentLineRef.current = [];
+        }));
     }
 
     //AI function, keep an eye on this one

@@ -16,9 +16,11 @@ export const StateProvider = ({children}) => {
     const chatMessagesRef = useRef([]);
     const syncFlag = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
+    const [highlightFlag, updateHighlight] = useState(false);
     const [undoFlag, updateUndo] = useState(false);
     const [redoFlag, updateRedo] = useState(false);
     const [clearFlag, updateClear] = useState(false);
+    const [sliderThumbColor, updateSliderColor] = useState('white');
     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
@@ -158,6 +160,18 @@ export const StateProvider = ({children}) => {
         updateRedo(!redoFlag);
     }
 
+    const triggerHighlight = () => {
+        updateHighlight(!highlightFlag);
+    }
+
+    const triggerClear = () => {
+        updateClear(!clearFlag);
+    }
+
+    const newSliderColor = (newColor) => {
+        updateSliderColor(newColor);
+    }
+
     const randomId = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
@@ -180,6 +194,9 @@ export const StateProvider = ({children}) => {
         chatMessagesRef,
         undoFlag,
         redoFlag,
+        highlightFlag,
+        clearFlag,
+        sliderThumbColor,
         penInfoRef,
         joinRoom,
         leaveRoom,
@@ -189,6 +206,9 @@ export const StateProvider = ({children}) => {
         loadRoomState,
         triggerUndo,
         triggerRedo,
+        triggerHighlight,
+        triggerClear,
+        newSliderColor,
     }
 
     return <stateContext.Provider value={state}>
