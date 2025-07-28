@@ -1,4 +1,5 @@
 .icon {
+    display: none;
     pointer-events: none;
     position: absolute;
     width: 20px;

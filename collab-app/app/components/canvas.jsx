@@ -23,7 +23,6 @@ const Canvas = () => {
         canvas.width = 1000;
         canvas.height = 1000;
         ctxRef.current = canvas.getContext('2d');
-
         changeWindowSize(window.innerWidth);
         window.addEventListener('resize', windowResize);
     }, []);

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
-import ColorPicker from './colorPicker.jsx';
+import ColorPicker from './colorPicker.jsx'
+import Comment from './comment.jsx'
 
 const ToolBar = () => {
     const [expanded, changeSize] = useState(false);
@@ -30,6 +31,7 @@ const ToolBar = () => {
     }
 
     return (
+        <>
         <div id='tool-bar-container' className='grid grid-cols-[4fr_1fr]'>
             <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-content'}>
                 <div id='tool-grid' className={!expanded ? "transparent" : ""}>
@@ -64,6 +66,8 @@ const ToolBar = () => {
             </div>
             <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-close'} onClick={handleToggleClick}></div>
         </div>
+        <Comment/>
+        </>
     )
 }
 
