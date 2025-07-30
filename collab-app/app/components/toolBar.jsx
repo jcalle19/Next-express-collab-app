@@ -7,7 +7,9 @@ const ToolBar = () => {
     const [expanded, changeSize] = useState(false);
     const [sliderValue, changeSlider] = useState('0');
     const sliderPxRef = useRef(2);
-    const { triggerUndo, triggerRedo, triggerLineTool, triggerHighlight, triggerClear, sliderThumbColor, penInfoRef } = useStateContext();
+    const { triggerUndo, triggerRedo, triggerLineTool, 
+            triggerHighlight, triggerClear, triggerTextFlag, 
+            sliderThumbColor, penInfoRef, addComment, randomId } = useStateContext();
 
     const minSize = 1;
     const maxSize = 7;
@@ -24,6 +26,10 @@ const ToolBar = () => {
     const handleSliderChange = (newVal) => {
         changeSlider(newVal);
         percentToPixel(newVal);
+    }
+
+    const triggerAddComment = () => {
+        addComment({key: randomId(), width: 180, height: 90, top: 0, left: 0, text: '', color: 'white'});
     }
 
     const percentToPixel = (percent) => {
@@ -52,13 +58,14 @@ const ToolBar = () => {
                             />
                         </div>
                     </div>
-                    <div className='grid grid-cols-2 grid-rows-3'>
-                        <div className="grid-box" onClick={triggerHighlight}>highlight</div>
-                        <div className="grid-box" onClick={triggerClear}>clear</div>
-                        <div className="grid-box row-start-2" onClick={triggerLineTool}>line</div>
-                        <div className="grid-box row-start-2">text</div>
-                        <div className="grid-box row-start-3" onClick={triggerUndo}>undo</div>
-                        <div className="grid-box row-start-3" onClick={triggerRedo}>redo</div>
+                    <div className='grid grid-cols-12 grid-rows-3'>
+                        <div className="grid-box col-span-6" onClick={triggerHighlight}>highlight</div>
+                        <div className="grid-box col-span-6" onClick={triggerClear}>clear</div>
+                        <div className="grid-box col-span-3 row-start-2" onClick={triggerLineTool}>line</div>
+                        <div className="grid-box col-span-5 row-start-2" onClick={triggerAddComment}>Comment</div>
+                        <div className="grid-box col-span-4 row-start-2" onClick={triggerTextFlag}>Edit text</div>
+                        <div className="grid-box col-span-6 row-start-3" onClick={triggerUndo}>undo</div>
+                        <div className="grid-box col-span-6 row-start-3" onClick={triggerRedo}>redo</div>
                     </div>
 
                 </div>
@@ -66,7 +73,6 @@ const ToolBar = () => {
             </div>
             <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-close'} onClick={handleToggleClick}></div>
         </div>
-        <Comment/>
         </>
     )
 }

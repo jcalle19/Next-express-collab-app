@@ -3,9 +3,9 @@ import { useStateContext } from '../contexts/userState.jsx'
 import DOMPurify from "dompurify"
 import '../css/comments.css'
 
-const Comment = () => {
-    const { penInfoRef } = useStateContext();
-    const originalDimensions = {width: 180, height: 90};
+const Comment = ({commentInfo}) => {
+    const { textEditFlag, penInfoRef } = useStateContext();
+    const originalDimensions = {width: commentInfo.width, height: commentInfo.height};
     const [inputText, updateText] = useState('Click to edit comment');
     const [isResizing, updateResizeState] = useState(false);
     const [isTranslating, updateTranslateState] = useState(false);
@@ -13,6 +13,9 @@ const Comment = () => {
     const [resizeDistY, updateResizeY] = useState(originalDimensions.height);
     const [resizeCoords, updateResizeCoords] = useState([0,0]);
     const [translateCoords, updateTranslateCoords] = useState([0,0]);
+    const [isHidden, setHidden] = useState(false);
+    const [isEditable, toggleEdits] = useState(true);
+    const [expandedMenu, toggleMenu] = useState(false);
     const containerRef = useRef(null);
     const containerRect = useRef(null);
     const resizeRef = useRef(null);
@@ -32,6 +35,10 @@ const Comment = () => {
         updateResizeCoords([resizeLeft, resizeTop]);
         updateTranslateCoords([translateLeft, translateTop]);
     },[]);
+
+    useEffect(() => {
+        toggleEdits(textEditFlag);
+    },[textEditFlag]);
 
     const enableResizing = (e) => {
         updateResizeState(true);
@@ -69,11 +76,16 @@ const Comment = () => {
             ALLOWED_TAGS: ['b', 'i', 'u', 'a', 'p', 'br', 'ul', 'ol', 'li'],
             ALLOWED_ATTR: ['href']
         });
-        
+        toggleMenu(false);
+        toggleEdits(false);
     }
 
     const handleCancel = () => {
+        setHidden(true);
+    }
 
+    const handleEdit = () => {
+        toggleMenu(!expandedMenu);
     }
 
     const disableResizing = (e) => {
@@ -89,32 +101,46 @@ const Comment = () => {
     }
 
     return (
-        <div id='full-window' onMouseMove={isTranslating ? handleDragTranslate : isResizing ? handleDragResize : ()=>{}}>
-            <div className='transform' ref={translateRef}
+        <div id='full-window' 
+             onMouseMove={isTranslating ? handleDragTranslate : isResizing ? handleDragResize : ()=>{}}
+             style={{display: `${isHidden ? 'none' : ''}`, 
+                     pointerEvents: `${isEditable ? 'auto' : 'none'}`}}
+        >
+            <div id='translate-handle' className='transform' ref={translateRef}
                 onDragStart={(e) => e.preventDefault()}
                 onMouseDown={enableTranslate}
                 onMouseUp={disableTranslate}
-                style={{left: `${translateCoords[0]}px`, top: `${translateCoords[1]}px`}}
-            >
+                style={{left: `${translateCoords[0]}px`, top: `${translateCoords[1]}px`, display: `${isEditable ? '' : 'none'}`}}
+            >   &#10070;
+                <div className='actions-container' style={{display: `${isEditable ? '' : 'none'}`}}>
+                    <div id='edit' className='actions'
+                         onClick={handleEdit}>&#9998;</div>
+                    <div id='confirm' className='actions' 
+                         style={{transform: `translateY(${expandedMenu ? `${resizeRect.current.width}px` : '0px'})`}}
+                         onClick={handleConfirm}>&#10003;
+                    </div>
+                    <div id='cancel' className='actions'
+                         style={{transform: `translateY(${expandedMenu ? `${2 * resizeRect.current.width}px` : '0px'})`}}
+                         onClick={handleCancel}>&#10005;
+                    </div>
+                </div>
             </div>
             <div id='comment-container' ref={containerRef}
                 onDragStart={(e) => e.preventDefault()}
                 
-                style={{width: `${resizeDistX}px`, height: `${resizeDistY}px`, left: `${translateCoords[0]}px`, top: `${translateCoords[1]}px`}}>
+                style={{width: `${resizeDistX}px`, height: `${resizeDistY}px`, 
+                        left: `${translateCoords[0]}px`, top: `${translateCoords[1]}px`
+                       }}>
                 <div id='comment-field' 
                     contentEditable='true' 
                     suppressContentEditableWarning
                     role='textbox'
                     onInput={(e)=>{updateText(e.currentTarget.textContent)}}
                     style={{fontSize: `calc(1em * ${resizeDistY / originalDimensions.height})`,
-                            lineHeight: `clamp(.2, ${resizeDistY / originalDimensions.height}, 1)`
+                            lineHeight: `clamp(.2, ${resizeDistY / originalDimensions.height}, 1)`,
+                            border: `${isEditable ? '1px dashed white' : 'none'}`
                           }}
-                >
-                </div>
-                <div id='actions-container' className='grid grid-cols-3 grid-rows-1'>
-                    <div id='confirm' className='actions' onClick={handleConfirm}>&#10003;</div>
-                    <div id='background' className='actions'></div>
-                    <div id='cancel' className='actions'>&#10005;</div>
+                >{commentInfo.text}
                 </div>
             </div>
             
@@ -123,12 +149,13 @@ const Comment = () => {
                 onMouseDown={enableResizing} 
                 onMouseUp={disableResizing}
                 style={{left: `${resizeCoords[0]}px`, 
-                        top: `${resizeCoords[1]}px`}}
+                        top: `${resizeCoords[1]}px`,
+                        display: `${isEditable ? '' : 'none'}`}}
             > 
             </div>
         </div>
     )
 }
-//`calc(${resizeCoords[0]}px + ${translateCoords[0]}px)`
-//${resizeCoords[0]}
+
+
 export default Comment

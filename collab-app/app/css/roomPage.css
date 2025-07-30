@@ -19,20 +19,6 @@
     height: 100%;
 }
 
-#canvas-window {
-    position: absolute;
-    left: 50%;
-    top: 0vh;
-    transform: translateX(-50%);
-    display: block;
-    max-width: calc(8.5 / 11 * 100vh);
-    max-height: 100vh;
-    background-color: transparent;
-    border: 2px dashed orange;
-    padding: 0px;
-    margin: 0px;
-}
-
 .chat-window {
     position: absolute;
     background-color: var(--window-bg-color);

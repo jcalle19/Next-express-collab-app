@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
+import '../css/canvas.css'
+import Comment from './comment.jsx'
 
 const Canvas = () => {
     const canvasRef = useRef(null);
@@ -14,7 +16,7 @@ const Canvas = () => {
     const scaleYRef = useRef(1);
     const [windowSizeX, changeWindowSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef } = useStateContext();
+    const { undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -27,7 +29,7 @@ const Canvas = () => {
         window.addEventListener('resize', windowResize);
     }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
         const canvas = canvasRef.current;
         ctxRef.current = canvas.getContext('2d');
         ctxRef.current.lineCap = 'round';
@@ -102,7 +104,6 @@ const Canvas = () => {
         }
 
         lineStorageRef.current.push(currentLineRef.current);
-        console.log(lineStorageRef.current.length);
         currentLineRef.current = [];
     };
 
@@ -136,7 +137,19 @@ const Canvas = () => {
     };
 
     return (
-        <canvas ref={canvasRef} style={{width: `${8.5 / 11 * 70}vw`, height: '70vw',}}id='canvas-window' onMouseMove={handleMouseMove} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}></canvas>
+        <div id='canvas-container' >
+            <canvas ref={canvasRef} 
+                id='canvas-window'
+                style={{width: `${8.5 / 11 * 70}vw`, height: '70vw'}}
+                onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown} 
+                onMouseUp={handleMouseUp}>
+            </canvas>
+            {[...roomCommentsRef.current].map(([commentKey, comment]) => (
+                <Comment key={commentKey} commentInfo={comment}/>
+            ))}
+            <Comment commentInfo={{key: 123, width: 180, height: 90, top: 0, left: 0, text: '', color: 'white'}}/>
+        </div>
     )
 }
 

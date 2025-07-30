@@ -13,6 +13,7 @@ export const StateProvider = ({children}) => {
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
     const roomUsersRef = useRef([]);
+    const roomCommentsRef = useRef(new Map());
     const chatMessagesRef = useRef([]);
     const syncFlag = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
@@ -21,6 +22,7 @@ export const StateProvider = ({children}) => {
     const [undoFlag, updateUndo] = useState(false);
     const [redoFlag, updateRedo] = useState(false);
     const [clearFlag, updateClear] = useState(false);
+    const [textEditFlag, updateTextFlag] = useState(false);
     const [sliderThumbColor, updateSliderColor] = useState('white');
     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
@@ -141,6 +143,11 @@ export const StateProvider = ({children}) => {
         console.log('added message');
     }
 
+    const addComment = (commentInfo) => {
+        console.log(commentInfo);
+        roomCommentsRef.current.set(commentInfo.key, commentInfo);
+    }
+
     const loadRoomState = (roomId) => {
         const storedInfo = JSON.parse(sessionStorage.getItem('userObj'));
         if (userObj.current.roomId === '' && roomId === storedInfo.roomId) {
@@ -175,6 +182,10 @@ export const StateProvider = ({children}) => {
         updateClear(!clearFlag);
     }
 
+    const triggerTextFlag = () => {
+        updateTextFlag(!textEditFlag);
+    }
+
     const newSliderColor = (newColor) => {
         updateSliderColor(newColor);
     }
@@ -198,12 +209,14 @@ export const StateProvider = ({children}) => {
         roomUsersKeys,
         chatMessages,
         roomUsersRef,
+        roomCommentsRef,
         chatMessagesRef,
         undoFlag,
         redoFlag,
         highlightFlag,
         lineFlag,
         clearFlag,
+        textEditFlag,
         sliderThumbColor,
         penInfoRef,
         joinRoom,
@@ -211,13 +224,16 @@ export const StateProvider = ({children}) => {
         removeUser,
         addUser,
         addMessage,
+        addComment,
         loadRoomState,
         triggerUndo,
         triggerRedo,
         triggerHighlight,
         triggerLineTool,
         triggerClear,
+        triggerTextFlag,
         newSliderColor,
+        randomId,
     }
 
     return <stateContext.Provider value={state}>

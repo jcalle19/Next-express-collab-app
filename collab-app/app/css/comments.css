@@ -9,16 +9,16 @@
     top: 0%;
     width: 100vw;
     height: 100vh;
+    z-index: 1; /*Not focused */
 }
 
 #comment-container {
     position: absolute;
     width: 300px;
-    min-width: calc(4 * var(--transform-width));
+    min-width: calc(5 * var(--transform-width) + 3px);
     height: 0px;
     z-index: 0;
     min-height: 40px;
-    border: 2px dashed orange;
 }
 
 #comment-field {
@@ -26,9 +26,8 @@
     left: 0%;
     top: 0%;
     width: calc(100% - (2 * var(--transform-width)));
-    height: calc(100% - (2 * var(--transform-width)));
-    transform: translate(var(--transform-width), var(--transform-width));
-    border: 1px dashed white;
+    height: calc(100% - (1 * var(--transform-width)));
+    transform: translateX(var(--transform-width));
     overflow: hidden;
 }
 
@@ -37,32 +36,46 @@
     z-index: 2;
     width: var(--transform-width);
     aspect-ratio: 1 / 1;
-    border: 1px dashed white;
-    border-radius: 50%;
+    background-color: grey;
+    user-select: none;
 }
 
-#actions-container {
+#translate-handle {
+    text-align: center;
+}
+
+.actions-container {
     position: absolute;
     width: calc(3 * var(--transform-width));
     top: 0%;
-    left: var(--transform-width);
+    transform: translateY(var(--transform-width));
 }
 
 .actions {
-    position: relative;
+    position: absolute;
     width: var(--transform-width);
     aspect-ratio: 1/1;
-    border: 1px dashed white;
+    user-select: none;
+    transition: transform .2s;
+    left: 0px;
+}
+
+#edit {
+    background-color: blue;
+    text-align: center;
+    z-index: 3;
 }
 
 #confirm {
     background-color: var(--confirm-green);
     text-align: center;
+    z-index: 2;
 }
 
 #cancel {
     background-color: red;
     text-align: center;
+    z-index: 1;
 }
 .resize {
     transform: translate(-50%, -50%);
