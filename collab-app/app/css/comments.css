@@ -3,16 +3,14 @@
     --confirm-green: #1dbc60;
 }
 
-#full-window {
+#comment-container {
     position: absolute;
     left: 0%;
     top: 0%;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1; /*Not focused */
+    border: 1px solid red;
 }
 
-#comment-container {
+#content-container {
     position: absolute;
     width: 300px;
     min-width: calc(5 * var(--transform-width) + 3px);

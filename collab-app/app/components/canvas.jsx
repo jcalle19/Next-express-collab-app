@@ -47,7 +47,6 @@ const Canvas = () => {
         
         if (last) {
             removedLineRef.current.push(last);
-            console.log(`LS: ${lineStorageRef.current.length} RS:${removedLineRef.current.length}`);
             redrawCanvas();
         }
     },[undoFlag]);
@@ -56,7 +55,6 @@ const Canvas = () => {
         let last = removedLineRef.current.pop();
         if (last) {
             lineStorageRef.current.push(last);
-            console.log(`LS: ${lineStorageRef.current.length} RS:${removedLineRef.current.length}`);
             redrawCanvas();
         }
     },[redoFlag]);
@@ -123,7 +121,6 @@ const Canvas = () => {
 
     const redrawCanvas = () => {
         clearCanvas();
-        console.log(`redraw LS: ${lineStorageRef.current.length} RS:${removedLineRef.current.length}`);
         lineStorageRef.current.forEach(line => line.forEach(path => {
             drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current);
             currentLineRef.current = [];
@@ -145,10 +142,6 @@ const Canvas = () => {
                 onMouseDown={handleMouseDown} 
                 onMouseUp={handleMouseUp}>
             </canvas>
-            {[...roomCommentsRef.current].map(([commentKey, comment]) => (
-                <Comment key={commentKey} commentInfo={comment}/>
-            ))}
-            <Comment commentInfo={{key: 123, width: 180, height: 90, top: 0, left: 0, text: '', color: 'white'}}/>
         </div>
     )
 }

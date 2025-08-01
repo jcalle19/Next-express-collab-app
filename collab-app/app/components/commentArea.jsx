@@ -1,9 +1,23 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
+import { useStateContext } from '../contexts/userState.jsx'
+import Comment from './comment.jsx'
 
 const CommentArea = () => {
-  return (
-    <div>C</div>
-  )
+    const { roomCommentsRef } = useStateContext();
+
+    const handleMouseMove = (e) => {
+        updateMouseLocation([e.clientX, e.clientY]);
+    }
+
+    return (
+        <div 
+            style={{width: '100vw', height: '100vh',}}
+        >
+            {[...roomCommentsRef.current].map(([commentKey, comment]) => 
+                <Comment key={commentKey} commentInfo={comment}/>
+            )}
+        </div>
+    )
 }
 
 export default CommentArea

@@ -4,16 +4,15 @@ import DOMPurify from "dompurify"
 import '../css/comments.css'
 
 const Comment = ({commentInfo}) => {
-    const { textEditFlag, penInfoRef } = useStateContext();
+    const { textEditFlag, roomCommentsRef, penInfoRef } = useStateContext();
     const originalDimensions = {width: commentInfo.width, height: commentInfo.height};
-    const [inputText, updateText] = useState('Click to edit comment');
+    const [inputText, updateText] = useState(commentInfo.text);
     const [isResizing, updateResizeState] = useState(false);
     const [isTranslating, updateTranslateState] = useState(false);
     const [resizeDistX, updateResizeX] = useState(originalDimensions.width);
     const [resizeDistY, updateResizeY] = useState(originalDimensions.height);
     const [resizeCoords, updateResizeCoords] = useState([0,0]);
     const [translateCoords, updateTranslateCoords] = useState([0,0]);
-    const [isHidden, setHidden] = useState(false);
     const [isEditable, toggleEdits] = useState(true);
     const [expandedMenu, toggleMenu] = useState(false);
     const containerRef = useRef(null);
@@ -23,7 +22,7 @@ const Comment = ({commentInfo}) => {
     const translateRef = useRef(null);
     const translateRect = useRef(null);
 
-    useEffect(()=> {
+    useEffect(() => {
         resizeRect.current = resizeRef.current.getBoundingClientRect();
         translateRect.current = translateRef.current.getBoundingClientRect();
         containerRect.current = containerRef.current.getBoundingClientRect();
@@ -34,12 +33,37 @@ const Comment = ({commentInfo}) => {
         let translateTop = containerRect.current.top;
         updateResizeCoords([resizeLeft, resizeTop]);
         updateTranslateCoords([translateLeft, translateTop]);
+
+        return ()=>{
+            window.removeEventListener('mousemove', handleDragTranslate);
+            window.removeEventListener('mousemove', handleDragResize);
+        };
     },[]);
 
     useEffect(() => {
+        if (isTranslating) {
+            window.addEventListener('mousemove', handleDragTranslate);
+        } else if (isResizing) {
+            window.addEventListener('mousemove', handleDragResize);
+        }
+        return () => {
+            window.removeEventListener('mousemove', handleDragTranslate);
+            window.removeEventListener('mousemove', handleDragResize);
+        }
+    }, [isTranslating, isResizing]);
+
+
+    useEffect(() => {
         toggleEdits(textEditFlag);
+        if (!textEditFlag && commentInfo.text === '') {
+            handleCancel();
+        }
     },[textEditFlag]);
 
+    useEffect(()=>{
+        roomCommentsRef.current.get(commentInfo.key).text = inputText;
+    },[inputText]);
+    
     const enableResizing = (e) => {
         updateResizeState(true);
         updateTranslateState(false);
@@ -81,7 +105,7 @@ const Comment = ({commentInfo}) => {
     }
 
     const handleCancel = () => {
-        setHidden(true);
+        roomCommentsRef.current.delete(commentInfo.key);
     }
 
     const handleEdit = () => {
@@ -90,10 +114,12 @@ const Comment = ({commentInfo}) => {
 
     const disableResizing = (e) => {
         updateResizeState(false);
+        window.removeEventListener('mousemove', handleDragResize);
     }
 
     const disableTranslate = (e) => {
         updateTranslateState(false);
+        window.removeEventListener('mousemove', handleDragTranslate);
     }
 
     const dist = (x1, y1, x2, y2) => {
@@ -101,11 +127,7 @@ const Comment = ({commentInfo}) => {
     }
 
     return (
-        <div id='full-window' 
-             onMouseMove={isTranslating ? handleDragTranslate : isResizing ? handleDragResize : ()=>{}}
-             style={{display: `${isHidden ? 'none' : ''}`, 
-                     pointerEvents: `${isEditable ? 'auto' : 'none'}`}}
-        >
+        <div id='comment-container' style={{pointerEvents: `${isEditable ? 'auto' : 'none'}`}}>
             <div id='translate-handle' className='transform' ref={translateRef}
                 onDragStart={(e) => e.preventDefault()}
                 onMouseDown={enableTranslate}
@@ -125,7 +147,7 @@ const Comment = ({commentInfo}) => {
                     </div>
                 </div>
             </div>
-            <div id='comment-container' ref={containerRef}
+            <div id='content-container' ref={containerRef}
                 onDragStart={(e) => e.preventDefault()}
                 
                 style={{width: `${resizeDistX}px`, height: `${resizeDistY}px`, 
@@ -140,7 +162,7 @@ const Comment = ({commentInfo}) => {
                             lineHeight: `clamp(.2, ${resizeDistY / originalDimensions.height}, 1)`,
                             border: `${isEditable ? '1px dashed white' : 'none'}`
                           }}
-                >{commentInfo.text}
+                >
                 </div>
             </div>
             

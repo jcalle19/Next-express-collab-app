@@ -17,17 +17,17 @@ export const StateProvider = ({children}) => {
     const chatMessagesRef = useRef([]);
     const syncFlag = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
+    const mouseLocationRef = useRef({x: 0, y: 0});
     const [lineFlag, updateLineFlag] = useState(false);
     const [highlightFlag, updateHighlight] = useState(false);
     const [undoFlag, updateUndo] = useState(false);
     const [redoFlag, updateRedo] = useState(false);
     const [clearFlag, updateClear] = useState(false);
-    const [textEditFlag, updateTextFlag] = useState(false);
+    const [textEditFlag, updateTextFlag] = useState(true);
     const [sliderThumbColor, updateSliderColor] = useState('white');
     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
-    
     useEffect(() => {
         //Socket stuff
         socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_URL);
@@ -146,6 +146,7 @@ export const StateProvider = ({children}) => {
     const addComment = (commentInfo) => {
         console.log(commentInfo);
         roomCommentsRef.current.set(commentInfo.key, commentInfo);
+        updateTextFlag(true);
     }
 
     const loadRoomState = (roomId) => {
@@ -219,6 +220,7 @@ export const StateProvider = ({children}) => {
         textEditFlag,
         sliderThumbColor,
         penInfoRef,
+        mouseLocationRef,
         joinRoom,
         leaveRoom,
         removeUser,
