@@ -16,6 +16,7 @@ export const StateProvider = ({children}) => {
     const roomCommentsRef = useRef(new Map());
     const chatMessagesRef = useRef([]);
     const syncFlag = useRef(false);
+    const commentsLoaded = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
     const [lineFlag, updateLineFlag] = useState(false);
@@ -24,10 +25,12 @@ export const StateProvider = ({children}) => {
     const [redoFlag, updateRedo] = useState(false);
     const [clearFlag, updateClear] = useState(false);
     const [textEditFlag, updateTextFlag] = useState(true);
+    const [commentsFlag, updateCommentsFlag] = useState(false);
     const [sliderThumbColor, updateSliderColor] = useState('white');
     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
+
     useEffect(() => {
         //Socket stuff
         socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_URL);
@@ -102,6 +105,14 @@ export const StateProvider = ({children}) => {
         sessionStorage.setItem('chatMessages', JSON.stringify(chatMessagesRef.current));
     }, [chatMessages]);
 
+    useEffect(() => {
+        if (!commentsLoaded.current) {
+            roomCommentsRef.current = new Map(JSON.parse(sessionStorage.getItem('roomCommentsMap')));
+            commentsLoaded.current = true;
+        }
+        sessionStorage.setItem('roomCommentsMap', JSON.stringify(Array.from(roomCommentsRef.current.entries())));
+    },[commentsFlag]);
+
     const joinRoom = (newRoom) => {
         if (socketRef.current) {
             let id = randomId();
@@ -118,6 +129,7 @@ export const StateProvider = ({children}) => {
             socketRef.current.emit('clear-room', userObj.current.roomId);
             userObj.current = {id: '', user: '', roomId: '', xCoord: '', yCoord: ''};
             roomUsers.current = new Map();
+            roomCommentsRef.current = new Map();
             updateKeys([]);
             updateMessages([]);
             sessionStorage.clear();
@@ -143,9 +155,10 @@ export const StateProvider = ({children}) => {
         console.log('added message');
     }
 
-    const addComment = (commentInfo) => {
-        console.log(commentInfo);
-        roomCommentsRef.current.set(commentInfo.key, commentInfo);
+    const addComment = () => {
+        let randKey = randomId();
+        roomCommentsRef.current.set(randKey, {key: randKey, width: 180, height: 90, top: 0, left: 0, text: '', color: 'white'});
+        updateCommentsFlag(!commentsFlag);
         updateTextFlag(true);
     }
 
@@ -155,6 +168,7 @@ export const StateProvider = ({children}) => {
             userObj.current = storedInfo;
             updateKeys(JSON.parse(sessionStorage.getItem('roomUsersKeys')));
             updateMessages(JSON.parse(sessionStorage.getItem('chatMessages')));
+            roomCommentsRef.current = new Map(JSON.parse(sessionStorage.getItem('roomCommentsMap'))); //uses separate flag (commentsLoaded) due to it being useRef
             socketRef.current.emit('user-left', userObj.current);
             socketRef.current.emit('user-joined', userObj.current);
             console.log(userObj.current);
@@ -218,6 +232,7 @@ export const StateProvider = ({children}) => {
         lineFlag,
         clearFlag,
         textEditFlag,
+        commentsFlag,
         sliderThumbColor,
         penInfoRef,
         mouseLocationRef,
@@ -234,8 +249,8 @@ export const StateProvider = ({children}) => {
         triggerLineTool,
         triggerClear,
         triggerTextFlag,
+        updateCommentsFlag,
         newSliderColor,
-        randomId,
     }
 
     return <stateContext.Provider value={state}>

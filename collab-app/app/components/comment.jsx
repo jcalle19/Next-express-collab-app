@@ -4,7 +4,7 @@ import DOMPurify from "dompurify"
 import '../css/comments.css'
 
 const Comment = ({commentInfo}) => {
-    const { textEditFlag, roomCommentsRef, penInfoRef } = useStateContext();
+    const { textEditFlag, commentsFlag, roomCommentsRef, updateCommentsFlag, penInfoRef } = useStateContext();
     const originalDimensions = {width: commentInfo.width, height: commentInfo.height};
     const [inputText, updateText] = useState(commentInfo.text);
     const [isResizing, updateResizeState] = useState(false);
@@ -12,15 +12,15 @@ const Comment = ({commentInfo}) => {
     const [resizeDistX, updateResizeX] = useState(originalDimensions.width);
     const [resizeDistY, updateResizeY] = useState(originalDimensions.height);
     const [resizeCoords, updateResizeCoords] = useState([0,0]);
-    const [translateCoords, updateTranslateCoords] = useState([0,0]);
+    const [translateCoords, updateTranslateCoords] = useState([commentInfo.left,commentInfo.top]);
     const [isEditable, toggleEdits] = useState(true);
-    const [expandedMenu, toggleMenu] = useState(false);
     const containerRef = useRef(null);
     const containerRect = useRef(null);
     const resizeRef = useRef(null);
     const resizeRect = useRef(null);
     const translateRef = useRef(null);
     const translateRect = useRef(null);
+    const storedCommentState = roomCommentsRef.current.get(commentInfo.key);
 
     useEffect(() => {
         resizeRect.current = resizeRef.current.getBoundingClientRect();
@@ -61,7 +61,8 @@ const Comment = ({commentInfo}) => {
     },[textEditFlag]);
 
     useEffect(()=>{
-        roomCommentsRef.current.get(commentInfo.key).text = inputText;
+        storedCommentState.text = inputText;
+        updateCommentsFlag(!commentsFlag);
     },[inputText]);
     
     const enableResizing = (e) => {
@@ -81,6 +82,8 @@ const Comment = ({commentInfo}) => {
             updateResizeCoords([e.clientX, e.clientY]);
             updateResizeX(offsetDistX);
             updateResizeY(offsetDistY);
+            storedCommentState.width = offsetDistX;
+            storedCommentState.height = offsetDistY;
         }
     }
 
@@ -92,33 +95,33 @@ const Comment = ({commentInfo}) => {
             updateTranslateCoords([translateX, translateY]);
             updateResizeCoords([translateX + resizeDistX - resizeRect.current.width / 2, 
                                 translateY + resizeDistY - resizeRect.current.width / 2]);
+            storedCommentState.left = translateX;
+            storedCommentState.top = translateY;
         }
     }
 
-    const handleConfirm = () => {
-        const clean = DOMPurify.sanitize(inputText, {
+    const cleanText = (dirtyText) => {
+        const clean = DOMPurify.sanitize(dirtyText, {
             ALLOWED_TAGS: ['b', 'i', 'u', 'a', 'p', 'br', 'ul', 'ol', 'li'],
             ALLOWED_ATTR: ['href']
         });
-        toggleMenu(false);
-        toggleEdits(false);
+        return clean;
     }
 
     const handleCancel = () => {
         roomCommentsRef.current.delete(commentInfo.key);
-    }
-
-    const handleEdit = () => {
-        toggleMenu(!expandedMenu);
+        updateCommentsFlag(!commentsFlag);
     }
 
     const disableResizing = (e) => {
         updateResizeState(false);
+        updateCommentsFlag(!commentsFlag);
         window.removeEventListener('mousemove', handleDragResize);
     }
 
     const disableTranslate = (e) => {
         updateTranslateState(false);
+        updateCommentsFlag(!commentsFlag);
         window.removeEventListener('mousemove', handleDragTranslate);
     }
 
@@ -135,14 +138,7 @@ const Comment = ({commentInfo}) => {
                 style={{left: `${translateCoords[0]}px`, top: `${translateCoords[1]}px`, display: `${isEditable ? '' : 'none'}`}}
             >   &#10070;
                 <div className='actions-container' style={{display: `${isEditable ? '' : 'none'}`}}>
-                    <div id='edit' className='actions'
-                         onClick={handleEdit}>&#9998;</div>
-                    <div id='confirm' className='actions' 
-                         style={{transform: `translateY(${expandedMenu ? `${resizeRect.current.width}px` : '0px'})`}}
-                         onClick={handleConfirm}>&#10003;
-                    </div>
                     <div id='cancel' className='actions'
-                         style={{transform: `translateY(${expandedMenu ? `${2 * resizeRect.current.width}px` : '0px'})`}}
                          onClick={handleCancel}>&#10005;
                     </div>
                 </div>
@@ -157,10 +153,12 @@ const Comment = ({commentInfo}) => {
                     contentEditable='true' 
                     suppressContentEditableWarning
                     role='textbox'
+                    dangerouslySetInnerHTML={{ __html: cleanText(commentInfo.text) }}
                     onInput={(e)=>{updateText(e.currentTarget.textContent)}}
                     style={{fontSize: `calc(1em * ${resizeDistY / originalDimensions.height})`,
                             lineHeight: `clamp(.2, ${resizeDistY / originalDimensions.height}, 1)`,
-                            border: `${isEditable ? '1px dashed white' : 'none'}`
+                            border: `${isEditable ? '1px dashed white' : 'none'}`,
+                            color: `${commentInfo.color}`,
                           }}
                 >
                 </div>

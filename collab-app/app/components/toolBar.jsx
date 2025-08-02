@@ -9,7 +9,7 @@ const ToolBar = () => {
     const sliderPxRef = useRef(2);
     const { triggerUndo, triggerRedo, triggerLineTool, 
             triggerHighlight, triggerClear, triggerTextFlag, 
-            sliderThumbColor, penInfoRef, addComment, randomId } = useStateContext();
+            sliderThumbColor, penInfoRef, addComment } = useStateContext();
 
     const minSize = 1;
     const maxSize = 7;
@@ -29,7 +29,7 @@ const ToolBar = () => {
     }
 
     const triggerAddComment = () => {
-        addComment({key: randomId(), width: 180, height: 90, top: 0, left: 0, text: '', color: 'white'});
+        addComment();
     }
 
     const percentToPixel = (percent) => {
