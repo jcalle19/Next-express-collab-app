@@ -5,15 +5,16 @@ import '../css/comments.css'
 
 const Comment = ({commentInfo}) => {
     const { textEditFlag, commentsFlag, roomCommentsRef, updateCommentsFlag, penInfoRef } = useStateContext();
-    const originalDimensions = {width: commentInfo.width, height: commentInfo.height};
+    const dimensions = {width: commentInfo.width, height: commentInfo.height};
     const [inputText, updateText] = useState(commentInfo.text);
     const [isResizing, updateResizeState] = useState(false);
     const [isTranslating, updateTranslateState] = useState(false);
-    const [resizeDistX, updateResizeX] = useState(originalDimensions.width);
-    const [resizeDistY, updateResizeY] = useState(originalDimensions.height);
+    const [resizeDistX, updateResizeX] = useState(dimensions.width);
+    const [resizeDistY, updateResizeY] = useState(dimensions.height);
     const [resizeCoords, updateResizeCoords] = useState([0,0]);
     const [translateCoords, updateTranslateCoords] = useState([commentInfo.left,commentInfo.top]);
     const [isEditable, toggleEdits] = useState(true);
+    const initialTextRef = useRef(commentInfo.text);
     const containerRef = useRef(null);
     const containerRect = useRef(null);
     const resizeRef = useRef(null);
@@ -153,14 +154,14 @@ const Comment = ({commentInfo}) => {
                     contentEditable='true' 
                     suppressContentEditableWarning
                     role='textbox'
-                    dangerouslySetInnerHTML={{ __html: cleanText(commentInfo.text) }}
                     onInput={(e)=>{updateText(e.currentTarget.textContent)}}
-                    style={{fontSize: `calc(1em * ${resizeDistY / originalDimensions.height})`,
-                            lineHeight: `clamp(.2, ${resizeDistY / originalDimensions.height}, 1)`,
+                    style={{fontSize: `calc(1em * ${resizeDistY / 90})`,
+                            lineHeight: `clamp(.2, ${resizeDistY / 90}, 1)`,
                             border: `${isEditable ? '1px dashed white' : 'none'}`,
                             color: `${commentInfo.color}`,
                           }}
                 >
+                    {initialTextRef.current}
                 </div>
             </div>
             

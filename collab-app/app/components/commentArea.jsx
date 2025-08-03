@@ -5,10 +5,6 @@ import Comment from './comment.jsx'
 const CommentArea = () => {
     const { roomCommentsRef } = useStateContext();
 
-    const handleMouseMove = (e) => {
-        updateMouseLocation([e.clientX, e.clientY]);
-    }
-
     return (
         <div 
             style={{width: '100vw', height: '100vh',}}
