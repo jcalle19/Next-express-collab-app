@@ -19,6 +19,7 @@ export const StateProvider = ({children}) => {
     const commentsLoaded = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
+    const windowSizeRef = useRef({x: 0, y: 0});
     const [lineFlag, updateLineFlag] = useState(false);
     const [highlightFlag, updateHighlight] = useState(false);
     const [undoFlag, updateUndo] = useState(false);
@@ -236,6 +237,7 @@ export const StateProvider = ({children}) => {
         sliderThumbColor,
         penInfoRef,
         mouseLocationRef,
+        windowSizeRef,
         joinRoom,
         leaveRoom,
         removeUser,
