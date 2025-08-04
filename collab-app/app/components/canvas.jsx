@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
 import '../css/canvas.css'
-import CommentArea from './commentArea.jsx'
+import Comment from './comment.jsx'
 
 const Canvas = () => {
     const canvasRef = useRef(null);
@@ -16,7 +16,7 @@ const Canvas = () => {
     const scaleYRef = useRef(1);
     const [windowSizeX, changeWindowSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, windowSizeRef, penInfoRef } = useStateContext();
+    const { undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -38,8 +38,6 @@ const Canvas = () => {
         canvas.style.height = `${windowSizeX * .70}px`;
         scaleXRef.current = canvas.width / canvas.clientWidth;
         scaleYRef.current = canvas.height / canvas.clientHeight;
-        windowSizeRef.current.x = window.innerWidth;
-        windowSizeRef.current.y = window.innerHeight;
         penInfoRef.current.scale = canvas.clientHeight / canvas.height;
     },[windowSizeX]);
 
@@ -139,7 +137,7 @@ const Canvas = () => {
         <div id='canvas-container' >
             <canvas ref={canvasRef} 
                 id='canvas-window'
-                style={{position: 'relative', width: `${8.5 / 11 * 70}vw`, height: '70vw'}}
+                style={{width: `${8.5 / 11 * 70}vw`, height: '70vw'}}
                 onMouseMove={handleMouseMove}
                 onMouseDown={handleMouseDown} 
                 onMouseUp={handleMouseUp}>
