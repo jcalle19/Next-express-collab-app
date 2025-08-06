@@ -1,9 +1,18 @@
+`use client`;
+
 import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
+import '../css/toolMenu.css'
 import ColorPicker from './colorPicker.jsx'
 import Comment from './comment.jsx'
+import * as THREE from 'three'; // Import Three.js
+import HALO from 'vanta/dist/vanta.halo.min';
 
 const ToolBar = () => {
+    /*Vanta.js Background Stuff*/
+    const vantaRef = useRef(null);
+    const [vantaEffect, setVantaEffect] = useState(null);
+    /*-------------------------*/
     const [expanded, changeSize] = useState(false);
     const [sliderValue, changeSlider] = useState('0');
     const sliderPxRef = useRef(2);
@@ -13,11 +22,35 @@ const ToolBar = () => {
 
     const minSize = 1;
     const maxSize = 7;
-    const maxScale = .822;
 
     useEffect(() => {
         penInfoRef.current.size = sliderPxRef.current * 2; //multiplying by 2 to account for symmetry of radial gradient to make more accurate
     },[sliderValue, sliderThumbColor]);
+
+    /*Template Code*/
+    useEffect(() => {
+        if (!vantaEffect) {
+            setVantaEffect(
+                HALO({ 
+                    el: vantaRef.current,
+                    THREE: THREE,
+                    mouseControls: true,
+                    touchControls: true,
+                    gyroControls: false,
+                    minHeight: 200.00,
+                    minWidth: 200.00,
+                    baseColor: 0x0,
+                    backgroundColor: 0x0,
+                    amplitudeFactor: 3.00,
+                    size: 1.80
+                })
+            );
+        }
+        return () => {
+        if (vantaEffect) vantaEffect.destroy();
+        };
+    }, [vantaEffect]);
+    /*-------------*/
 
     const handleToggleClick = (e) => {
         changeSize(!expanded);
@@ -37,6 +70,56 @@ const ToolBar = () => {
     }
 
     return (
+        <div ref={vantaRef} id='side-bar-container' className='grid grid-cols-1 grid-rows-[8fr_4fr]'>
+            <div id='side-bar-overlay'>
+                <section id='edit-section' className='grid grid-cols-1 grid-rows-[3fr_2fr]'>
+                <div id='pen-row' className='grid grid-cols-2 grid-rows-1'>
+                    <div id='pen-col-1' className='grid grid-cols-1 grid-rows-[1fr_2fr_4fr]'>
+                        <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1 grid-box'>
+                            <div id='undo' className='col-start-1 button'></div>
+                            <div id='redo' className='col-start-2 button'></div>
+                        </div>
+                        <div id='width-row' className='grid grid-cols-1 grid-rows-[1fr_2fr]'>
+                            <div className='row-start-1'>width</div>
+                            <div className='row-start-2'>
+                                <input 
+                                    id="width-slider" 
+                                    type="range" min="2" 
+                                    max="100" value={sliderValue} 
+                                    onChange={(e) => handleSliderChange(e.target.value)}
+                                    style={{'--slider-thumb-bg' : 
+                                        `radial-gradient(${penInfoRef.current.color} 0px, 
+                                        ${penInfoRef.current.color} ${sliderPxRef.current}px, 
+                                        transparent  ${sliderPxRef.current}px, 
+                                        transparent 100%)`
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div id='draw-mode-row' className='grid grid-cols-3 grid-rows-[1fr_2fr] grid-box'>
+                            <div id='highlight-active' className='row-start-1 col-start-1 button'></div>
+                            <div id='line-active' className='row-start-1 col-start-2 button'></div>
+                            <div id='text-edit-active' className='row-start-1 col-start-3 button'></div>
+                            <div id='highlight-toggle' className='row-start-2 col-start-1 button'></div>
+                            <div id='line-toggle' className='row-start-2 col-start-2 button'></div>
+                            <div id='text-edit-toggle' className='row-start-2 col-start-3 button'></div>
+                        </div>
+                    </div>
+                    <div id='pen-col-2' className='relative grid-box'>
+                        <ColorPicker expanded={true}/>
+                    </div>
+                </div>
+                <div id='comment-row' className='grid grid-cols-[1fr_9fr] grid-rows-1'>
+                    <div id='clear-button' className='col-start-1 comment-button'></div>
+                    <div id='comment-window' className='col-start-2 comment-button'></div>
+                </div>
+            </section>
+            <section id='chat-section'>
+
+            </section>
+            </div>
+        </div>
+        /*
         <>
         <div id='tool-bar-container' className='grid grid-cols-[4fr_1fr]'>
             <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-content'}>
@@ -73,7 +156,7 @@ const ToolBar = () => {
             </div>
             <div className={!expanded ? 'tool-bar tool-bar-expand' : 'tool-bar tool-bar-close'} onClick={handleToggleClick}></div>
         </div>
-        </>
+        </>*/
     )
 }
 
