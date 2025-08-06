@@ -74,7 +74,7 @@
   max-width: 40px;
   max-height: 40px;
   border-radius: 50% 20%;
-  transform:rotateX(.5deg);
+  transform:rotateX(.5deg) rotateZ(90deg);
   transition: width .1s, height .1s, max-width .1s, max-height .1s, transform .1s;
 }
 
