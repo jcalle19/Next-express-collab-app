@@ -28,3 +28,33 @@ body {
   position: relative;
   transform: translate(50%, 50%);
 }
+
+.grid-box {
+    border: 1px solid red;
+}
+
+.glassy {
+    /* From https://css.glass */
+    background: rgba(15, 15, 15, 1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(25, 25, 25, 1);
+    margin: 0px 1px 1px 0px;
+}
+
+.half-margin-right {
+    margin-right: .5px;
+}
+
+.no-margin-right {
+    margin-right: 0px;
+}
+
+.half-margin-bottom {
+    margin-bottom: .5px;
+}
+
+.relative {
+    position: relative;
+}

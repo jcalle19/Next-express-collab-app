@@ -14,7 +14,8 @@ const Canvas = () => {
     const currentLineRef = useRef([]);
     const scaleXRef = useRef(1);
     const scaleYRef = useRef(1);
-    const [windowSizeX, changeWindowSize] = useState(0);
+    const [windowSizeX, changeWindowXSize] = useState(0);
+    const [windowSizeY, changeWindowYSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
     const { undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
 
@@ -25,22 +26,23 @@ const Canvas = () => {
         canvas.width = 1000;
         canvas.height = 1000;
         ctxRef.current = canvas.getContext('2d');
-        changeWindowSize(window.innerWidth);
+        changeWindowXSize(window.innerWidth);
+        changeWindowYSize(window.innerHeight);
         window.addEventListener('resize', windowResize);
     }, []);
 
+    /* Need to make canvas scale equally with x and y */
     useEffect(() => {
         const canvas = canvasRef.current;
         ctxRef.current = canvas.getContext('2d');
         ctxRef.current.lineCap = 'round';
         ctxRef.current.lineJoin = 'round';
-        canvas.style.width = `${windowSizeX * (8.5 / 11) * .70}px`;
-        canvas.style.height = `${windowSizeX * .70}px`;
+        canvas.style.width = `${windowSizeX * .65}px`;
+        canvas.style.height = `${windowSizeX * .50}px`;
         scaleXRef.current = canvas.width / canvas.clientWidth;
         scaleYRef.current = canvas.height / canvas.clientHeight;
         penInfoRef.current.scale = canvas.clientHeight / canvas.height;
     },[windowSizeX]);
-
     /*----- Menu Button Effects -----*/
     useEffect(()=> {
         let last = lineStorageRef.current.pop();
@@ -73,7 +75,8 @@ const Canvas = () => {
     /*-------------------------------*/
 
     const windowResize = () => {
-        changeWindowSize(window.innerWidth);
+        changeWindowXSize(window.innerWidth);
+        changeWindowYSize(window.innerHeight);
     }
 
     const handleMouseDown = (e) => {
@@ -132,12 +135,11 @@ const Canvas = () => {
         if (!ctxRef.current || !canvasRef.current) return;
             ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     };
-
+    //style={{width: `70vw`, height: `${.50 * 70}vw`}}
     return (
         <div id='canvas-container' >
             <canvas ref={canvasRef} 
                 id='canvas-window'
-                style={{width: `${8.5 / 11 * 70}vw`, height: '70vw'}}
                 onMouseMove={handleMouseMove}
                 onMouseDown={handleMouseDown} 
                 onMouseUp={handleMouseUp}>

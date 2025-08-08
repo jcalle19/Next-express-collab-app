@@ -1,15 +1,15 @@
 #canvas-container {
-    width: 100vw;
+    width: 69.5vw;
     height: 100vh;
 }
 
 #canvas-window {
-    position: absolute;
-    left: 50%;
-    top: 0vh;
-    transform: translateX(-50%);
+    position: relative;
     display: block;
-    max-width: calc(8.5 / 11 * 100vh);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 70vw;
     max-height: 100vh;
     background-color: transparent;
     border: 2px dashed orange;

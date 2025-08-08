@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
 import '../css/toolMenu.css'
+import '../css/globals.css'
 import ColorPicker from './colorPicker.jsx'
 import Comment from './comment.jsx'
+import ChatBox from './chatBox.jsx'
 import * as THREE from 'three'; // Import Three.js
 import HALO from 'vanta/dist/vanta.halo.min';
 
@@ -75,13 +77,13 @@ const ToolBar = () => {
                 <section id='edit-section' className='grid grid-cols-1 grid-rows-[3fr_2fr]'>
                 <div id='pen-row' className='grid grid-cols-2 grid-rows-1'>
                     <div id='pen-col-1' className='grid grid-cols-1 grid-rows-[1fr_2fr_4fr]'>
-                        <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1 grid-box'>
-                            <div id='undo' className='col-start-1 button'></div>
-                            <div id='redo' className='col-start-2 button'></div>
+                        <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1'>
+                            <div id='undo' className='col-start-1 glassy'></div>
+                            <div id='redo' className='col-start-2 glassy'></div>
                         </div>
                         <div id='width-row' className='grid grid-cols-1 grid-rows-[1fr_2fr]'>
-                            <div className='row-start-1'>width</div>
-                            <div className='row-start-2'>
+                            <div className='row-start-1 glassy'>width</div>
+                            <div className='row-start-2 glassy'>
                                 <input 
                                     id="width-slider" 
                                     type="range" min="2" 
@@ -96,26 +98,26 @@ const ToolBar = () => {
                                 />
                             </div>
                         </div>
-                        <div id='draw-mode-row' className='grid grid-cols-3 grid-rows-[1fr_2fr] grid-box'>
-                            <div id='highlight-active' className='row-start-1 col-start-1 button'></div>
-                            <div id='line-active' className='row-start-1 col-start-2 button'></div>
-                            <div id='text-edit-active' className='row-start-1 col-start-3 button'></div>
-                            <div id='highlight-toggle' className='row-start-2 col-start-1 button'></div>
-                            <div id='line-toggle' className='row-start-2 col-start-2 button'></div>
-                            <div id='text-edit-toggle' className='row-start-2 col-start-3 button'></div>
+                        <div id='draw-mode-row' className='grid grid-cols-3 grid-rows-[1fr_2fr]'>
+                            <div id='highlight-active' className='row-start-1 col-start-1 glassy'></div>
+                            <div id='line-active' className='row-start-1 col-start-2 glassy'></div>
+                            <div id='text-edit-active' className='row-start-1 col-start-3 glassy'></div>
+                            <div id='highlight-toggle' className='row-start-2 col-start-1 glassy'></div>
+                            <div id='line-toggle' className='row-start-2 col-start-2 glassy'></div>
+                            <div id='text-edit-toggle' className='row-start-2 col-start-3 glassy'></div>
                         </div>
                     </div>
-                    <div id='pen-col-2' className='relative grid-box'>
+                    <div id='pen-col-2' className='relative glassy no-margin-right'>
                         <ColorPicker expanded={true}/>
                     </div>
                 </div>
-                <div id='comment-row' className='grid grid-cols-[1fr_9fr] grid-rows-1'>
-                    <div id='clear-button' className='col-start-1 comment-button'></div>
-                    <div id='comment-window' className='col-start-2 comment-button'></div>
+                <div id='comment-row' className='grid grid-cols-[1fr_10fr] grid-rows-1'>
+                    <div id='clear-button' className='col-start-1 glassy'></div>
+                    <div id='comment-window' className='col-start-2 glassy no-margin-right'></div>
                 </div>
             </section>
             <section id='chat-section'>
-
+                <ChatBox/>
             </section>
             </div>
         </div>

@@ -3,18 +3,25 @@
     right: 0px;
     width: 30vw;
     height: 100vh;
-    border-radius: 25px;
     overflow: hidden;
 }
 
 #side-bar-overlay {
-    background: rgba(0, 0, 0, 0.88);
+    background: rgba(0, 0, 0, 0.6);
     border-radius: 16px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     width: 30vw;
     height: 100vw;
+}
+
+#edit-section {
+    height: 60vh;
+}
+
+#chat-section {
+    height: 40vh;
 }
 
 #width-slider {
@@ -27,28 +34,27 @@
     height: 100%;
 }
 
-.button {
-    margin: 8%;
-    border-radius: 10px;
-    /* From https://css.glass */
-    background: rgba(255, 251, 251, 0.25);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(6.3px);
-    -webkit-backdrop-filter: blur(6.3px);
-}
-
-#clear-button {
-    margin: 16%;
-    background-color: white;
-    border-radius: 10px;
-}
-
-#comment-window {
-    margin: 2%;
-    background-color: white;
-    border-radius: 10px;
-}
-
-.relative {
+#width-slider::-webkit-slider-runnable-track {
     position: relative;
+    background-color: transparent;
+    border: 1px dashed white;
+    height: 8px;
+    border-radius: 25px;
+}
+
+#width-slider::-webkit-slider-thumb{
+    position: relative;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    background: var(--slider-thumb-bg);
+    border: 1px dashed white;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#comment-row {
+    margin-top: -.5px;
 }

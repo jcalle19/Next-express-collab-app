@@ -24,11 +24,11 @@ export default function RoomPage() {
     }
   }, [socketReady]);
 
-
+  //<ChatBox/>
   return (
     <div className='window-container'>
       <CursorArea id={id}/>
-      <ChatBox/>
+      
       <RoomInfoPanel/>
       <ToolBar/>
     </div>
