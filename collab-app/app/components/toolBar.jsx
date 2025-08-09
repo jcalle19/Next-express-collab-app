@@ -7,6 +7,7 @@ import '../css/globals.css'
 import ColorPicker from './colorPicker.jsx'
 import Comment from './comment.jsx'
 import ChatBox from './chatBox.jsx'
+import Icon from './icon.jsx'
 import * as THREE from 'three'; // Import Three.js
 import HALO from 'vanta/dist/vanta.halo.min';
 
@@ -17,11 +18,12 @@ const ToolBar = () => {
     /*-------------------------*/
     const [expanded, changeSize] = useState(false);
     const [sliderValue, changeSlider] = useState('0');
+    const [previewWidth, changeWidth] = useState('0');
     const sliderPxRef = useRef(2);
     const { triggerUndo, triggerRedo, triggerLineTool, 
             triggerHighlight, triggerClear, triggerTextFlag, 
             sliderThumbColor, penInfoRef, addComment } = useStateContext();
-
+    const iconFolder = 'toolbar-icons'
     const minSize = 1;
     const maxSize = 7;
 
@@ -41,10 +43,11 @@ const ToolBar = () => {
                     gyroControls: false,
                     minHeight: 200.00,
                     minWidth: 200.00,
+                    xOffset: 0.75,
                     baseColor: 0x0,
                     backgroundColor: 0x0,
                     amplitudeFactor: 3.00,
-                    size: 1.80
+                    size: 3.00
                 })
             );
         }
@@ -68,7 +71,9 @@ const ToolBar = () => {
     }
 
     const percentToPixel = (percent) => {
-        sliderPxRef.current = minSize + Math.ceil((percent / 100) * maxSize * penInfoRef.current.scale) ;
+        sliderPxRef.current = minSize + Math.ceil((percent / 100) * maxSize * penInfoRef.current.scale);
+        console.log(sliderPxRef.current);
+        changeWidth(sliderPxRef.current * 1.8 * penInfoRef.current.scale);
     }
 
     return (
@@ -78,11 +83,22 @@ const ToolBar = () => {
                 <div id='pen-row' className='grid grid-cols-2 grid-rows-1'>
                     <div id='pen-col-1' className='grid grid-cols-1 grid-rows-[1fr_2fr_4fr]'>
                         <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1'>
-                            <div id='undo' className='col-start-1 glassy'></div>
-                            <div id='redo' className='col-start-2 glassy'></div>
+                            <div id='undo' className='col-start-1 glassy'>
+                                <Icon src={`/${iconFolder}/left-arrow.svg`} width='85%' height='85%'/>
+                            </div>
+                            
+                            <div id='redo' className='col-start-2 glassy'>
+                                <Icon src={`/${iconFolder}/right-arrow.svg`} width='85%' height='85%'/>
+                            </div>
                         </div>
                         <div id='width-row' className='grid grid-cols-1 grid-rows-[1fr_2fr]'>
-                            <div className='row-start-1 glassy'>width</div>
+                            <div className='row-start-1 glassy'>
+                                <div id='width-preview'
+                                    style={{height: `${previewWidth}px`}}
+                                >
+
+                                </div>
+                            </div>
                             <div className='row-start-2 glassy'>
                                 <input 
                                     id="width-slider" 
@@ -102,9 +118,15 @@ const ToolBar = () => {
                             <div id='highlight-active' className='row-start-1 col-start-1 glassy'></div>
                             <div id='line-active' className='row-start-1 col-start-2 glassy'></div>
                             <div id='text-edit-active' className='row-start-1 col-start-3 glassy'></div>
-                            <div id='highlight-toggle' className='row-start-2 col-start-1 glassy'></div>
-                            <div id='line-toggle' className='row-start-2 col-start-2 glassy'></div>
-                            <div id='text-edit-toggle' className='row-start-2 col-start-3 glassy'></div>
+                            <div id='highlight-toggle' className='row-start-2 col-start-1 glassy'>
+                                <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
+                            </div>
+                            <div id='line-toggle' className='row-start-2 col-start-2 glassy'>
+                                <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
+                            </div>
+                            <div id='text-edit-toggle' className='row-start-2 col-start-3 glassy'>
+                                <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%'/>
+                            </div>
                         </div>
                     </div>
                     <div id='pen-col-2' className='relative glassy no-margin-right'>
@@ -112,7 +134,9 @@ const ToolBar = () => {
                     </div>
                 </div>
                 <div id='comment-row' className='grid grid-cols-[1fr_10fr] grid-rows-1'>
-                    <div id='clear-button' className='col-start-1 glassy'></div>
+                    <div id='clear-button' className='col-start-1 glassy'>
+                        <Icon src={`/${iconFolder}/trash.svg`} width='35%' height='35%'/>
+                    </div>
                     <div id='comment-window' className='col-start-2 glassy no-margin-right'></div>
                 </div>
             </section>
