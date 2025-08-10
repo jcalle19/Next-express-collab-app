@@ -18,17 +18,21 @@ const ToolBar = () => {
     /*-------------------------*/
     const [expanded, changeSize] = useState(false);
     const [sliderValue, changeSlider] = useState('0');
-    const [previewWidth, changeWidth] = useState('0');
+    const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(2);
     const { triggerUndo, triggerRedo, triggerLineTool, 
             triggerHighlight, triggerClear, triggerTextFlag, 
             sliderThumbColor, penInfoRef, addComment } = useStateContext();
     const iconFolder = 'toolbar-icons'
-    const minSize = 1;
-    const maxSize = 7;
+    const minSize = 3;
+    const maxSize = 48;
 
     useEffect(() => {
-        penInfoRef.current.size = sliderPxRef.current * 2; //multiplying by 2 to account for symmetry of radial gradient to make more accurate
+        window.addEventListener('resize', percentToPixel);
+    }, []);
+
+    useEffect(() => {
+        penInfoRef.current.size = sliderPxRef.current; //multiplying by 2 to account for symmetry of radial gradient to make more accurate
     },[sliderValue, sliderThumbColor]);
 
     /*Template Code*/
@@ -71,9 +75,9 @@ const ToolBar = () => {
     }
 
     const percentToPixel = (percent) => {
-        sliderPxRef.current = minSize + Math.ceil((percent / 100) * maxSize * penInfoRef.current.scale);
-        console.log(sliderPxRef.current);
-        changeWidth(sliderPxRef.current * 1.8 * penInfoRef.current.scale);
+        sliderPxRef.current = minSize + ((percent / 100) * maxSize);
+        console.log(penInfoRef.current.size);
+        changeWidth(penInfoRef.current.size  * penInfoRef.current.scale);
     }
 
     return (
@@ -94,10 +98,11 @@ const ToolBar = () => {
                         <div id='width-row' className='grid grid-cols-1 grid-rows-[1fr_2fr]'>
                             <div className='row-start-1 glassy'>
                                 <div id='width-preview'
-                                    style={{height: `${previewWidth}px`}}
-                                >
-
-                                </div>
+                                    style={{height: `${previewWidth}px`,
+                                            borderRadius: `${previewWidth / 2}px`,
+                                            backgroundColor: `${penInfoRef.current.color}`
+                                    }}
+                                ></div>
                             </div>
                             <div className='row-start-2 glassy'>
                                 <input 
@@ -105,12 +110,7 @@ const ToolBar = () => {
                                     type="range" min="2" 
                                     max="100" value={sliderValue} 
                                     onChange={(e) => handleSliderChange(e.target.value)}
-                                    style={{'--slider-thumb-bg' : 
-                                        `radial-gradient(${penInfoRef.current.color} 0px, 
-                                        ${penInfoRef.current.color} ${sliderPxRef.current}px, 
-                                        transparent  ${sliderPxRef.current}px, 
-                                        transparent 100%)`
-                                    }}
+                                    style={{'--slider-thumb-color' : `${penInfoRef.current.color}`}}
                                 />
                             </div>
                         </div>

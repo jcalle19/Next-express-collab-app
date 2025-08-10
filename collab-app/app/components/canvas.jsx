@@ -23,8 +23,8 @@ const Canvas = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        canvas.width = 1000;
-        canvas.height = 1000;
+        canvas.width = 2600;
+        canvas.height = 2000;
         ctxRef.current = canvas.getContext('2d');
         changeWindowXSize(window.innerWidth);
         changeWindowYSize(window.innerHeight);
