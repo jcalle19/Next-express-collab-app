@@ -19,7 +19,7 @@ const ToolBar = () => {
     const [expanded, changeSize] = useState(false);
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
-    const sliderPxRef = useRef(2);
+    const sliderPxRef = useRef(3);
     const { triggerUndo, triggerRedo, triggerLineTool, 
             triggerHighlight, triggerClear, triggerTextFlag, 
             sliderThumbColor, penInfoRef, addComment } = useStateContext();
@@ -32,6 +32,8 @@ const ToolBar = () => {
     }, []);
 
     useEffect(() => {
+        sliderPxRef.current = minSize + ((sliderValue / 100) * maxSize);
+        changeWidth(penInfoRef.current.size  * penInfoRef.current.scale);
         penInfoRef.current.size = sliderPxRef.current; //multiplying by 2 to account for symmetry of radial gradient to make more accurate
     },[sliderValue, sliderThumbColor]);
 
@@ -67,7 +69,7 @@ const ToolBar = () => {
 
     const handleSliderChange = (newVal) => {
         changeSlider(newVal);
-        percentToPixel(newVal);
+        //percentToPixel(newVal);
     }
 
     const triggerAddComment = () => {
@@ -87,11 +89,11 @@ const ToolBar = () => {
                 <div id='pen-row' className='grid grid-cols-2 grid-rows-1'>
                     <div id='pen-col-1' className='grid grid-cols-1 grid-rows-[1fr_2fr_4fr]'>
                         <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1'>
-                            <div id='undo' className='col-start-1 glassy'>
+                            <div id='undo' className='col-start-1 glassy' onClick={triggerUndo}>
                                 <Icon src={`/${iconFolder}/left-arrow.svg`} width='85%' height='85%'/>
                             </div>
                             
-                            <div id='redo' className='col-start-2 glassy'>
+                            <div id='redo' className='col-start-2 glassy' onClick={triggerRedo}>
                                 <Icon src={`/${iconFolder}/right-arrow.svg`} width='85%' height='85%'/>
                             </div>
                         </div>
@@ -118,13 +120,13 @@ const ToolBar = () => {
                             <div id='highlight-active' className='row-start-1 col-start-1 glassy'></div>
                             <div id='line-active' className='row-start-1 col-start-2 glassy'></div>
                             <div id='text-edit-active' className='row-start-1 col-start-3 glassy'></div>
-                            <div id='highlight-toggle' className='row-start-2 col-start-1 glassy'>
+                            <div id='highlight-toggle' className='row-start-2 col-start-1 glassy' onClick={triggerHighlight}>
                                 <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
                             </div>
-                            <div id='line-toggle' className='row-start-2 col-start-2 glassy'>
+                            <div id='line-toggle' className='row-start-2 col-start-2 glassy' onClick={triggerLineTool}>
                                 <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
                             </div>
-                            <div id='text-edit-toggle' className='row-start-2 col-start-3 glassy'>
+                            <div id='text-edit-toggle' className='row-start-2 col-start-3 glassy' onClick={triggerTextFlag}>
                                 <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%'/>
                             </div>
                         </div>
@@ -133,9 +135,9 @@ const ToolBar = () => {
                         <ColorPicker expanded={true}/>
                     </div>
                 </div>
-                <div id='comment-row' className='grid grid-cols-[1fr_10fr] grid-rows-1'>
+                <div id='comment-row' className='grid grid-cols-[1fr_10fr] grid-rows-1' onClick={triggerClear}>
                     <div id='clear-button' className='col-start-1 glassy'>
-                        <Icon src={`/${iconFolder}/trash.svg`} width='35%' height='35%'/>
+                        <Icon src={`/${iconFolder}/trash.svg`} width='50%' height='35%'/>
                     </div>
                     <div id='comment-window' className='col-start-2 glassy no-margin-right'></div>
                 </div>

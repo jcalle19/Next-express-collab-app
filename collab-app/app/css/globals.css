@@ -5,6 +5,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --inspecting: rgba(80, 80, 80, .5);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -45,7 +46,12 @@ body {
 }
 
 .glassy:hover {
-  background: rgba(80, 80, 80, .5);
+  background: var(--inspecting);
+}
+
+.set-inspecting {
+  background: var(--inspecting);
+  border: 1px solid rgb(150, 150, 150, 1);
 }
 
 .half-margin-right {
@@ -62,4 +68,19 @@ body {
 
 .relative {
     position: relative;
+}
+
+.hidden {
+  display: none;
+}
+
+.thin-text {
+  font-weight: lighter;
+}
+
+.center {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
