@@ -1,5 +1,5 @@
 import React from 'react'
-import '../css/roomPage.css'
+import '../css/roomInfo.css'
 import { useStateContext } from '../contexts/userState.jsx'
 import { useRouter } from 'next/navigation';
 

@@ -22,6 +22,7 @@ const ToolBar = () => {
     const sliderPxRef = useRef(3);
     const { triggerUndo, triggerRedo, triggerLineTool, 
             triggerHighlight, triggerClear, triggerTextFlag, 
+            highlightFlag, lineFlag, textEditFlag,
             sliderThumbColor, penInfoRef, addComment } = useStateContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
@@ -100,7 +101,7 @@ const ToolBar = () => {
                         <div id='width-row' className='grid grid-cols-1 grid-rows-[1fr_2fr]'>
                             <div className='row-start-1 glassy'>
                                 <div id='width-preview'
-                                    style={{height: `${previewWidth}px`,
+                                    style={{height: `${previewWidth ? previewWidth : '2'}px`,
                                             borderRadius: `${previewWidth / 2}px`,
                                             backgroundColor: `${penInfoRef.current.color}`
                                     }}
@@ -120,13 +121,13 @@ const ToolBar = () => {
                             <div id='highlight-active' className='row-start-1 col-start-1 glassy'></div>
                             <div id='line-active' className='row-start-1 col-start-2 glassy'></div>
                             <div id='text-edit-active' className='row-start-1 col-start-3 glassy'></div>
-                            <div id='highlight-toggle' className='row-start-2 col-start-1 glassy' onClick={triggerHighlight}>
+                            <div id='highlight-toggle' className={`row-start-2 col-start-1 glassy ${highlightFlag ? 'set-inspecting' : ''}`} onClick={triggerHighlight}>
                                 <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
                             </div>
-                            <div id='line-toggle' className='row-start-2 col-start-2 glassy' onClick={triggerLineTool}>
+                            <div id='line-toggle' className={`row-start-2 col-start-2 glassy ${lineFlag ? 'set-inspecting' : ''}`} onClick={triggerLineTool}>
                                 <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
                             </div>
-                            <div id='text-edit-toggle' className='row-start-2 col-start-3 glassy' onClick={triggerTextFlag}>
+                            <div id='text-edit-toggle' className={`row-start-2 col-start-3 glassy ${textEditFlag ? 'set-inspecting' : ''}`} onClick={triggerTextFlag}>
                                 <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%'/>
                             </div>
                         </div>

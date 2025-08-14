@@ -23,13 +23,6 @@
     opacity: 0;
 }
 
-.room-panel {
-    position: absolute;
-    right: 0%;
-    bottom: 0px;
-    border: 2px solid green;
-}
-
 #tool-bar-container {
     position: relative;
     top: 5%;

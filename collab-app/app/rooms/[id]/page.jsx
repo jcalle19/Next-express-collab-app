@@ -28,8 +28,6 @@ export default function RoomPage() {
   return (
     <div className='window-container'>
       <CursorArea id={id}/>
-      
-      <RoomInfoPanel/>
       <ToolBar/>
     </div>
   );

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
 import Message from './message.jsx'
 import Icon from './icon.jsx'
+import RoomInfoPanel from './roomInfoPanel.jsx'
 import '../css/globals.css'
 import '../css/chatBox.css'
 
@@ -64,7 +65,9 @@ const ChatBox = () => {
                 </div>
             </section>
             <section id='room-container' className={`${activeTab === 'room' ? '' : 'hidden'}`}>
-                <div id='room-field' className='glassy'></div>
+                <div id='room-field' className='glassy'>
+                    <RoomInfoPanel/>
+                </div>
             </section>
         </div>
   )
