@@ -2,12 +2,14 @@
 
 import {createContext, useState, useContext, useEffect, useRef} from "react"
 import { io } from 'socket.io-client';
+import { useRouter } from 'next/navigation';
 
 const stateContext = createContext()
 
 export const useStateContext = () => useContext(stateContext);
 
 export const StateProvider = ({children}) => {
+    const router = useRouter();
     const userObj = useRef({id: '', user: '', roomId: '', xCoord: '', yCoord: ''});
     const roomUsers = useRef(new Map()); //Holding player data, will constantly update
     const socketRef = useRef(null);
@@ -40,6 +42,26 @@ export const StateProvider = ({children}) => {
                 socketRefReady.current = true;
                 return true;
             });
+        });
+
+        socketRef.current.on('confirm-room-creation', (status, info) => {
+            if (status) {
+                joinRoom(info.roomId);
+                sessionStorage.setItem('hostId', info.hostId);
+                router.push(`/rooms/${info.roomId}`);
+            } else {
+                console.log('Error creating room');
+            }
+        });
+
+        socketRef.current.on('confirm-room-join', (status, userInfo) => {
+            console.log('hello');
+            if (status) {
+                sessionStorage.setItem('userObj', JSON.stringify(userInfo));
+                router.push(`/rooms/${userInfo.roomId}`);
+            } else {
+                console.log('error joining room');
+            }
         });
 
         socketRef.current.on('add-user', (userInfo) => {
@@ -113,12 +135,17 @@ export const StateProvider = ({children}) => {
         sessionStorage.setItem('roomCommentsMap', JSON.stringify(Array.from(roomCommentsRef.current.entries())));
     },[commentsFlag]);
 
+    const createRoom = () => {
+        let roomId = randomId();
+        let hostId = randomId();
+        socketRef.current.emit('create-room', roomId, hostId);
+    }
+
     const joinRoom = (newRoom) => {
         if (socketRef.current) {
             let id = randomId();
             userObj.current.id = id;
             userObj.current.roomId = newRoom;
-            sessionStorage.setItem('userObj', JSON.stringify(userObj.current));
             socketRef.current.emit('user-joined', userObj.current);
         }
     }
@@ -236,6 +263,7 @@ export const StateProvider = ({children}) => {
         sliderThumbColor,
         penInfoRef,
         mouseLocationRef,
+        createRoom,
         joinRoom,
         leaveRoom,
         removeUser,

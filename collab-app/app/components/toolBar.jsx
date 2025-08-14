@@ -70,7 +70,6 @@ const ToolBar = () => {
 
     const handleSliderChange = (newVal) => {
         changeSlider(newVal);
-        //percentToPixel(newVal);
     }
 
     const triggerAddComment = () => {
@@ -79,7 +78,6 @@ const ToolBar = () => {
 
     const percentToPixel = (percent) => {
         sliderPxRef.current = minSize + ((percent / 100) * maxSize);
-        console.log(penInfoRef.current.size);
         changeWidth(penInfoRef.current.size  * penInfoRef.current.scale);
     }
 

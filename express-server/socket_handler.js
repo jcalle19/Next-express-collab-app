@@ -2,30 +2,48 @@
 -contexts/userState.jsx
 -rooms/[id]/page.jsx
 */
+const roomMap = new Map();
+
 const socket_functions = (io) => {
     io.on('connection', function (socket) {
-        socket.on('user-joined', async (userObj) => {
-            console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
-            socket.join(userObj.roomId);
-
-            //get all sockets in room
-            const socketIds = await io.in(userObj.roomId).allSockets();
-            const firstSocketId = [...socketIds][0];
-
-            //emit sync-request
-            if (firstSocketId) {
-                const firstSocket = io.sockets.sockets.get(firstSocketId);
-
-                if (firstSocket) {
-                    console.log(`syncing room ${userObj.roomId} with host`);
-                    firstSocket.emit('add-user', userObj);
-                }
+        socket.on('create-room', (roomId, hostId) => {
+            roomMap.set(roomId, hostId);
+            if (roomMap.get(roomId)) {
+                socket.emit('confirm-room-creation', true, {roomId: roomId, hostId: hostId});  
             }
-        })
+            else {
+                socket.emit('confirm-room-creation', false, {roomId: '', hostId: ''});
+            }
+        });
+
+        socket.on('user-joined', async (userObj) => {
+            if (!roomMap.get(userObj.roomId)) {
+                socket.emit('confirm-room-join', false, userObj);
+            } else {
+                console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
+                socket.join(userObj.roomId);
+
+                //get all sockets in room
+                const socketIds = await io.in(userObj.roomId).allSockets();
+                const firstSocketId = [...socketIds][0];
+
+                //emit sync-request
+                if (firstSocketId) {
+                    const firstSocket = io.sockets.sockets.get(firstSocketId);
+
+                    if (firstSocket) {
+                        console.log(`syncing room ${userObj.roomId} with host`);
+                        firstSocket.emit('add-user', userObj);
+                    }
+                }
+                socket.emit('confirm-room-join', true, userObj);
+            }
+            
+        });
 
         socket.on('user-left', (userObj) => {
             io.to(userObj.roomId).emit('remove-user', userObj);
-        })
+        });
         
         socket.on('update-room', (userObj) => {
             io.to(userObj.roomId).emit('update-room', userObj);

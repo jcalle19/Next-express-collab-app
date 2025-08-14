@@ -8,7 +8,7 @@ import comps from '../css/homecomps.css'
 const RoomForm = () => {
     const [nameInput, updateUsername] = useState('');
     const [searchCode, updateSearchCode] = useState('');
-    const { joinRoom, userObj } = useStateContext();
+    const { createRoom, joinRoom, userObj } = useStateContext();
     const router = useRouter();
 
     //Add user to room map in socket_handler.js
@@ -16,8 +16,14 @@ const RoomForm = () => {
         e.preventDefault();
         userObj.current.user = nameInput;
         joinRoom(searchCode);
-        router.push(`/rooms/${searchCode}`);
+        //router.push(`/rooms/${searchCode}`);
     };
+
+    const handleCreate = (e) => {
+        e.preventDefault();
+        userObj.current.user = nameInput;
+        createRoom();
+    }
 
     return (
         <div className="grid home-form-container">
@@ -40,7 +46,7 @@ const RoomForm = () => {
                     Join Room
                 </button>
                 <br/>
-                <button onClick={handleJoin} className="enter-btn test-border">
+                <button onClick={handleCreate} className="enter-btn test-border">
                     Create Room
                 </button>
             </form>

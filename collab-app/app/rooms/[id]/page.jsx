@@ -17,6 +17,7 @@ export default function RoomPage() {
   useEffect(() => {
     if (socketRefReady.current) {
       console.log('Socket ready');
+      console.log(id);
       loadRoomState(String(id));
     }
     else {
