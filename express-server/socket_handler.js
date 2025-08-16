@@ -20,6 +20,7 @@ const socket_functions = (io) => {
             if (!roomMap.get(userObj.roomId)) {
                 socket.emit('confirm-room-join', false, userObj);
             } else {
+                socket.emit('confirm-room-join', true, userObj);
                 console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
                 socket.join(userObj.roomId);
 
@@ -36,7 +37,6 @@ const socket_functions = (io) => {
                         firstSocket.emit('add-user', userObj);
                     }
                 }
-                socket.emit('confirm-room-join', true, userObj);
             }
             
         });

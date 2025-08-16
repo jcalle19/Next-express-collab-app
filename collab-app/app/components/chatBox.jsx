@@ -61,7 +61,15 @@ const ChatBox = () => {
             </section>
             <section id='people-container' className={`${activeTab === 'people' ? '' : 'hidden'}`}>
                 <div id='people-field' className='glassy'>
-                    {roomUsersKeys.map((user) => (<div key={user.key}>{user.user}</div>))}
+                    {roomUsersKeys.map((user) => (
+                        <div key={user.key} className='grid grid-cols-[2fr_2fr_2fr_2fr_2fr_5fr] grid-rows-1'>
+                            <div className='col-start-1'>{user.user}</div>
+                            <div className='col-start-2'><Icon src={`/${iconFolder}/pen.svg`} width='85%' height='70%'/></div>
+                            <div className='col-start-3'><Icon src={`/${iconFolder}/chat.svg`} width='85%' height='70%'/></div>
+                            <div className='col-start-4'><Icon src={`/${iconFolder}/admin.svg`} width='85%' height='70%'/></div>
+                            <div className='col-start-5'><Icon src={`/${iconFolder}/kick.svg`} width='85%' height='70%'/></div>
+                        </div>
+                    ))}
                 </div>
             </section>
             <section id='room-container' className={`${activeTab === 'room' ? '' : 'hidden'}`}>

@@ -55,7 +55,6 @@ export const StateProvider = ({children}) => {
         });
 
         socketRef.current.on('confirm-room-join', (status, userInfo) => {
-            console.log('hello');
             if (status) {
                 sessionStorage.setItem('userObj', JSON.stringify(userInfo));
                 router.push(`/rooms/${userInfo.roomId}`);
@@ -136,9 +135,11 @@ export const StateProvider = ({children}) => {
     },[commentsFlag]);
 
     const createRoom = () => {
-        let roomId = randomId();
-        let hostId = randomId();
-        socketRef.current.emit('create-room', roomId, hostId);
+        if (socketRef.current) {
+            let roomId = randomId();
+            let hostId = randomId();
+            socketRef.current.emit('create-room', roomId, hostId);
+        }
     }
 
     const joinRoom = (newRoom) => {
