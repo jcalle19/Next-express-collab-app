@@ -2,12 +2,41 @@
 -contexts/userState.jsx
 -rooms/[id]/page.jsx
 */
+
+//Has hostIds, canvas info, and userTokens
 const roomMap = new Map();
 
+//Has all user room for each token for easy lookup
+const tokenMap = new Map();
+
+const randomId = () => {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let result = "";
+        for (let i = 0; i < 16; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    };
+
 const socket_functions = (io) => {
+    const broadcastInfo = (roomId, socket) => {
+        console.log('broadcasting');
+        const roomInfo = {
+            members: Array.from(roomMap.get(roomId).members),
+            chat: roomMap.get(roomId).chat,
+        }
+        if (socket) {
+            socket.emit('sync-with-server', roomInfo);
+        }
+        else {
+            io.to(roomId).emit('sync-with-server', roomInfo);  
+        }
+        
+    };
+
     io.on('connection', function (socket) {
         socket.on('create-room', (roomId, hostId) => {
-            roomMap.set(roomId, hostId);
+            roomMap.set(roomId, {hostId: hostId, members: new Map(), chat: []});
             if (roomMap.get(roomId)) {
                 socket.emit('confirm-room-creation', true, {roomId: roomId, hostId: hostId});  
             }
@@ -16,27 +45,17 @@ const socket_functions = (io) => {
             }
         });
 
-        socket.on('user-joined', async (userObj) => {
+        socket.on('user-joined', (userObj, roomToken) => {
+            console.log(roomToken);
             if (!roomMap.get(userObj.roomId)) {
-                socket.emit('confirm-room-join', false, userObj);
+                socket.emit('confirm-room-join', false, userObj.roomId, '');
             } else {
-                socket.emit('confirm-room-join', true, userObj);
-                console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
                 socket.join(userObj.roomId);
-
-                //get all sockets in room
-                const socketIds = await io.in(userObj.roomId).allSockets();
-                const firstSocketId = [...socketIds][0];
-
-                //emit sync-request
-                if (firstSocketId) {
-                    const firstSocket = io.sockets.sockets.get(firstSocketId);
-
-                    if (firstSocket) {
-                        console.log(`syncing room ${userObj.roomId} with host`);
-                        firstSocket.emit('add-user', userObj);
-                    }
-                }
+                tokenMap.set(roomToken, userObj.roomId);
+                roomMap.get(userObj.roomId).members.set(roomToken, userObj);
+                socket.emit('confirm-room-join', true, userObj.roomId, roomToken);
+                console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
+                broadcastInfo(userObj.roomId, false);
             }
             
         });
@@ -50,16 +69,39 @@ const socket_functions = (io) => {
         });
 
         socket.on('broadcast-msg', (userObj, msg) => {
-            io.to(userObj.roomId).emit('new-msg', userObj, msg);
+            console.log(`received ${msg} from ${userObj.roomId}`);
+            let messagesArray = roomMap.get(userObj.roomId).chat;
+            messagesArray.push({key: randomId(), name: userObj.user, msg: msg});
+            broadcastInfo(userObj.roomId, false);
         });
+
+        socket.on('request-sync', (roomId)=> {
+            broadcastInfo(roomId, socket);
+        }); 
 
         socket.on('clear-room', (room) => {
             socket.leave(room);
         });
 
-        socket.on('sync-host-out', (roomId, roomUsersMap, chatHistory) => {
-            //Send to every socket except self
-            socket.to(roomId).emit('sync-host-in', roomUsersMap, chatHistory);
+        /*
+        socket.on('sync-with-host', (hostId, hostInfo, roomUsersMap, chatMessages) => {
+            let roomInfo = roomMap.get(hostInfo.roomId);
+            if (roomInfo && roomInfo.hostId === hostId) {
+                roomInfo.members = new Map(roomUsersMap);
+                roomInfo.chat = chatMessages();
+            }
+            socket.to(hostInfo.roomId).emit('sync-with-server', roomUsersMap, chatMessages);
+        });
+        */
+
+        socket.on('request-user-info', (roomToken, roomId) => {
+            let userInfo = roomMap.get(roomId).members.get(roomToken);
+            if (userInfo && userInfo.roomId === roomId) {
+                socket.join(roomId);
+                socket.emit('receive-user-info', true, userInfo);
+            } else {
+                socket.emit('receive-user-info', false, 'error loading user info');
+            }
         });
     });
 }

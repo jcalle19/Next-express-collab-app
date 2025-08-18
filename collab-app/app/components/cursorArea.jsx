@@ -34,13 +34,16 @@ const CursorArea = ({id}) => {
       socketRef.current.emit('update-room', userObj.current);
     }
   }
-  return (
-    <div onMouseMove={getMouseLocation} className="test-border cursor-window">
-      <UserIcon x={coords[0]} y={coords[1]}/>
-      {[...mapSnapshot].map(([user, userInfo]) => 
+
+  /* not currently working
+  {[...mapSnapshot].map(([user, userInfo]) => 
           userInfo.id != userObj.current.id ? <UserIcon key={userInfo.id} x={userInfo.xCoord} y={userInfo.yCoord}/> : ''
         )
       }
+  */
+  return (
+    <div onMouseMove={getMouseLocation} className="test-border cursor-window">
+      <UserIcon x={coords[0]} y={coords[1]}/>
       <Canvas/>
       <CommentArea/>
     </div>

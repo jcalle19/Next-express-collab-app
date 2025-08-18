@@ -15,7 +15,7 @@ const ChatBox = () => {
     const iconFolder = 'toolbar-icons';
 
     const handleSubmit = () => {
-        socketRef.current.emit('broadcast-msg', userObj.current, chatMsg);
+        addMessage(userObj.current, chatMsg);
         updateMsg('');
     }
 
@@ -44,7 +44,7 @@ const ChatBox = () => {
             <section id='msg-container' className={`${activeTab === 'chat' ? '' : 'hidden'}`}>
                 <div id='msg-field' className='glassy'>
                     {
-                        chatMessages.length > 0 ? chatMessages.map((chat) => (<Message key={chat.key} user={chat.username} message={chat.content}/>)) : ''
+                        chatMessages.length > 0 ? chatMessages.map((chat) => (<Message key={chat.key} user={chat.name} message={chat.msg}/>)) : ''
                     }
                 </div>
                 <div id='input-container' className='grid grid-cols-5 glassy'>
@@ -62,7 +62,7 @@ const ChatBox = () => {
             <section id='people-container' className={`${activeTab === 'people' ? '' : 'hidden'}`}>
                 <div id='people-field' className='glassy'>
                     {roomUsersKeys.map((user) => (
-                        <div key={user.key} className='grid grid-cols-[2fr_2fr_2fr_2fr_2fr_5fr] grid-rows-1'>
+                        <div key={user.id} className='grid grid-cols-[2fr_2fr_2fr_2fr_2fr_5fr] grid-rows-1'>
                             <div className='col-start-1'>{user.user}</div>
                             <div className='col-start-2'><Icon src={`/${iconFolder}/pen.svg`} width='85%' height='70%'/></div>
                             <div className='col-start-3'><Icon src={`/${iconFolder}/chat.svg`} width='85%' height='70%'/></div>

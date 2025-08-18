@@ -54,17 +54,37 @@ export const StateProvider = ({children}) => {
             }
         });
 
-        socketRef.current.on('confirm-room-join', (status, userInfo) => {
+        socketRef.current.on('confirm-room-join', (status, roomId, roomToken) => {
             if (status) {
-                sessionStorage.setItem('userObj', JSON.stringify(userInfo));
-                router.push(`/rooms/${userInfo.roomId}`);
+                sessionStorage.setItem('roomToken', roomToken);
+                router.push(`/rooms/${roomId}`);
             } else {
                 console.log('error joining room');
             }
         });
 
+        socketRef.current.on('sync-with-server', (roomInfo) => {
+            console.log(roomInfo);
+            const members = new Map(roomInfo.members);
+            const chatMessages = roomInfo.chat;
+            roomUsers.current = members;
+            updateKeys(Array.from(members.values()));
+            updateMessages(chatMessages);
+        })
+
+        socketRef.current.on('receive-user-info', (status, received) => {
+            if (status) {
+                userObj.current = received;
+                console.log('received info', received);
+                socketRef.current.emit('request-sync', (userObj.current.roomId));
+            } else {
+                console.log('Could not get user info from server');
+                sessionStorage.clear();
+                router.push('/rooms/home');
+            }
+        });
+
         socketRef.current.on('add-user', (userInfo) => {
-            syncFlag.current = true;
             addUser(userInfo);
         });
 
@@ -75,24 +95,6 @@ export const StateProvider = ({children}) => {
         
         socketRef.current.on('update-room', (userInfo) => {
             roomUsers.current.set(userInfo.user, userInfo);
-        });
-
-        socketRef.current.on('new-msg', (userInfo, message) => {
-            //receive new message
-            console.log(`received: ${message}`)
-            addMessage(userInfo, message);
-        });
-
-        socketRef.current.on('sync-request', () => {
-            console.log('Syncing with room', roomUsersRef.current);
-            socketRef.current.emit('sync-host-out', userObj.current.roomId, {roomMap: Object.fromEntries(roomUsers.current), keys: roomUsersRef.current}, chatMessagesRef.current);
-        });
-
-        socketRef.current.on('sync-host-in', (roomInfo, chatHist) => {
-            console.log('syncing from host');
-            roomUsers.current = new Map(Object.entries(roomInfo.roomMap));
-            updateMessages(chatHist);
-            updateKeys([...roomInfo.keys]);
         });
 
         //stuff to do on unmount
@@ -112,18 +114,13 @@ export const StateProvider = ({children}) => {
 
     useEffect(() => {
         roomUsersRef.current = roomUsersKeys;
-        console.log('New list of users: ', roomUsersRef.current);
+        console.log('New list of users: ', roomUsersKeys);
         sessionStorage.setItem('roomUsersKeys', JSON.stringify(roomUsersRef.current));
-        if (syncFlag.current) {
-            socketRef.current.emit('sync-host-out', userObj.current.roomId, {roomMap: Object.fromEntries(roomUsers.current), keys: roomUsersRef.current}, chatMessagesRef.current);
-        }
-        syncFlag.current = false;
     }, [roomUsersKeys]);
 
     useEffect(() => {
         chatMessagesRef.current = chatMessages;
         console.log('New list of chat messages: ', chatMessagesRef.current);
-        sessionStorage.setItem('chatMessages', JSON.stringify(chatMessagesRef.current));
     }, [chatMessages]);
 
     useEffect(() => {
@@ -145,9 +142,10 @@ export const StateProvider = ({children}) => {
     const joinRoom = (newRoom) => {
         if (socketRef.current) {
             let id = randomId();
+            let serverToken = randomId();
             userObj.current.id = id;
             userObj.current.roomId = newRoom;
-            socketRef.current.emit('user-joined', userObj.current);
+            socketRef.current.emit('user-joined', userObj.current, serverToken);
         }
     }
 
@@ -179,7 +177,7 @@ export const StateProvider = ({children}) => {
 
     const addMessage = (user, msg) => {
         //Functional update to add to most current message list
-        updateMessages(prevMessages => [...prevMessages, {key: randomId(), username: user.user, content: msg}]);
+        socketRef.current.emit('broadcast-msg', user, msg);
         console.log('added message');
     }
 
@@ -191,16 +189,8 @@ export const StateProvider = ({children}) => {
     }
 
     const loadRoomState = (roomId) => {
-        const storedInfo = JSON.parse(sessionStorage.getItem('userObj'));
-        if (userObj.current.roomId === '' && roomId === storedInfo.roomId) {
-            userObj.current = storedInfo;
-            updateKeys(JSON.parse(sessionStorage.getItem('roomUsersKeys')));
-            updateMessages(JSON.parse(sessionStorage.getItem('chatMessages')));
-            roomCommentsRef.current = new Map(JSON.parse(sessionStorage.getItem('roomCommentsMap'))); //uses separate flag (commentsLoaded) due to it being useRef
-            socketRef.current.emit('user-left', userObj.current);
-            socketRef.current.emit('user-joined', userObj.current);
-            console.log(userObj.current);
-        }
+        const roomToken = sessionStorage.getItem('roomToken');
+        socketRef.current.emit('request-user-info', roomToken, roomId);
     }
 
     const triggerUndo = () => {
