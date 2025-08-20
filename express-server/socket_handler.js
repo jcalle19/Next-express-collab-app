@@ -25,13 +25,13 @@ const socket_functions = (io) => {
             members: Array.from(roomMap.get(roomId).members),
             chat: roomMap.get(roomId).chat,
         }
+        //might be being called twice, havl
         if (socket) {
             socket.emit('sync-with-server', roomInfo);
         }
         else {
             io.to(roomId).emit('sync-with-server', roomInfo);  
         }
-        
     };
 
     io.on('connection', function (socket) {
@@ -56,6 +56,7 @@ const socket_functions = (io) => {
                 socket.emit('confirm-room-join', true, userObj.roomId, roomToken);
                 console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
                 broadcastInfo(userObj.roomId, false);
+                console.log('from user-joined');
             }
             
         });
@@ -73,33 +74,37 @@ const socket_functions = (io) => {
             let messagesArray = roomMap.get(userObj.roomId).chat;
             messagesArray.push({key: randomId(), name: userObj.user, msg: msg});
             broadcastInfo(userObj.roomId, false);
+            console.log('from broadcast-msg');
         });
 
         socket.on('request-sync', (roomId)=> {
             broadcastInfo(roomId, socket);
+            console.log('from request-sync');
         }); 
+
+        socket.on('check-token', (roomId, token) => {
+            if (!roomMap.get(roomId).members.has(token)) {
+                socket.leave(roomId);
+                socket.emit('token-valid', false);
+            }
+            socket.emit('token-valid', true);
+        });
 
         socket.on('clear-room', (room) => {
             socket.leave(room);
         });
 
-        /*
-        socket.on('sync-with-host', (hostId, hostInfo, roomUsersMap, chatMessages) => {
-            let roomInfo = roomMap.get(hostInfo.roomId);
-            if (roomInfo && roomInfo.hostId === hostId) {
-                roomInfo.members = new Map(roomUsersMap);
-                roomInfo.chat = chatMessages();
-            }
-            socket.to(hostInfo.roomId).emit('sync-with-server', roomUsersMap, chatMessages);
-        });
-        */
-
         socket.on('request-user-info', (roomToken, roomId) => {
-            let userInfo = roomMap.get(roomId).members.get(roomToken);
-            if (userInfo && userInfo.roomId === roomId) {
-                socket.join(roomId);
-                socket.emit('receive-user-info', true, userInfo);
-            } else {
+            try {
+                let userInfo = roomMap.get(roomId).members.get(roomToken);
+                if (userInfo && userInfo.roomId === roomId) {
+                    socket.join(roomId);
+                    socket.emit('receive-user-info', true, userInfo);
+                } else {
+                    socket.emit('receive-user-info', false, 'error loading user info');
+                }
+            }
+            catch (e) {
                 socket.emit('receive-user-info', false, 'error loading user info');
             }
         });

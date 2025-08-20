@@ -3,6 +3,7 @@
 import {createContext, useState, useContext, useEffect, useRef} from "react"
 import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
+import { TextureLoader } from "three";
 
 const stateContext = createContext()
 
@@ -17,7 +18,7 @@ export const StateProvider = ({children}) => {
     const roomUsersRef = useRef([]);
     const roomCommentsRef = useRef(new Map());
     const chatMessagesRef = useRef([]);
-    const syncFlag = useRef(false);
+    const tokenSetRef = useRef(false);
     const commentsLoaded = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
@@ -57,6 +58,7 @@ export const StateProvider = ({children}) => {
         socketRef.current.on('confirm-room-join', (status, roomId, roomToken) => {
             if (status) {
                 sessionStorage.setItem('roomToken', roomToken);
+                tokenSetRef.current = true;
                 router.push(`/rooms/${roomId}`);
             } else {
                 console.log('error joining room');
@@ -64,13 +66,11 @@ export const StateProvider = ({children}) => {
         });
 
         socketRef.current.on('sync-with-server', (roomInfo) => {
-            console.log(roomInfo);
-            const members = new Map(roomInfo.members);
-            const chatMessages = roomInfo.chat;
-            roomUsers.current = members;
-            updateKeys(Array.from(members.values()));
-            updateMessages(chatMessages);
-        })
+            if (tokenSetRef.current) {
+                let currToken = sessionStorage.getItem('roomToken');
+                socketRef.current.emit('check-token', userObj.current.roomId, currToken);
+            }
+        });
 
         socketRef.current.on('receive-user-info', (status, received) => {
             if (status) {
@@ -79,8 +79,7 @@ export const StateProvider = ({children}) => {
                 socketRef.current.emit('request-sync', (userObj.current.roomId));
             } else {
                 console.log('Could not get user info from server');
-                sessionStorage.clear();
-                router.push('/rooms/home');
+                disconnectUser();
             }
         });
 
@@ -95,6 +94,18 @@ export const StateProvider = ({children}) => {
         
         socketRef.current.on('update-room', (userInfo) => {
             roomUsers.current.set(userInfo.user, userInfo);
+        });
+
+        socketRef.current.on('token-valid', (valid) => {
+            if (valid) {
+                const members = new Map(roomInfo.members);
+                const chatMessages = roomInfo.chat;
+                roomUsers.current = members;
+                updateKeys(Array.from(members.values()));
+                updateMessages(chatMessages);
+            } else {
+                disconnectUser();
+            }
         });
 
         //stuff to do on unmount
@@ -115,7 +126,6 @@ export const StateProvider = ({children}) => {
     useEffect(() => {
         roomUsersRef.current = roomUsersKeys;
         console.log('New list of users: ', roomUsersKeys);
-        sessionStorage.setItem('roomUsersKeys', JSON.stringify(roomUsersRef.current));
     }, [roomUsersKeys]);
 
     useEffect(() => {
@@ -128,7 +138,6 @@ export const StateProvider = ({children}) => {
             roomCommentsRef.current = new Map(JSON.parse(sessionStorage.getItem('roomCommentsMap')));
             commentsLoaded.current = true;
         }
-        sessionStorage.setItem('roomCommentsMap', JSON.stringify(Array.from(roomCommentsRef.current.entries())));
     },[commentsFlag]);
 
     const createRoom = () => {
@@ -232,6 +241,10 @@ export const StateProvider = ({children}) => {
         return result;
     }
 
+    const disconnectUser = () => {
+        sessionStorage.clear();
+        router.push('/home');
+    }
 
     const state = {
         userObj,
