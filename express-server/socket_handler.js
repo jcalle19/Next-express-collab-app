@@ -20,7 +20,6 @@ const randomId = () => {
 
 const socket_functions = (io) => {
     const broadcastInfo = (roomId, socket) => {
-        console.log('broadcasting');
         const roomInfo = {
             members: Array.from(roomMap.get(roomId).members),
             chat: roomMap.get(roomId).chat,
@@ -46,7 +45,6 @@ const socket_functions = (io) => {
         });
 
         socket.on('user-joined', (userObj, roomToken) => {
-            console.log(roomToken);
             if (!roomMap.get(userObj.roomId)) {
                 socket.emit('confirm-room-join', false, userObj.roomId, '');
             } else {
@@ -56,7 +54,6 @@ const socket_functions = (io) => {
                 socket.emit('confirm-room-join', true, userObj.roomId, roomToken);
                 console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
                 broadcastInfo(userObj.roomId, false);
-                console.log('from user-joined');
             }
             
         });
@@ -74,20 +71,24 @@ const socket_functions = (io) => {
             let messagesArray = roomMap.get(userObj.roomId).chat;
             messagesArray.push({key: randomId(), name: userObj.user, msg: msg});
             broadcastInfo(userObj.roomId, false);
-            console.log('from broadcast-msg');
         });
 
         socket.on('request-sync', (roomId)=> {
             broadcastInfo(roomId, socket);
-            console.log('from request-sync');
         }); 
 
         socket.on('check-token', (roomId, token) => {
             if (!roomMap.get(roomId).members.has(token)) {
                 socket.leave(roomId);
-                socket.emit('token-valid', false);
+                socket.emit('token-valid', false, '');
+            } else {
+                const roomInfo = {
+                    members: Array.from(roomMap.get(roomId).members),
+                    chat: roomMap.get(roomId).chat,
+                }
+                socket.emit('token-valid', true, roomInfo);
             }
-            socket.emit('token-valid', true);
+            
         });
 
         socket.on('clear-room', (room) => {

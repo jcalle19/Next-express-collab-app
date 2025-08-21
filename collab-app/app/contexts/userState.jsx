@@ -66,6 +66,7 @@ export const StateProvider = ({children}) => {
         });
 
         socketRef.current.on('sync-with-server', (roomInfo) => {
+            console.log(tokenSetRef.current);
             if (tokenSetRef.current) {
                 let currToken = sessionStorage.getItem('roomToken');
                 socketRef.current.emit('check-token', userObj.current.roomId, currToken);
@@ -96,7 +97,7 @@ export const StateProvider = ({children}) => {
             roomUsers.current.set(userInfo.user, userInfo);
         });
 
-        socketRef.current.on('token-valid', (valid) => {
+        socketRef.current.on('token-valid', (valid, roomInfo) => {
             if (valid) {
                 const members = new Map(roomInfo.members);
                 const chatMessages = roomInfo.chat;
@@ -199,6 +200,7 @@ export const StateProvider = ({children}) => {
 
     const loadRoomState = (roomId) => {
         const roomToken = sessionStorage.getItem('roomToken');
+        tokenSetRef.current = true;
         socketRef.current.emit('request-user-info', roomToken, roomId);
     }
 
