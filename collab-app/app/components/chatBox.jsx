@@ -5,6 +5,7 @@ import { useStateContext } from '../contexts/userState.jsx'
 import Message from './message.jsx'
 import Icon from './icon.jsx'
 import RoomInfoPanel from './roomInfoPanel.jsx'
+import UserPanel from './userPanel.jsx'
 import '../css/globals.css'
 import '../css/chatBox.css'
 
@@ -22,12 +23,7 @@ const ChatBox = () => {
     const handleToggleTab = (tab) => {
         setActiveTab(tab);
     }
-
-    /*
-        <div id='users-drop-down' className='glassy'>
-            {roomUsersKeys.map((user) => (<div key={user.key}>{user.user}</div>))}
-        </div>
-    */
+    
     return (
         <div className={'chat-window'}>
             <section id='nav-menu' className='grid grid-cols-3 grid-rows-1'>
@@ -62,13 +58,7 @@ const ChatBox = () => {
             <section id='people-container' className={`${activeTab === 'people' ? '' : 'hidden'}`}>
                 <div id='people-field' className='glassy'>
                     {roomUsersKeys.map((user) => (
-                        <div key={user.id} className='grid grid-cols-[2fr_2fr_2fr_2fr_2fr_5fr] grid-rows-1'>
-                            <div className='col-start-1'>{user.user}</div>
-                            <div className='col-start-2'><Icon src={`/${iconFolder}/pen.svg`} width='85%' height='70%'/></div>
-                            <div className='col-start-3'><Icon src={`/${iconFolder}/chat.svg`} width='85%' height='70%'/></div>
-                            <div className='col-start-4'><Icon src={`/${iconFolder}/admin.svg`} width='85%' height='70%'/></div>
-                            <div className='col-start-5'><Icon src={`/${iconFolder}/kick.svg`} width='85%' height='70%'/></div>
-                        </div>
+                        <UserPanel key={user.id} user={user}/>
                     ))}
                 </div>
             </section>

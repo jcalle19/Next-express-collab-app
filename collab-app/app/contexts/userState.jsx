@@ -11,7 +11,8 @@ export const useStateContext = () => useContext(stateContext);
 
 export const StateProvider = ({children}) => {
     const router = useRouter();
-    const userObj = useRef({id: '', user: '', roomId: '', xCoord: '', yCoord: ''});
+    const userObj = useRef({id: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isAdmin: false});
+    const isAdmin = useRef(false);
     const roomUsers = useRef(new Map()); //Holding player data, will constantly update
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
@@ -49,6 +50,7 @@ export const StateProvider = ({children}) => {
             if (status) {
                 joinRoom(info.roomId);
                 sessionStorage.setItem('hostId', info.hostId);
+                isAdmin.current = true;
                 router.push(`/rooms/${info.roomId}`);
             } else {
                 console.log('Error creating room');
@@ -163,7 +165,7 @@ export const StateProvider = ({children}) => {
         if (socketRef.current) {
             socketRef.current.emit('user-left', userObj.current);
             socketRef.current.emit('clear-room', userObj.current.roomId);
-            userObj.current = {id: '', user: '', roomId: '', xCoord: '', yCoord: ''};
+            userObj.current = {id: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isAdmin: false};
             roomUsers.current = new Map();
             roomCommentsRef.current = new Map();
             updateKeys([]);

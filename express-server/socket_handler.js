@@ -7,7 +7,7 @@
 const roomMap = new Map();
 
 //Has all user room for each token for easy lookup
-const tokenMap = new Map();
+const userMap = new Map();
 
 const randomId = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -49,7 +49,7 @@ const socket_functions = (io) => {
                 socket.emit('confirm-room-join', false, userObj.roomId, '');
             } else {
                 socket.join(userObj.roomId);
-                tokenMap.set(roomToken, userObj.roomId);
+                //userMap.set(roomToken, userObj.roomId);
                 roomMap.get(userObj.roomId).members.set(roomToken, userObj);
                 socket.emit('confirm-room-join', true, userObj.roomId, roomToken);
                 console.log(`User ${userObj.user} joining room ${userObj.roomId}`);

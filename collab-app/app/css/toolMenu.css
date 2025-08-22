@@ -17,7 +17,7 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     width: 30vw;
-    height: 100vw;
+    height: 100vh;
 }
 
 #edit-section {

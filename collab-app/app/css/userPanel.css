@@ -1,0 +1,7 @@
+.perm-button:hover {
+    background: var(--inspecting);
+}
+
+.user-panel {
+    padding-bottom: 2%;
+}
