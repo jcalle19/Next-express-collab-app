@@ -49,7 +49,6 @@ const socket_functions = (io) => {
                 socket.emit('confirm-room-join', false, userObj.roomId, '');
             } else {
                 socket.join(userObj.roomId);
-                //userMap.set(roomToken, userObj.roomId);
                 roomMap.get(userObj.roomId).members.set(roomToken, userObj);
                 socket.emit('confirm-room-join', true, userObj.roomId, roomToken);
                 console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
@@ -62,8 +61,10 @@ const socket_functions = (io) => {
             io.to(userObj.roomId).emit('remove-user', userObj);
         });
         
-        socket.on('update-room', (userObj) => {
-            io.to(userObj.roomId).emit('update-room', userObj);
+        socket.on('update-room', (token, userObj) => {
+            //io.to(userObj.roomId).emit('update-room', token, userObj);
+            roomMap.get(userObj.roomId).members.set(token, userObj);
+            broadcastInfo(userObj.roomId, false);
         });
 
         socket.on('broadcast-msg', (userObj, msg) => {
@@ -95,10 +96,11 @@ const socket_functions = (io) => {
             socket.leave(room);
         });
 
-        socket.on('request-user-info', (roomToken, roomId) => {
+        socket.on('request-user-info', (roomToken, roomId, socketId) => {
             try {
                 let userInfo = roomMap.get(roomId).members.get(roomToken);
                 if (userInfo && userInfo.roomId === roomId) {
+                    userInfo.socketId = socketId;
                     socket.join(roomId);
                     socket.emit('receive-user-info', true, userInfo);
                 } else {
@@ -108,6 +110,18 @@ const socket_functions = (io) => {
             catch (e) {
                 socket.emit('receive-user-info', false, 'error loading user info');
             }
+        });
+
+        socket.on('toggle-drawing', (value, userSocket) => {
+            io.to(userSocket).emit('update-drawing', value);
+        });
+
+        socket.on('toggle-chat', (value, userSocket) => {
+            io.to(userSocket).emit('update-chat', value);
+        });
+
+        socket.on('toggle-admin', (value, userSocket) => {
+            io.to(userSocket).emit('update-admin', value);
         });
     });
 }

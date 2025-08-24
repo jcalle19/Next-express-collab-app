@@ -11,8 +11,7 @@ export const useStateContext = () => useContext(stateContext);
 
 export const StateProvider = ({children}) => {
     const router = useRouter();
-    const userObj = useRef({id: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isAdmin: false});
-    const isAdmin = useRef(false);
+    const userObj = useRef({id: '', socketId: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isAdmin: false});
     const roomUsers = useRef(new Map()); //Holding player data, will constantly update
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
@@ -41,6 +40,7 @@ export const StateProvider = ({children}) => {
 
         socketRef.current.on('connect', () => {
             updateSocketStatus(curr => {
+                userObj.current.socketId = socketRef.current.id;
                 socketRefReady.current = true;
                 return true;
             });
@@ -50,7 +50,7 @@ export const StateProvider = ({children}) => {
             if (status) {
                 joinRoom(info.roomId);
                 sessionStorage.setItem('hostId', info.hostId);
-                isAdmin.current = true;
+                userObj.current.isAdmin = true;
                 router.push(`/rooms/${info.roomId}`);
             } else {
                 console.log('Error creating room');
@@ -95,8 +95,8 @@ export const StateProvider = ({children}) => {
             removeUser(userInfo);
         });
         
-        socketRef.current.on('update-room', (userInfo) => {
-            roomUsers.current.set(userInfo.user, userInfo);
+        socketRef.current.on('update-room', (token, userInfo) => {
+            roomUsers.current.set(token, userInfo);
         });
 
         socketRef.current.on('token-valid', (valid, roomInfo) => {
@@ -109,6 +109,25 @@ export const StateProvider = ({children}) => {
             } else {
                 disconnectUser();
             }
+        });
+
+        socketRef.current.on('update-drawing', (value) => {
+            userObj.current.canDraw = value;
+            const token = sessionStorage.getItem('roomToken');
+            socketRef.current.emit('update-room', userObj.current, token);
+            console.log('updated drawing', value);
+        });
+        socketRef.current.on('update-chat', (value) => {
+            userObj.current.canChat = value;
+            const token = sessionStorage.getItem('roomToken');
+            socketRef.current.emit('update-room', userObj.current, token);
+            console.log('updated chat', value);
+        });
+        socketRef.current.on('update-admin', (value) => {
+            userObj.current.isAdmin = value;
+            const token = sessionStorage.getItem('roomToken');
+            socketRef.current.emit('update-room', userObj.current, token);
+            console.log('updated admin', value);
         });
 
         //stuff to do on unmount
@@ -203,7 +222,7 @@ export const StateProvider = ({children}) => {
     const loadRoomState = (roomId) => {
         const roomToken = sessionStorage.getItem('roomToken');
         tokenSetRef.current = true;
-        socketRef.current.emit('request-user-info', roomToken, roomId);
+        socketRef.current.emit('request-user-info', roomToken, roomId, userObj.current.socketId);
     }
 
     const triggerUndo = () => {

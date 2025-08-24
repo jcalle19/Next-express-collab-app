@@ -31,7 +31,7 @@ const CursorArea = ({id}) => {
     if (socketRef.current !== null) {
       userObj.current.xCoord = e.clientX;
       userObj.current.yCoord = e.clientY;
-      socketRef.current.emit('update-room', userObj.current);
+      //socketRef.current.emit('update-room', userObj.current);
     }
   }
 
