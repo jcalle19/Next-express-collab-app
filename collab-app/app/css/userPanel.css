@@ -1,5 +1,9 @@
 .perm-button:hover {
-    background: var(--inspecting);
+    border: 1px solid rgb(150, 150, 150, 1);
+}
+
+.set-inspecting-borderless {
+  background: var(--inspecting);
 }
 
 .user-panel {

@@ -17,7 +17,7 @@ const Canvas = () => {
     const [windowSizeX, changeWindowXSize] = useState(0);
     const [windowSizeY, changeWindowYSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
+    const { userObj, undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -81,8 +81,10 @@ const Canvas = () => {
 
     const handleMouseDown = (e) => {
         e.preventDefault();
-        drawingRef.current = true;
-        prevRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
+        if (userObj.current.canDraw) {
+            drawingRef.current = true;
+            prevRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
+        }
     };
 
     const handleMouseMove = (e) => {

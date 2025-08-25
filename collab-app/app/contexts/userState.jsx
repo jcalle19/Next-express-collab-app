@@ -48,9 +48,9 @@ export const StateProvider = ({children}) => {
 
         socketRef.current.on('confirm-room-creation', (status, info) => {
             if (status) {
+                userObj.current.isAdmin = true;
                 joinRoom(info.roomId);
                 sessionStorage.setItem('hostId', info.hostId);
-                userObj.current.isAdmin = true;
                 router.push(`/rooms/${info.roomId}`);
             } else {
                 console.log('Error creating room');
@@ -128,6 +128,10 @@ export const StateProvider = ({children}) => {
             const token = sessionStorage.getItem('roomToken');
             socketRef.current.emit('update-room', userObj.current, token);
             console.log('updated admin', value);
+        });
+
+        socketRef.current.on('kick', () => {
+            disconnectUser();
         });
 
         //stuff to do on unmount
@@ -265,7 +269,7 @@ export const StateProvider = ({children}) => {
     }
 
     const disconnectUser = () => {
-        sessionStorage.clear();
+        leaveRoom();
         router.push('/home');
     }
 

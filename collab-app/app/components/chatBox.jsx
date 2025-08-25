@@ -16,14 +16,16 @@ const ChatBox = () => {
     const iconFolder = 'toolbar-icons';
 
     const handleSubmit = () => {
-        addMessage(userObj.current, chatMsg);
+        if (userObj.current.canChat) {
+            addMessage(userObj.current, chatMsg);
+        }
         updateMsg('');
     }
 
     const handleToggleTab = (tab) => {
         setActiveTab(tab);
     }
-    
+
     return (
         <div className={'chat-window'}>
             <section id='nav-menu' className='grid grid-cols-3 grid-rows-1'>

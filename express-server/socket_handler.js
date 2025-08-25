@@ -61,8 +61,7 @@ const socket_functions = (io) => {
             io.to(userObj.roomId).emit('remove-user', userObj);
         });
         
-        socket.on('update-room', (token, userObj) => {
-            //io.to(userObj.roomId).emit('update-room', token, userObj);
+        socket.on('update-room', (userObj, token) => {
             roomMap.get(userObj.roomId).members.set(token, userObj);
             broadcastInfo(userObj.roomId, false);
         });
@@ -110,6 +109,10 @@ const socket_functions = (io) => {
             catch (e) {
                 socket.emit('receive-user-info', false, 'error loading user info');
             }
+        });
+
+        socket.on('kick-user', (socketId) => {
+            io.to(socketId).emit('kick');
         });
 
         socket.on('toggle-drawing', (value, userSocket) => {
