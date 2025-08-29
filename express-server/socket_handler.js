@@ -24,7 +24,7 @@ const socket_functions = (io) => {
             members: Array.from(roomMap.get(roomId).members),
             chat: roomMap.get(roomId).chat,
         }
-        //might be being called twice, havl
+        //might be being called twice, have to look further
         if (socket) {
             socket.emit('sync-with-server', roomInfo);
         }
@@ -35,7 +35,7 @@ const socket_functions = (io) => {
 
     io.on('connection', function (socket) {
         socket.on('create-room', (roomId, hostId) => {
-            roomMap.set(roomId, {hostId: hostId, members: new Map(), chat: []});
+            roomMap.set(roomId, {hostId: hostId, admins: new Set(), members: new Map(), chat: []});
             if (roomMap.get(roomId)) {
                 socket.emit('confirm-room-creation', true, {roomId: roomId, hostId: hostId});  
             }
@@ -57,8 +57,9 @@ const socket_functions = (io) => {
             
         });
 
-        socket.on('user-left', (userObj) => {
-            io.to(userObj.roomId).emit('remove-user', userObj);
+        socket.on('user-left', (roomId, token) => {
+            roomMap.get(roomId).members.delete(token);
+            broadcastInfo(roomId, false);
         });
         
         socket.on('update-room', (userObj, token) => {
@@ -115,16 +116,32 @@ const socket_functions = (io) => {
             io.to(socketId).emit('kick');
         });
 
-        socket.on('toggle-drawing', (value, userSocket) => {
-            io.to(userSocket).emit('update-drawing', value);
+        socket.on('toggle-drawing', (value, userSocket, roomId, token) => {
+            if (roomMap.get(roomId).admins.has(token)) {
+                io.to(userSocket).emit('update-drawing', value);
+            }
         });
 
-        socket.on('toggle-chat', (value, userSocket) => {
-            io.to(userSocket).emit('update-chat', value);
+        socket.on('toggle-chat', (value, userSocket, roomId, token) => {
+            if (roomMap.get(roomId).admins.has(token)) {
+                io.to(userSocket).emit('update-chat', value);
+            }
         });
 
-        socket.on('toggle-admin', (value, userSocket) => {
-            io.to(userSocket).emit('update-admin', value);
+        socket.on('toggle-admin', (value, userSocket, roomId, hostToken) => {
+            if (roomMap.get(roomId).hostId === hostToken) {
+                io.to(userSocket).emit('update-admin', value);
+            }
+        });
+
+        socket.on('edit-admins', (roomId, token, value) => {
+            if (value) {
+                roomMap.get(roomId).admins.add(token);
+            }
+            else {
+                roomMap.get(roomId).admins.delete(token);
+            }
+            console.log(roomMap.get(roomId).admins);
         });
     });
 }

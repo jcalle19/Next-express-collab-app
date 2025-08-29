@@ -1,5 +1,10 @@
+.perm-button { 
+    width: 50%;
+    height: 30px;
+    border-radius: 30px;
+}
 .perm-button:hover {
-    border: 1px solid rgb(150, 150, 150, 1);
+    border: 1px solid rgb(150, 150, 150);
 }
 
 .set-inspecting-borderless {
@@ -8,4 +13,5 @@
 
 .user-panel {
     padding-bottom: 2%;
+    overflow-y: scroll;
 }

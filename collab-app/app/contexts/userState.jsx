@@ -11,7 +11,7 @@ export const useStateContext = () => useContext(stateContext);
 
 export const StateProvider = ({children}) => {
     const router = useRouter();
-    const userObj = useRef({id: '', socketId: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isAdmin: false});
+    const userObj = useRef({id: '', socketId: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isHost: false, isAdmin: false});
     const roomUsers = useRef(new Map()); //Holding player data, will constantly update
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
@@ -39,8 +39,8 @@ export const StateProvider = ({children}) => {
         socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_URL);
 
         socketRef.current.on('connect', () => {
+            userObj.current.socketId = socketRef.current.id;
             updateSocketStatus(curr => {
-                userObj.current.socketId = socketRef.current.id;
                 socketRefReady.current = true;
                 return true;
             });
@@ -48,10 +48,10 @@ export const StateProvider = ({children}) => {
 
         socketRef.current.on('confirm-room-creation', (status, info) => {
             if (status) {
-                userObj.current.isAdmin = true;
-                joinRoom(info.roomId);
                 sessionStorage.setItem('hostId', info.hostId);
-                router.push(`/rooms/${info.roomId}`);
+                userObj.current.isAdmin = true;
+                userObj.current.isHost = true;
+                joinRoom(info.roomId);
             } else {
                 console.log('Error creating room');
             }
@@ -60,6 +60,9 @@ export const StateProvider = ({children}) => {
         socketRef.current.on('confirm-room-join', (status, roomId, roomToken) => {
             if (status) {
                 sessionStorage.setItem('roomToken', roomToken);
+                if (userObj.current.isHost) {
+                    socketRef.current.emit('edit-admins', userObj.current.roomId, roomToken, true);
+                }
                 tokenSetRef.current = true;
                 router.push(`/rooms/${roomId}`);
             } else {
@@ -84,15 +87,6 @@ export const StateProvider = ({children}) => {
                 console.log('Could not get user info from server');
                 disconnectUser();
             }
-        });
-
-        socketRef.current.on('add-user', (userInfo) => {
-            addUser(userInfo);
-        });
-
-        socketRef.current.on('remove-user', (userInfo) => {
-            console.log('removing user ', userInfo.user);
-            removeUser(userInfo);
         });
         
         socketRef.current.on('update-room', (token, userInfo) => {
@@ -127,6 +121,7 @@ export const StateProvider = ({children}) => {
             userObj.current.isAdmin = value;
             const token = sessionStorage.getItem('roomToken');
             socketRef.current.emit('update-room', userObj.current, token);
+            socketRef.current.emit('edit-admins', userObj.current.roomId, token, value);
             console.log('updated admin', value);
         });
 
@@ -186,8 +181,9 @@ export const StateProvider = ({children}) => {
 
     const leaveRoom = () => {
         if (socketRef.current) {
-            socketRef.current.emit('user-left', userObj.current);
+            const token = sessionStorage.getItem('roomToken');
             socketRef.current.emit('clear-room', userObj.current.roomId);
+            socketRef.current.emit('user-left', userObj.current.roomId, token);
             userObj.current = {id: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isAdmin: false};
             roomUsers.current = new Map();
             roomCommentsRef.current = new Map();
@@ -197,23 +193,9 @@ export const StateProvider = ({children}) => {
         }
     }
 
-    const removeUser = (userInfo) => {
-        roomUsers.current.delete(userInfo.user);
-        roomUsersRef.current = roomUsersRef.current.filter(obj => obj.user !== userInfo.user);
-        updateKeys([...roomUsersRef.current]);
-        console.log('New user list: ', [...roomUsersRef.current]);
-    };
-
-    const addUser = (userInfo) => {
-        roomUsers.current.set(userInfo.user, userInfo);
-        updateKeys(currUsers => [...currUsers, {key: randomId(), user: userInfo.user}]);
-        console.log(`added user: ${userInfo.user}`, roomUsersRef.current);
-    }
-
     const addMessage = (user, msg) => {
         //Functional update to add to most current message list
         socketRef.current.emit('broadcast-msg', user, msg);
-        console.log('added message');
     }
 
     const addComment = () => {
@@ -297,8 +279,6 @@ export const StateProvider = ({children}) => {
         createRoom,
         joinRoom,
         leaveRoom,
-        removeUser,
-        addUser,
         addMessage,
         addComment,
         loadRoomState,
