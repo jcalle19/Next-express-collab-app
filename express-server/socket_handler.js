@@ -23,6 +23,7 @@ const socket_functions = (io) => {
         const roomInfo = {
             members: Array.from(roomMap.get(roomId).members),
             chat: roomMap.get(roomId).chat,
+            options: roomMap.get(roomId).options,
         }
         //might be being called twice, have to look further
         if (socket) {
@@ -34,8 +35,13 @@ const socket_functions = (io) => {
     };
 
     io.on('connection', function (socket) {
-        socket.on('create-room', (roomId, hostId) => {
-            roomMap.set(roomId, {hostId: hostId, admins: new Set(), members: new Map(), chat: []});
+        socket.on('create-room', (roomId, hostId, roomOptions) => {
+            roomMap.set(roomId, {hostId: hostId, 
+                                 options: roomOptions,
+                                 admins: new Set(), 
+                                 members: new Map(), 
+                                 chat: [],
+                                });
             if (roomMap.get(roomId)) {
                 socket.emit('confirm-room-creation', true, {roomId: roomId, hostId: hostId});  
             }
@@ -45,7 +51,7 @@ const socket_functions = (io) => {
         });
 
         socket.on('user-joined', (userObj, roomToken) => {
-            if (!roomMap.get(userObj.roomId)) {
+            if (!roomMap.get(userObj.roomId) || !roomMap.get(userObj.roomId).options.canJoin) {
                 socket.emit('confirm-room-join', false, userObj.roomId, '');
             } else {
                 socket.join(userObj.roomId);
@@ -69,9 +75,11 @@ const socket_functions = (io) => {
 
         socket.on('broadcast-msg', (userObj, msg) => {
             console.log(`received ${msg} from ${userObj.roomId}`);
-            let messagesArray = roomMap.get(userObj.roomId).chat;
-            messagesArray.push({key: randomId(), name: userObj.user, msg: msg});
-            broadcastInfo(userObj.roomId, false);
+            if (roomMap.get(userObj.roomId).options.canChat) {
+                let messagesArray = roomMap.get(userObj.roomId).chat;
+                messagesArray.push({key: randomId(), name: userObj.user, msg: msg});
+                broadcastInfo(userObj.roomId, false);
+            }
         });
 
         socket.on('request-sync', (roomId)=> {
@@ -86,6 +94,7 @@ const socket_functions = (io) => {
                 const roomInfo = {
                     members: Array.from(roomMap.get(roomId).members),
                     chat: roomMap.get(roomId).chat,
+                    options: roomMap.get(roomId).options,
                 }
                 socket.emit('token-valid', true, roomInfo);
             }
@@ -141,7 +150,15 @@ const socket_functions = (io) => {
             else {
                 roomMap.get(roomId).admins.delete(token);
             }
-            console.log(roomMap.get(roomId).admins);
+        });
+
+        socket.on('update-options', (roomId, roomOptions, hostId)=> {
+            const mapAccess = roomMap.get(roomId);
+            if (mapAccess.hostId === hostId) {
+                mapAccess.options = roomOptions;
+                console.log(`canJoin ${roomOptions.canJoin}, can Draw ${roomOptions.canDraw}, canChat ${roomOptions.canChat}`);
+                broadcastInfo(roomId, false);
+            }
         });
     });
 }

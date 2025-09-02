@@ -1,0 +1,18 @@
+.switch-container {
+    width: 50px;
+    aspect-ratio: 2 / 1;
+    background-color: white;
+    border-radius: 25px;
+}
+
+.switch-toggle {
+    position: relative;
+    transform: translateY(-50%);
+    top: 50%;
+    background-color: black;
+    width: 45%;
+    height: 90%;
+    border: 2px solid white;
+    border-radius: 50%;
+    transition: left .2s;
+}

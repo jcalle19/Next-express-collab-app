@@ -12,6 +12,7 @@ export const useStateContext = () => useContext(stateContext);
 export const StateProvider = ({children}) => {
     const router = useRouter();
     const userObj = useRef({id: '', socketId: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isHost: false, isAdmin: false});
+    const roomOptions = useRef({canJoin: true, canDraw: true, canChat: true});
     const roomUsers = useRef(new Map()); //Holding player data, will constantly update
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
@@ -98,6 +99,7 @@ export const StateProvider = ({children}) => {
                 const members = new Map(roomInfo.members);
                 const chatMessages = roomInfo.chat;
                 roomUsers.current = members;
+                roomOptions.current = roomInfo.options;
                 updateKeys(Array.from(members.values()));
                 updateMessages(chatMessages);
             } else {
@@ -165,7 +167,7 @@ export const StateProvider = ({children}) => {
         if (socketRef.current) {
             let roomId = randomId();
             let hostId = randomId();
-            socketRef.current.emit('create-room', roomId, hostId);
+            socketRef.current.emit('create-room', roomId, hostId, roomOptions.current);
         }
     }
 
@@ -257,6 +259,7 @@ export const StateProvider = ({children}) => {
 
     const state = {
         userObj,
+        roomOptions,
         roomUsers,
         socketRef,
         socketRefReady,
