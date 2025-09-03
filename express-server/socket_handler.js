@@ -156,7 +156,6 @@ const socket_functions = (io) => {
             const mapAccess = roomMap.get(roomId);
             if (mapAccess.hostId === hostId) {
                 mapAccess.options = roomOptions;
-                console.log(`canJoin ${roomOptions.canJoin}, can Draw ${roomOptions.canDraw}, canChat ${roomOptions.canChat}`);
                 broadcastInfo(roomId, false);
             }
         });
