@@ -15,7 +15,6 @@ const RoomInfoPanel = () => {
     }
 
     const handleToggleOptions = () => {
-        console.log(roomOptions.current);
         const hostId = sessionStorage.getItem('hostId');
         socketRef.current.emit(`update-options`, userObj.current.roomId, roomOptions.current, hostId);
     }
@@ -61,7 +60,7 @@ const RoomInfoPanel = () => {
                     }
                 </div>
             </div>
-            <button onClick={handleLeave}>Leave Room</button>
+            <button className='leave-button' onClick={handleLeave}>Leave Room</button>
         </div>
     )
 }

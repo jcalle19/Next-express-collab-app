@@ -111,20 +111,17 @@ export const StateProvider = ({children}) => {
             userObj.current.canDraw = value;
             const token = sessionStorage.getItem('roomToken');
             socketRef.current.emit('update-room', userObj.current, token);
-            console.log('updated drawing', value);
         });
         socketRef.current.on('update-chat', (value) => {
             userObj.current.canChat = value;
             const token = sessionStorage.getItem('roomToken');
             socketRef.current.emit('update-room', userObj.current, token);
-            console.log('updated chat', value);
         });
         socketRef.current.on('update-admin', (value) => {
             userObj.current.isAdmin = value;
             const token = sessionStorage.getItem('roomToken');
             socketRef.current.emit('update-room', userObj.current, token);
             socketRef.current.emit('edit-admins', userObj.current.roomId, token, value);
-            console.log('updated admin', value);
         });
 
         socketRef.current.on('kick', () => {
