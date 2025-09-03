@@ -1,3 +1,6 @@
 .room-panel {
-    border: 2px solid green;
+}
+
+.room-panel * {
+    font-size: min(1vw, 2vh) !important;
 }

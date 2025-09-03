@@ -16,7 +16,6 @@ const ToolBar = () => {
     const vantaRef = useRef(null);
     const [vantaEffect, setVantaEffect] = useState(null);
     /*-------------------------*/
-    const [expanded, changeSize] = useState(false);
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
@@ -112,9 +111,9 @@ const ToolBar = () => {
                             </div>
                         </div>
                         <div id='draw-mode-row' className='grid grid-cols-3 grid-rows-[1fr_2fr]'>
-                            <div id='highlight-active' className='row-start-1 col-start-1 glassy'></div>
-                            <div id='line-active' className='row-start-1 col-start-2 glassy'></div>
-                            <div id='text-edit-active' className='row-start-1 col-start-3 glassy'></div>
+                            <div id='background-set' className='row-start-1 col-start-1 glassy'></div>
+                            <div id='undetermined1-active' className='row-start-1 col-start-2 glassy'></div>
+                            <div id='undetermined2-active' className='row-start-1 col-start-3 glassy'></div>
                             <div id='highlight-toggle' className={`row-start-2 col-start-1 glassy ${highlightFlag ? 'set-inspecting' : ''}`} onClick={triggerHighlight}>
                                 <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
                             </div>

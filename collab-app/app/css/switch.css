@@ -1,5 +1,5 @@
 .switch-container {
-    width: 50px;
+    width: max(2vw, 4vh);
     aspect-ratio: 2 / 1;
     background-color: white;
     border-radius: 25px;
