@@ -1,6 +1,7 @@
 #canvas-container {
     width: 69.5vw;
     height: 100vh;
+    position: relative;
 }
 
 #canvas-window {
@@ -11,7 +12,6 @@
     transform: translate(-50%, -50%);
     max-width: 70vw;
     max-height: 100vh;
-    background-color: transparent;
     border: 1px dashed grey;
     padding: 0px;
     margin: 0px;

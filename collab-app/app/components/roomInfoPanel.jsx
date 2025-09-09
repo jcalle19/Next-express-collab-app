@@ -15,7 +15,6 @@ const RoomInfoPanel = () => {
     }
 
     const handleToggleOptions = () => {
-        console.log(roomOptions.current);
         const hostId = sessionStorage.getItem('hostId');
         socketRef.current.emit(`update-options`, userObj.current.roomId, roomOptions.current, hostId);
     }

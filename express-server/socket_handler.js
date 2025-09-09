@@ -24,6 +24,7 @@ const socket_functions = (io) => {
             members: Array.from(roomMap.get(roomId).members),
             chat: roomMap.get(roomId).chat,
             options: roomMap.get(roomId).options,
+            background: roomMap.get(roomId).background,
         }
         //might be being called twice, have to look further
         if (socket) {
@@ -41,6 +42,7 @@ const socket_functions = (io) => {
                                  admins: new Set(), 
                                  members: new Map(), 
                                  chat: [],
+                                 background: '',
                                 });
             if (roomMap.get(roomId)) {
                 socket.emit('confirm-room-creation', true, {roomId: roomId, hostId: hostId});  
@@ -95,6 +97,7 @@ const socket_functions = (io) => {
                     members: Array.from(roomMap.get(roomId).members),
                     chat: roomMap.get(roomId).chat,
                     options: roomMap.get(roomId).options,
+                    background: roomMap.get(roomId).background,
                 }
                 socket.emit('token-valid', true, roomInfo);
             }
@@ -159,6 +162,11 @@ const socket_functions = (io) => {
                 console.log(`canJoin ${roomOptions.canJoin}, can Draw ${roomOptions.canDraw}, canChat ${roomOptions.canChat}`);
                 broadcastInfo(roomId, false);
             }
+        });
+
+        socket.on('update-background', (roomId, background) => {
+            roomMap.get(roomId).background = background;
+            broadcastInfo(roomId, false);
         });
     });
 }

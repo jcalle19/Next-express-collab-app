@@ -23,6 +23,8 @@ export const StateProvider = ({children}) => {
     const commentsLoaded = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
+    const [canvasBackground, updateBackground] = useState('');
+    const [backgroundSelectFlag, updateBackgroundSelect] = useState(false);
     const [lineFlag, updateLineFlag] = useState(false);
     const [highlightFlag, updateHighlight] = useState(false);
     const [undoFlag, updateUndo] = useState(false);
@@ -72,7 +74,6 @@ export const StateProvider = ({children}) => {
         });
 
         socketRef.current.on('sync-with-server', (roomInfo) => {
-            console.log(tokenSetRef.current);
             if (tokenSetRef.current) {
                 let currToken = sessionStorage.getItem('roomToken');
                 socketRef.current.emit('check-token', userObj.current.roomId, currToken);
@@ -102,6 +103,7 @@ export const StateProvider = ({children}) => {
                 roomOptions.current = roomInfo.options;
                 updateKeys(Array.from(members.values()));
                 updateMessages(chatMessages);
+                updateBackground(roomInfo.background);
             } else {
                 disconnectUser();
             }
@@ -163,6 +165,13 @@ export const StateProvider = ({children}) => {
         }
     },[commentsFlag]);
 
+    useEffect(() => {
+        if (canvasBackground !== '') {
+            console.log(canvasBackground);
+            socketRef.current.emit('update-background', userObj.current.roomId, canvasBackground);
+        }
+    }, [canvasBackground]);
+
     const createRoom = () => {
         if (socketRef.current) {
             let roomId = randomId();
@@ -213,6 +222,15 @@ export const StateProvider = ({children}) => {
         socketRef.current.emit('request-user-info', roomToken, roomId, userObj.current.socketId);
     }
 
+    const setBackground = (url) => {
+        updateBackground(url);
+    }
+
+    const triggerBackgroundFlag = () => {
+        if (userObj.current.isHost) {
+           updateBackgroundSelect(!backgroundSelectFlag) 
+        }
+    }
     const triggerUndo = () => {
         updateUndo(!undoFlag);
     }
@@ -269,6 +287,8 @@ export const StateProvider = ({children}) => {
         roomUsersRef,
         roomCommentsRef,
         chatMessagesRef,
+        canvasBackground,
+        backgroundSelectFlag,
         undoFlag,
         redoFlag,
         highlightFlag,
@@ -285,6 +305,8 @@ export const StateProvider = ({children}) => {
         addMessage,
         addComment,
         loadRoomState,
+        setBackground,
+        triggerBackgroundFlag,
         triggerUndo,
         triggerRedo,
         triggerHighlight,
