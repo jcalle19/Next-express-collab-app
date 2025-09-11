@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
 import '../css/canvas.css'
 import Comment from './comment.jsx'
+import BackgroundBox from './backgroundBox.jsx'
 
 const Canvas = () => {
     const canvasRef = useRef(null);
@@ -17,7 +18,7 @@ const Canvas = () => {
     const [windowSizeX, changeWindowXSize] = useState(0);
     const [windowSizeY, changeWindowYSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { userObj, undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
+    const { userObj, canvasBackground, backgroundSelectFlag, undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -139,13 +140,17 @@ const Canvas = () => {
     };
     //style={{width: `70vw`, height: `${.50 * 70}vw`}}
     return (
-        <div id='canvas-container' >
+        <div id='canvas-container'>
             <canvas ref={canvasRef} 
                 id='canvas-window'
+                style={{
+                    background: `${canvasBackground === '' ? 'black' : canvasBackground} center / cover no-repeat`
+                }}
                 onMouseMove={handleMouseMove}
                 onMouseDown={handleMouseDown} 
                 onMouseUp={handleMouseUp}>
             </canvas>
+            {backgroundSelectFlag ? <BackgroundBox isVisible={true}/> : ''}
         </div>
     )
 }

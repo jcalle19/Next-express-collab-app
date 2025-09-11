@@ -1,0 +1,54 @@
+.box-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(15, 15, 15, 1);
+    border: 1px solid rgba(25, 25, 25, 1);
+    width: 36%;
+    height: 24%;
+    min-width: 270px;
+    min-height: 200px;
+    border-radius: 5px 8px 5px 5px;
+}
+
+#url-input {
+    color: black;
+}
+
+#close-button {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    height: 25px;
+    width: 25px;
+    background-color: red;
+    border-radius: 0px 5px 0px 0px;
+}
+
+#black-select {
+    background-color: black;
+    border: 1px solid white;
+}
+
+#white-select {
+    background-color: white;
+}
+
+.select-button:hover {
+    border: 2px dashed rgb(5, 202, 104) !important;
+}
+
+.selected {
+    border: 2px solid rgb(5, 202, 104) !important;
+}
+
+.url-submit {
+    border: 1px solid white;
+    height: 100%;
+    transition: background .1s;
+}
+
+.url-submit:hover {
+    background: rgb(5, 202, 104);
+}

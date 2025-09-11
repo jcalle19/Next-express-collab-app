@@ -10,7 +10,7 @@
     padding: 0px;
     margin: 0px;
     overflow: hidden;
-    
+    background: repeating-linear-gradient(135deg, rgb(15,15,15) , rgb(15,15,15) 2px, rgb(22, 22, 22) 2px, rgb(22,22,22) 4px);
 }
 
 .cursor-window {
