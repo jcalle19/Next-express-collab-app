@@ -24,6 +24,7 @@ export const StateProvider = ({children}) => {
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
     const [canvasBackground, updateBackground] = useState('');
+    const [canvasZoom, updateZoom] = useState(100); 
     const [backgroundSelectFlag, updateBackgroundSelect] = useState(false);
     const [lineFlag, updateLineFlag] = useState(false);
     const [highlightFlag, updateHighlight] = useState(false);
@@ -104,6 +105,7 @@ export const StateProvider = ({children}) => {
                 updateKeys(Array.from(members.values()));
                 updateMessages(chatMessages);
                 updateBackground(roomInfo.background);
+                updateZoom(roomInfo.zoom);
             } else {
                 disconnectUser();
             }
@@ -162,12 +164,19 @@ export const StateProvider = ({children}) => {
         }
     },[commentsFlag]);
 
+    /*-------------- Add host verification to these ones --------------*/
     useEffect(() => {
-        if (canvasBackground !== '') {
+        if (canvasBackground !== '' && userObj.current.isHost) {
             console.log(canvasBackground);
             socketRef.current.emit('update-background', userObj.current.roomId, canvasBackground);
         }
     }, [canvasBackground]);
+
+    useEffect(() => {
+        if (userObj.current.roomId !== '' && userObj.current.isHost) {
+            socketRef.current.emit('update-zoom', userObj.current.roomId, canvasZoom);;
+        }
+    }, [canvasZoom]);
 
     const createRoom = () => {
         if (socketRef.current) {
@@ -254,6 +263,18 @@ export const StateProvider = ({children}) => {
         updateTextFlag(!textEditFlag);
     }
 
+    const zoomIn = () => {
+        if (canvasZoom + 25 < 450) {
+            updateZoom(canvasZoom + 25);
+        }
+    }
+
+    const zoomOut = () => {
+        if (canvasZoom - 25 > 0) {
+            updateZoom(canvasZoom - 25);
+        }
+    }
+
     const newSliderColor = (newColor) => {
         updateSliderColor(newColor);
     }
@@ -285,6 +306,7 @@ export const StateProvider = ({children}) => {
         roomCommentsRef,
         chatMessagesRef,
         canvasBackground,
+        canvasZoom,
         backgroundSelectFlag,
         undoFlag,
         redoFlag,
@@ -310,6 +332,8 @@ export const StateProvider = ({children}) => {
         triggerLineTool,
         triggerClear,
         triggerTextFlag,
+        zoomIn,
+        zoomOut,
         updateCommentsFlag,
         newSliderColor,
     }

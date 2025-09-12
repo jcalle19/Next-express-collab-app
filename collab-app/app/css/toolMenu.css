@@ -68,3 +68,21 @@
 #comment-row {
     margin-top: -.5px;
 }
+
+.react-aria-ColorSlider {
+  &[data-orientation=vertical] {
+    height: 150px;
+    display: block;
+    position: relative;
+
+    .react-aria-SliderTrack {
+      width: 28px;
+      height: 100%;
+    }
+
+    .react-aria-ColorThumb {
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+  }
+}

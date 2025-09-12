@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
+import {parseColor} from 'react-aria-components'
 import '../css/toolMenu.css'
 import '../css/globals.css'
 import ColorPicker from './colorPicker.jsx'
-import Comment from './comment.jsx'
+import Note from './note.jsx'
 import ChatBox from './chatBox.jsx'
 import Icon from './icon.jsx'
+import MyColorSlider from './myColorSlider.jsx'
 import * as THREE from 'three'; // Import Three.js
 import HALO from 'vanta/dist/vanta.halo.min';
 
@@ -16,12 +18,13 @@ const ToolBar = () => {
     const vantaRef = useRef(null);
     const [vantaEffect, setVantaEffect] = useState(null);
     /*-------------------------*/
+    let [value, setValue] = useState(parseColor('hsl(0, 100%, 50%)'));
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
     const { triggerBackgroundFlag, triggerUndo, triggerRedo, triggerLineTool, 
             triggerHighlight, triggerClear, triggerTextFlag, 
-            highlightFlag, lineFlag, textEditFlag,
+            highlightFlag, lineFlag, textEditFlag, zoomIn, zoomOut,
             sliderThumbColor, penInfoRef, addComment } = useStateContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
@@ -114,8 +117,12 @@ const ToolBar = () => {
                             <div id='background-set' className='row-start-1 col-start-1 glassy' onClick={triggerBackgroundFlag}>
                                 <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>
                             </div>
-                            <div id='undetermined1-active' className='row-start-1 col-start-2 glassy'></div>
-                            <div id='undetermined2-active' className='row-start-1 col-start-3 glassy'></div>
+                            <div id='zoom-in' className='row-start-1 col-start-2 glassy' onClick={zoomIn}>
+                                <Icon src={`/${iconFolder}/zoom-in.svg`} width='55%' height='55%'/>
+                            </div>
+                            <div id='zoom-out' className='row-start-1 col-start-3 glassy' onClick={zoomOut}>
+                                <Icon src={`/${iconFolder}/zoom-out.svg`} width='55%' height='55%'/>
+                            </div>
                             <div id='highlight-toggle' className={`row-start-2 col-start-1 glassy ${highlightFlag ? 'set-inspecting' : ''}`} onClick={triggerHighlight}>
                                 <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
                             </div>
@@ -135,7 +142,14 @@ const ToolBar = () => {
                     <div id='clear-button' className='col-start-1 glassy'>
                         <Icon src={`/${iconFolder}/trash.svg`} width='50%' height='35%'/>
                     </div>
-                    <div id='comment-window' className='col-start-2 glassy no-margin-right'></div>
+                    <div id='comment-window' className='col-start-2 glassy no-margin-right'>
+                       <Note isPreview={true}/>
+                       <MyColorSlider
+                            orientation="vertical"
+                            value={value}
+                            onChange={setValue}
+                            channel="hue" />
+                    </div>
                 </div>
             </section>
             <section id='chat-section'>

@@ -18,7 +18,8 @@ const Canvas = () => {
     const [windowSizeX, changeWindowXSize] = useState(0);
     const [windowSizeY, changeWindowYSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { userObj, canvasBackground, backgroundSelectFlag, undoFlag, redoFlag, lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
+    const { userObj, canvasBackground, canvasZoom, backgroundSelectFlag, undoFlag, redoFlag, 
+            lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -144,7 +145,7 @@ const Canvas = () => {
             <canvas ref={canvasRef} 
                 id='canvas-window'
                 style={{
-                    background: `${canvasBackground === '' ? 'black' : canvasBackground} center / cover no-repeat`
+                    background: `${canvasBackground === '' ? 'black' : canvasBackground} center / ${canvasZoom}% no-repeat`,
                 }}
                 onMouseMove={handleMouseMove}
                 onMouseDown={handleMouseDown} 

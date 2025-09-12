@@ -1,3 +1,5 @@
+//Currently unused, did not work so i reworked it into note.jsx
+
 import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
 import DOMPurify from "dompurify"
