@@ -14,7 +14,7 @@
 /coverage
 
 # next.js
-/collab-app/next/
+/collab-app/.next/
 /.next/
 /out/
 
