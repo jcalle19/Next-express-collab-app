@@ -1,6 +1,8 @@
-import { ColorSlider, SliderTrack, ColorThumb } from "react-aria-components";
+import { useState, useEffect, useRef } from 'react';
+import { ColorSlider, SliderTrack, SliderOutput, ColorThumb } from "react-aria-components";
 
 const MyColorSlider = ({ label, ...props }) => {
+
   return (
     <ColorSlider {...props}>
       <SliderTrack
@@ -10,7 +12,11 @@ const MyColorSlider = ({ label, ...props }) => {
         })}
       >
         <ColorThumb className="bg-black border-2 border-white"
-                    style={{width: '100%', height: '10%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
+                    style={{width: '100%', 
+                            aspectRatio: '1/1', left: '50%', 
+                            transform: 'translate(-50%, -50%)', 
+                            borderRadius: '10px',
+                          }}/>
       </SliderTrack>
     </ColorSlider>
   );

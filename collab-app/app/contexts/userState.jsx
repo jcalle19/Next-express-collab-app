@@ -1,9 +1,9 @@
 'use client';
 
 import {createContext, useState, useContext, useEffect, useRef} from "react"
+import {parseColor} from 'react-aria-components'
 import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
-import { TextureLoader } from "three";
 
 const stateContext = createContext()
 
@@ -25,6 +25,9 @@ export const StateProvider = ({children}) => {
     const mouseLocationRef = useRef({x: 0, y: 0});
     const [canvasBackground, updateBackground] = useState('');
     const [canvasZoom, updateZoom] = useState(100); 
+    const [penColor, setPenColor] = useState(parseColor('#ffffff'));
+    const [boxColor, setBoxColor] = useState(parseColor('#000000'));
+    const [textColor, setTextColor] = useState(parseColor('#ffffff'));
     const [backgroundSelectFlag, updateBackgroundSelect] = useState(false);
     const [lineFlag, updateLineFlag] = useState(false);
     const [highlightFlag, updateHighlight] = useState(false);
@@ -307,6 +310,9 @@ export const StateProvider = ({children}) => {
         chatMessagesRef,
         canvasBackground,
         canvasZoom,
+        penColor,
+        boxColor,
+        textColor,
         backgroundSelectFlag,
         undoFlag,
         redoFlag,
@@ -325,6 +331,9 @@ export const StateProvider = ({children}) => {
         addComment,
         loadRoomState,
         setBackground,
+        setPenColor,
+        setBoxColor,
+        setTextColor,
         triggerBackgroundFlag,
         triggerUndo,
         triggerRedo,

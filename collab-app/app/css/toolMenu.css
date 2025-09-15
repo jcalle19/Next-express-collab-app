@@ -65,24 +65,10 @@
     transform: translateY(-50%);
 }
 
-#comment-row {
-    margin-top: -.5px;
+#pen-row {
+    height: 40vh;
 }
 
-.react-aria-ColorSlider {
-  &[data-orientation=vertical] {
-    height: 150px;
-    display: block;
-    position: relative;
-
-    .react-aria-SliderTrack {
-      width: 28px;
-      height: 100%;
-    }
-
-    .react-aria-ColorThumb {
-      transform: translate(-50%, -50%);
-      display: none;
-    }
-  }
+#comment-row {
+    margin-top: -1px;
 }

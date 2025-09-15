@@ -5,11 +5,10 @@ import { useStateContext } from '../contexts/userState.jsx'
 import {parseColor} from 'react-aria-components'
 import '../css/toolMenu.css'
 import '../css/globals.css'
-import ColorPicker from './colorPicker.jsx'
+import ColorSelect from './colorSelect.jsx'
 import Note from './note.jsx'
 import ChatBox from './chatBox.jsx'
 import Icon from './icon.jsx'
-import MyColorSlider from './myColorSlider.jsx'
 import * as THREE from 'three'; // Import Three.js
 import HALO from 'vanta/dist/vanta.halo.min';
 
@@ -18,14 +17,13 @@ const ToolBar = () => {
     const vantaRef = useRef(null);
     const [vantaEffect, setVantaEffect] = useState(null);
     /*-------------------------*/
-    let [value, setValue] = useState(parseColor('hsl(0, 100%, 50%)'));
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
     const { triggerBackgroundFlag, triggerUndo, triggerRedo, triggerLineTool, 
             triggerHighlight, triggerClear, triggerTextFlag, 
             highlightFlag, lineFlag, textEditFlag, zoomIn, zoomOut,
-            sliderThumbColor, penInfoRef, addComment } = useStateContext();
+            sliderThumbColor, penInfoRef, boxColor, textColor, addComment } = useStateContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
     const maxSize = 48;
@@ -134,21 +132,19 @@ const ToolBar = () => {
                             </div>
                         </div>
                     </div>
-                    <div id='pen-col-2' className='relative glassy no-margin-right'>
-                        <ColorPicker expanded={true}/>
+                    <div id='pen-col-2' className='relative col-start-2 no-margin-right'>
+                        <ColorSelect/>
                     </div>
                 </div>
                 <div id='comment-row' className='grid grid-cols-[1fr_10fr] grid-rows-1' onClick={triggerClear}>
                     <div id='clear-button' className='col-start-1 glassy'>
                         <Icon src={`/${iconFolder}/trash.svg`} width='50%' height='35%'/>
                     </div>
-                    <div id='comment-window' className='col-start-2 glassy no-margin-right'>
-                       <Note isPreview={true}/>
-                       <MyColorSlider
-                            orientation="vertical"
-                            value={value}
-                            onChange={setValue}
-                            channel="hue" />
+                    <div id='comment-window' className='grid col-start-2 grid-cols-1 glassy no-margin-right'>
+                        <Note isPreview={true} 
+                              boxColor={`rgba(${boxColor.red},${boxColor.green},${boxColor.blue},${boxColor.alpha})`}
+                              textColor={`rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`}  
+                        />
                     </div>
                 </div>
             </section>

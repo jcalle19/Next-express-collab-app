@@ -1,0 +1,47 @@
+.react-aria-ColorSlider {
+  &[data-orientation=vertical] {
+    position: relative;
+    height: 90%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    .react-aria-SliderTrack {
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      height: 100%;
+      border: 1px solid white;
+      border-radius: 10px;
+    }
+
+    .react-aria-ColorThumb {
+      position: relative;
+      width: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 10px;
+    }
+  }
+}
+
+#color-preview {
+    position: relative;
+    width: 55%;
+    height: 90%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+#rgb-output p {
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    line-height: 0px;
+    font-size: min(1vw, 2vh);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

@@ -42,7 +42,7 @@ const CursorArea = ({id}) => {
       }
   */
   return (
-    <div onMouseMove={getMouseLocation} className="test-border cursor-window">
+    <div onMouseMove={getMouseLocation} className="cursor-window">
       <UserIcon x={coords[0]} y={coords[1]}/>
       <Canvas/>
       <CommentArea/>
