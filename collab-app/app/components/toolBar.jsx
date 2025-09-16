@@ -21,9 +21,9 @@ const ToolBar = () => {
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
     const { triggerBackgroundFlag, triggerUndo, triggerRedo, triggerLineTool, 
-            triggerHighlight, triggerClear, triggerTextFlag, 
-            highlightFlag, lineFlag, textEditFlag, zoomIn, zoomOut,
-            sliderThumbColor, penInfoRef, boxColor, textColor, addComment } = useStateContext();
+            triggerHighlight, triggerClear, triggerTextFlag, highlightFlag, 
+            lineFlag, textEditFlag, zoomIn, zoomOut, sliderThumbColor, penInfoRef, 
+            boxColor, textColor, previewFontSize} = useStateContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
     const maxSize = 48;
@@ -66,10 +66,6 @@ const ToolBar = () => {
 
     const handleSliderChange = (newVal) => {
         changeSlider(newVal);
-    }
-
-    const triggerAddComment = () => {
-        addComment();
     }
 
     const percentToPixel = (percent) => {
@@ -143,7 +139,8 @@ const ToolBar = () => {
                     <div id='comment-window' className='grid col-start-2 grid-cols-1 glassy no-margin-right'>
                         <Note isPreview={true} 
                               boxColor={`rgba(${boxColor.red},${boxColor.green},${boxColor.blue},${boxColor.alpha})`}
-                              textColor={`rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`}  
+                              textColor={`rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`}
+                              fontSize={previewFontSize}
                         />
                     </div>
                 </div>

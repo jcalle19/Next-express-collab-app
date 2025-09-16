@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
 import '../css/canvas.css'
-import Comment from './comment.jsx'
 import BackgroundBox from './backgroundBox.jsx'
 
 const Canvas = () => {
@@ -19,7 +18,7 @@ const Canvas = () => {
     const [windowSizeY, changeWindowYSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
     const { userObj, canvasBackground, canvasZoom, backgroundSelectFlag, undoFlag, redoFlag, 
-            lineFlag, highlightFlag, clearFlag, penInfoRef, roomCommentsRef } = useStateContext();
+            lineFlag, highlightFlag, clearFlag, penInfoRef} = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -139,7 +138,6 @@ const Canvas = () => {
         if (!ctxRef.current || !canvasRef.current) return;
             ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     };
-    //style={{width: `70vw`, height: `${.50 * 70}vw`}}
     return (
         <div id='canvas-container'>
             <canvas ref={canvasRef} 

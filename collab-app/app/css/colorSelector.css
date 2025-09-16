@@ -40,7 +40,7 @@
     width: fit-content;
     height: fit-content;
     line-height: 0px;
-    font-size: min(1vw, 2vh);
+    font-size: min(1vw, 1.5vh);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

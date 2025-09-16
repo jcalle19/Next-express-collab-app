@@ -17,10 +17,8 @@ export const StateProvider = ({children}) => {
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
     const roomUsersRef = useRef([]);
-    const roomCommentsRef = useRef(new Map());
     const chatMessagesRef = useRef([]);
     const tokenSetRef = useRef(false);
-    const commentsLoaded = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
     const [canvasBackground, updateBackground] = useState('');
@@ -28,6 +26,7 @@ export const StateProvider = ({children}) => {
     const [penColor, setPenColor] = useState(parseColor('#ffffff'));
     const [boxColor, setBoxColor] = useState(parseColor('#000000'));
     const [textColor, setTextColor] = useState(parseColor('#ffffff'));
+    const [previewFontSize, setPreviewFontSize] = useState('50');
     const [backgroundSelectFlag, updateBackgroundSelect] = useState(false);
     const [lineFlag, updateLineFlag] = useState(false);
     const [highlightFlag, updateHighlight] = useState(false);
@@ -160,13 +159,6 @@ export const StateProvider = ({children}) => {
         console.log('New list of chat messages: ', chatMessagesRef.current);
     }, [chatMessages]);
 
-    useEffect(() => {
-        if (!commentsLoaded.current) {
-            roomCommentsRef.current = new Map(JSON.parse(sessionStorage.getItem('roomCommentsMap')));
-            commentsLoaded.current = true;
-        }
-    },[commentsFlag]);
-
     /*-------------- Add host verification to these ones --------------*/
     useEffect(() => {
         if (canvasBackground !== '' && userObj.current.isHost) {
@@ -206,7 +198,6 @@ export const StateProvider = ({children}) => {
             socketRef.current.emit('user-left', userObj.current.roomId, token);
             userObj.current = {id: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isAdmin: false};
             roomUsers.current = new Map();
-            roomCommentsRef.current = new Map();
             updateKeys([]);
             updateMessages([]);
             sessionStorage.clear();
@@ -216,13 +207,6 @@ export const StateProvider = ({children}) => {
     const addMessage = (user, msg) => {
         //Functional update to add to most current message list
         socketRef.current.emit('broadcast-msg', user, msg);
-    }
-
-    const addComment = () => {
-        let randKey = randomId();
-        roomCommentsRef.current.set(randKey, {key: randKey, width: 180, height: 90, top: 0, left: 0, text: '', color: 'white'});
-        updateCommentsFlag(!commentsFlag);
-        updateTextFlag(true);
     }
 
     const loadRoomState = (roomId) => {
@@ -306,13 +290,13 @@ export const StateProvider = ({children}) => {
         roomUsersKeys,
         chatMessages,
         roomUsersRef,
-        roomCommentsRef,
         chatMessagesRef,
         canvasBackground,
         canvasZoom,
         penColor,
         boxColor,
         textColor,
+        previewFontSize,
         backgroundSelectFlag,
         undoFlag,
         redoFlag,
@@ -328,12 +312,12 @@ export const StateProvider = ({children}) => {
         joinRoom,
         leaveRoom,
         addMessage,
-        addComment,
         loadRoomState,
         setBackground,
         setPenColor,
         setBoxColor,
         setTextColor,
+        setPreviewFontSize,
         triggerBackgroundFlag,
         triggerUndo,
         triggerRedo,

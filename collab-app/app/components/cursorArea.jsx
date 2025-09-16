@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import { useStateContext } from '../contexts/userState.jsx'
 import UserIcon from './userIcons.jsx';
 import Canvas from './canvas.jsx';
-import CommentArea from './commentArea.jsx'
 import '../css/roomPage.css';
 
 const CursorArea = ({id}) => {
@@ -45,7 +44,6 @@ const CursorArea = ({id}) => {
     <div onMouseMove={getMouseLocation} className="cursor-window">
       <UserIcon x={coords[0]} y={coords[1]}/>
       <Canvas/>
-      <CommentArea/>
     </div>
   );
 }
