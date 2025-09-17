@@ -34,11 +34,36 @@ export const StateProvider = ({children}) => {
     const [redoFlag, updateRedo] = useState(false);
     const [clearFlag, updateClear] = useState(false);
     const [textEditFlag, updateTextFlag] = useState(true);
-    const [commentsFlag, updateCommentsFlag] = useState(false);
     const [sliderThumbColor, updateSliderColor] = useState('white');
     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
+
+    const triggerBackgroundFlag = (flag) => {
+        if (userObj.current.isHost) {
+           updateBackgroundSelect(!flag) ;
+        }
+    }
+
+    const triggerHighlight = (flag) => {
+        updateHighlight(flag);
+        updateLineFlag(false);
+    }
+
+    const triggerLineTool = (flag) => {
+        updateLineFlag(flag);
+        updateHighlight(false);
+    }
+
+    const flagMap = new Map([
+        ['undo', [undoFlag, updateUndo]],
+        ['redo', [redoFlag, updateRedo]],
+        ['clear', [clearFlag, updateClear]],
+        ['text', [textEditFlag, updateTextFlag]],
+        ['highlight', [highlightFlag, triggerHighlight]],
+        ['line', [lineFlag, triggerLineTool]],
+        ['background', [backgroundSelectFlag, triggerBackgroundFlag]],
+    ]);
 
     useEffect(() => {
         //Socket stuff
@@ -169,7 +194,7 @@ export const StateProvider = ({children}) => {
 
     useEffect(() => {
         if (userObj.current.roomId !== '' && userObj.current.isHost) {
-            socketRef.current.emit('update-zoom', userObj.current.roomId, canvasZoom);;
+            socketRef.current.emit('update-zoom', userObj.current.roomId, canvasZoom);
         }
     }, [canvasZoom]);
 
@@ -217,37 +242,6 @@ export const StateProvider = ({children}) => {
 
     const setBackground = (url) => {
         updateBackground(url);
-    }
-
-    const triggerBackgroundFlag = () => {
-        if (userObj.current.isHost) {
-           updateBackgroundSelect(!backgroundSelectFlag) 
-        }
-    }
-    const triggerUndo = () => {
-        updateUndo(!undoFlag);
-    }
-
-    const triggerRedo = () => {
-        updateRedo(!redoFlag);
-    }
-
-    const triggerHighlight = () => {
-        updateHighlight(!highlightFlag);
-        updateLineFlag(false);
-    }
-
-    const triggerLineTool = () => {
-        updateLineFlag(!lineFlag);
-        updateHighlight(false);
-    }
-
-    const triggerClear = () => {
-        updateClear(!clearFlag);
-    }
-
-    const triggerTextFlag = () => {
-        updateTextFlag(!textEditFlag);
     }
 
     const zoomIn = () => {
@@ -304,7 +298,7 @@ export const StateProvider = ({children}) => {
         lineFlag,
         clearFlag,
         textEditFlag,
-        commentsFlag,
+        flagMap,
         sliderThumbColor,
         penInfoRef,
         mouseLocationRef,
@@ -319,15 +313,10 @@ export const StateProvider = ({children}) => {
         setTextColor,
         setPreviewFontSize,
         triggerBackgroundFlag,
-        triggerUndo,
-        triggerRedo,
         triggerHighlight,
         triggerLineTool,
-        triggerClear,
-        triggerTextFlag,
         zoomIn,
         zoomOut,
-        updateCommentsFlag,
         newSliderColor,
     }
 

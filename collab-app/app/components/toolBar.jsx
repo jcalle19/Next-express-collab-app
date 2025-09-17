@@ -20,9 +20,7 @@ const ToolBar = () => {
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
-    const { triggerBackgroundFlag, triggerUndo, triggerRedo, triggerLineTool, 
-            triggerHighlight, triggerClear, triggerTextFlag, highlightFlag, 
-            lineFlag, textEditFlag, zoomIn, zoomOut, sliderThumbColor, penInfoRef, 
+    const { flagMap, zoomIn, zoomOut, sliderThumbColor, penInfoRef, 
             boxColor, textColor, previewFontSize} = useStateContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
@@ -73,6 +71,13 @@ const ToolBar = () => {
         changeWidth(penInfoRef.current.size  * penInfoRef.current.scale);
     }
 
+    const triggerFlag = (flagName) => {
+        let mapAccess = flagMap.get(flagName);
+        let varValue = mapAccess[0];
+        let funcRef = mapAccess[1];
+        funcRef(!varValue);
+    }
+
     return (
         <div ref={vantaRef} id='side-bar-container' className='grid grid-cols-1 grid-rows-[8fr_4fr]'>
             <div id='side-bar-overlay'>
@@ -80,11 +85,11 @@ const ToolBar = () => {
                 <div id='pen-row' className='grid grid-cols-2 grid-rows-1'>
                     <div id='pen-col-1' className='grid grid-cols-1 grid-rows-[1fr_2fr_4fr]'>
                         <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1'>
-                            <div id='undo' className='col-start-1 glassy' onClick={triggerUndo}>
+                            <div id='undo' className='col-start-1 glassy' onClick={()=>triggerFlag('undo')}>
                                 <Icon src={`/${iconFolder}/left-arrow.svg`} width='85%' height='85%'/>
                             </div>
                             
-                            <div id='redo' className='col-start-2 glassy' onClick={triggerRedo}>
+                            <div id='redo' className='col-start-2 glassy' onClick={()=>triggerFlag('redo')}>
                                 <Icon src={`/${iconFolder}/right-arrow.svg`} width='85%' height='85%'/>
                             </div>
                         </div>
@@ -108,7 +113,7 @@ const ToolBar = () => {
                             </div>
                         </div>
                         <div id='draw-mode-row' className='grid grid-cols-3 grid-rows-[1fr_2fr]'>
-                            <div id='background-set' className='row-start-1 col-start-1 glassy' onClick={triggerBackgroundFlag}>
+                            <div id='background-set' className='row-start-1 col-start-1 glassy' onClick={()=>triggerFlag('background')}>
                                 <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>
                             </div>
                             <div id='zoom-in' className='row-start-1 col-start-2 glassy' onClick={zoomIn}>
@@ -117,13 +122,13 @@ const ToolBar = () => {
                             <div id='zoom-out' className='row-start-1 col-start-3 glassy' onClick={zoomOut}>
                                 <Icon src={`/${iconFolder}/zoom-out.svg`} width='55%' height='55%'/>
                             </div>
-                            <div id='highlight-toggle' className={`row-start-2 col-start-1 glassy ${highlightFlag ? 'set-inspecting' : ''}`} onClick={triggerHighlight}>
+                            <div id='highlight-toggle' className={`row-start-2 col-start-1 glassy ${flagMap.get('highlight')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('highlight')}>
                                 <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
                             </div>
-                            <div id='line-toggle' className={`row-start-2 col-start-2 glassy ${lineFlag ? 'set-inspecting' : ''}`} onClick={triggerLineTool}>
+                            <div id='line-toggle' className={`row-start-2 col-start-2 glassy ${flagMap.get('line')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('line')}>
                                 <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
                             </div>
-                            <div id='text-edit-toggle' className={`row-start-2 col-start-3 glassy ${textEditFlag ? 'set-inspecting' : ''}`} onClick={triggerTextFlag}>
+                            <div id='text-edit-toggle' className={`row-start-2 col-start-3 glassy ${flagMap.get('text')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('text')}>
                                 <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%'/>
                             </div>
                         </div>
@@ -132,7 +137,7 @@ const ToolBar = () => {
                         <ColorSelect/>
                     </div>
                 </div>
-                <div id='comment-row' className='grid grid-cols-[1fr_10fr] grid-rows-1' onClick={triggerClear}>
+                <div id='comment-row' className='grid grid-cols-[1fr_10fr] grid-rows-1' onClick={()=>triggerFlag('clear')}>
                     <div id='clear-button' className='col-start-1 glassy'>
                         <Icon src={`/${iconFolder}/trash.svg`} width='50%' height='35%'/>
                     </div>
