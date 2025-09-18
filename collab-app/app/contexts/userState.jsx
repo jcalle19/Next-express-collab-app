@@ -38,10 +38,11 @@ export const StateProvider = ({children}) => {
     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
+    const [roomNotes, updateRoomNotes] = useState(new Map());
 
     const triggerBackgroundFlag = (flag) => {
         if (userObj.current.isHost) {
-           updateBackgroundSelect(!flag) ;
+           updateBackgroundSelect(flag) ;
         }
     }
 
@@ -64,6 +65,13 @@ export const StateProvider = ({children}) => {
         ['line', [lineFlag, triggerLineTool]],
         ['background', [backgroundSelectFlag, triggerBackgroundFlag]],
     ]);
+
+    const triggerFlag = (flagName) => {
+        let mapAccess = flagMap.get(flagName);
+        let varValue = mapAccess[0];
+        let funcRef = mapAccess[1];
+        funcRef(!varValue);
+    }
 
     useEffect(() => {
         //Socket stuff
@@ -131,6 +139,7 @@ export const StateProvider = ({children}) => {
                 roomOptions.current = roomInfo.options;
                 updateKeys(Array.from(members.values()));
                 updateMessages(chatMessages);
+                updateRoomNotes(roomInfo.notes);
                 updateBackground(roomInfo.background);
                 updateZoom(roomInfo.zoom);
             } else {
@@ -234,6 +243,10 @@ export const StateProvider = ({children}) => {
         socketRef.current.emit('broadcast-msg', user, msg);
     }
 
+    const addNote = (user, noteInfo) => {
+        socketRef.current.emit('broadcast-note', user, noteInfo);
+    }
+
     const loadRoomState = (roomId) => {
         const roomToken = sessionStorage.getItem('roomToken');
         tokenSetRef.current = true;
@@ -306,15 +319,14 @@ export const StateProvider = ({children}) => {
         joinRoom,
         leaveRoom,
         addMessage,
+        addNote,
         loadRoomState,
         setBackground,
         setPenColor,
         setBoxColor,
         setTextColor,
         setPreviewFontSize,
-        triggerBackgroundFlag,
-        triggerHighlight,
-        triggerLineTool,
+        triggerFlag,
         zoomIn,
         zoomOut,
         newSliderColor,

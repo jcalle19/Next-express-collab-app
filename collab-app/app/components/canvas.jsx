@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
 import '../css/canvas.css'
 import BackgroundBox from './backgroundBox.jsx'
+import NoteArea from './noteArea.jsx'
 
 const Canvas = () => {
     const canvasRef = useRef(null);
@@ -17,8 +18,8 @@ const Canvas = () => {
     const [windowSizeX, changeWindowXSize] = useState(0);
     const [windowSizeY, changeWindowYSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { userObj, canvasBackground, canvasZoom, backgroundSelectFlag, undoFlag, redoFlag, 
-            lineFlag, highlightFlag, clearFlag, penInfoRef} = useStateContext();
+    const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
+            lineFlag, clearFlag, penInfoRef} = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -38,12 +39,17 @@ const Canvas = () => {
         ctxRef.current = canvas.getContext('2d');
         ctxRef.current.lineCap = 'round';
         ctxRef.current.lineJoin = 'round';
-        canvas.style.width = `${windowSizeX * .65}px`;
-        canvas.style.height = `${windowSizeX * .50}px`;
+        if (windowSizeY < (1.2 * windowSizeX * .50)) {
+            canvas.style.width = `${windowSizeY * 1.105}px`;
+            canvas.style.height = `${windowSizeY * .85}px`;
+        } else {
+            canvas.style.width = `${windowSizeX * .65}px`;
+            canvas.style.height = `${windowSizeX * .50}px`;
+        }
         scaleXRef.current = canvas.width / canvas.clientWidth;
         scaleYRef.current = canvas.height / canvas.clientHeight;
         penInfoRef.current.scale = canvas.clientHeight / canvas.height;
-    },[windowSizeX]);
+    },[windowSizeX, windowSizeY]);
     /*----- Menu Button Effects -----*/
     useEffect(()=> {
         let last = lineStorageRef.current.pop();

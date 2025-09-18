@@ -21,7 +21,7 @@ const ToolBar = () => {
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
     const { flagMap, zoomIn, zoomOut, sliderThumbColor, penInfoRef, 
-            boxColor, textColor, previewFontSize} = useStateContext();
+            boxColor, textColor, previewFontSize, triggerFlag} = useStateContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
     const maxSize = 48;
@@ -70,14 +70,7 @@ const ToolBar = () => {
         sliderPxRef.current = minSize + ((percent / 100) * maxSize);
         changeWidth(penInfoRef.current.size  * penInfoRef.current.scale);
     }
-
-    const triggerFlag = (flagName) => {
-        let mapAccess = flagMap.get(flagName);
-        let varValue = mapAccess[0];
-        let funcRef = mapAccess[1];
-        funcRef(!varValue);
-    }
-
+    
     return (
         <div ref={vantaRef} id='side-bar-container' className='grid grid-cols-1 grid-rows-[8fr_4fr]'>
             <div id='side-bar-overlay'>

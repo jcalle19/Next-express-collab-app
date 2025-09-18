@@ -6,9 +6,6 @@
 //Has hostIds, canvas info, and userTokens
 const roomMap = new Map();
 
-//Has all user room for each token for easy lookup
-const userMap = new Map();
-
 const randomId = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
@@ -19,10 +16,12 @@ const randomId = () => {
     };
 
 const socket_functions = (io) => {
-    const broadcastInfo = (roomId, socket) => {
+    const broadcastInfo = (roomId, socket, event) => {
+        console.log(`broadcast source: ${roomId}, ${event}`);
         const roomInfo = {
             members: Array.from(roomMap.get(roomId).members),
             chat: roomMap.get(roomId).chat,
+            notes: roomMap.get(roomId).notes,
             options: roomMap.get(roomId).options,
             background: roomMap.get(roomId).background,
             zoom: roomMap.get(roomId).zoom,
@@ -42,6 +41,7 @@ const socket_functions = (io) => {
                                  options: roomOptions,
                                  admins: new Set(), 
                                  members: new Map(), 
+                                 notes: new Map(),
                                  chat: [],
                                  background: '',
                                  zoom: 100,
@@ -62,32 +62,41 @@ const socket_functions = (io) => {
                 roomMap.get(userObj.roomId).members.set(roomToken, userObj);
                 socket.emit('confirm-room-join', true, userObj.roomId, roomToken);
                 console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
-                broadcastInfo(userObj.roomId, false);
+                broadcastInfo(userObj.roomId, false, 'user-joined');
             }
             
         });
 
         socket.on('user-left', (roomId, token) => {
             roomMap.get(roomId).members.delete(token);
-            broadcastInfo(roomId, false);
+            broadcastInfo(roomId, false, 'user-left');
         });
         
         socket.on('update-room', (userObj, token) => {
             roomMap.get(userObj.roomId).members.set(token, userObj);
-            broadcastInfo(userObj.roomId, false);
+            broadcastInfo(userObj.roomId, false, 'update-room');
         });
 
         socket.on('broadcast-msg', (userObj, msg) => {
             console.log(`received ${msg} from ${userObj.roomId}`);
-            if (roomMap.get(userObj.roomId).options.canChat) {
+            if (roomMap.get(userObj.roomId).options.canChat || userObj.isHost) {
                 let messagesArray = roomMap.get(userObj.roomId).chat;
                 messagesArray.push({key: randomId(), name: userObj.user, msg: msg});
-                broadcastInfo(userObj.roomId, false);
+                broadcastInfo(userObj.roomId, false, 'broadcast-msg');
             }
         });
 
+        socket.on('broadcast-note', (userObj, noteInfo) => {
+            console.log(`received ${noteInfo} from ${userObj.user}`);
+            if (roomMap.get(userObj.roomId).options.canChat || userObj.isHost) {
+                roomMap.get(userObj.roomId).notes.set(randomId(), noteInfo);
+                console.log(roomMap.get(userObj.roomId).notes);
+                broadcastInfo(userObj.roomId, false, 'broadcast-note');
+            }
+            
+        });
         socket.on('request-sync', (roomId)=> {
-            broadcastInfo(roomId, socket);
+            broadcastInfo(roomId, socket, 'request-sync');
         }); 
 
         socket.on('check-token', (roomId, token) => {
@@ -99,6 +108,7 @@ const socket_functions = (io) => {
                 const roomInfo = {
                     members: Array.from(roomMap.get(roomId).members),
                     chat: roomMap.get(roomId).chat,
+                    notes: roomMap.get(roomId).notes,
                     options: roomMap.get(roomId).options,
                     background: roomMap.get(roomId).background,
                     zoom: roomMap.get(roomId).zoom,
@@ -163,18 +173,18 @@ const socket_functions = (io) => {
             const mapAccess = roomMap.get(roomId);
             if (mapAccess.hostId === hostId) {
                 mapAccess.options = roomOptions;
-                broadcastInfo(roomId, false);
+                broadcastInfo(roomId, false, 'update-options');
             }
         });
 
         socket.on('update-background', (roomId, background) => {
             roomMap.get(roomId).background = background;
-            broadcastInfo(roomId, false);
+            broadcastInfo(roomId, false, 'update-background');
         });
 
         socket.on('update-zoom', (roomId, zoom)=> {
             roomMap.get(roomId).zoom = zoom;
-            broadcastInfo(roomId, false);
+            broadcastInfo(roomId, false, 'update-zoom');
         })
     });
 }

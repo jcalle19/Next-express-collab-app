@@ -4,7 +4,7 @@ import Icon from './icon.jsx'
 import '../css/backgroundBox.css'
 
 const BackgroundBox = ({isVisible}) => {
-    const { setBackground, triggerBackgroundFlag } = useStateContext();
+    const { setBackground, triggerFlag} = useStateContext();
 
     const [blackSelected, updateBlack] = useState(false);
     const [whiteSelected, updateWhite] = useState(false);
@@ -39,7 +39,7 @@ const BackgroundBox = ({isVisible}) => {
 
     return (
         <div className='box-container grid grid-cols-1 grid-rows-[2fr_1fr_2fr_1fr_2fr]'>
-            <button id='close-button' onClick={triggerBackgroundFlag}>
+            <button id='close-button' onClick={()=>triggerFlag('background')}>
                 <Icon src={`/toolbar-icons/right-arrow.svg`} width='100%' height='100%'/>
             </button>
             <form id='image-container' className='grid grid-cols-[1fr_2fr_8fr_3fr_1fr] grid-rows-1 row-start-2' onSubmit={handleUrlSubmit}>
