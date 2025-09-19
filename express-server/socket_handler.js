@@ -21,7 +21,7 @@ const socket_functions = (io) => {
         const roomInfo = {
             members: Array.from(roomMap.get(roomId).members),
             chat: roomMap.get(roomId).chat,
-            notes: roomMap.get(roomId).notes,
+            notes: Array.from(roomMap.get(roomId).notes),
             options: roomMap.get(roomId).options,
             background: roomMap.get(roomId).background,
             zoom: roomMap.get(roomId).zoom,
@@ -90,7 +90,6 @@ const socket_functions = (io) => {
             console.log(`received ${noteInfo} from ${userObj.user}`);
             if (roomMap.get(userObj.roomId).options.canChat || userObj.isHost) {
                 roomMap.get(userObj.roomId).notes.set(randomId(), noteInfo);
-                console.log(roomMap.get(userObj.roomId).notes);
                 broadcastInfo(userObj.roomId, false, 'broadcast-note');
             }
             
@@ -108,7 +107,7 @@ const socket_functions = (io) => {
                 const roomInfo = {
                     members: Array.from(roomMap.get(roomId).members),
                     chat: roomMap.get(roomId).chat,
-                    notes: roomMap.get(roomId).notes,
+                    notes: Array.from(roomMap.get(roomId).notes),
                     options: roomMap.get(roomId).options,
                     background: roomMap.get(roomId).background,
                     zoom: roomMap.get(roomId).zoom,

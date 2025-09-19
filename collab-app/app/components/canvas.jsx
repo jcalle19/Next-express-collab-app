@@ -3,9 +3,11 @@ import { useStateContext } from '../contexts/userState.jsx'
 import '../css/canvas.css'
 import BackgroundBox from './backgroundBox.jsx'
 import NoteArea from './noteArea.jsx'
+import Note from './note.jsx'
 
 const Canvas = () => {
     const canvasRef = useRef(null);
+    const backgroundRef = useRef(null);
     const ctxRef = useRef(null);
     const prevRef = useRef(null);
     const newRef = useRef(null);
@@ -36,13 +38,18 @@ const Canvas = () => {
     /* Need to make canvas scale equally with x and y */
     useEffect(() => {
         const canvas = canvasRef.current;
+        const background = backgroundRef.current;
         ctxRef.current = canvas.getContext('2d');
         ctxRef.current.lineCap = 'round';
         ctxRef.current.lineJoin = 'round';
         if (windowSizeY < (1.2 * windowSizeX * .50)) {
+            background.style.width = `${windowSizeY * 1.105}px`;
+            background.style.height = `${windowSizeY * .85}px`;
             canvas.style.width = `${windowSizeY * 1.105}px`;
             canvas.style.height = `${windowSizeY * .85}px`;
         } else {
+            background.style.width = `${windowSizeX * .65}px`;
+            background.style.height = `${windowSizeX * .50}px`;
             canvas.style.width = `${windowSizeX * .65}px`;
             canvas.style.height = `${windowSizeX * .50}px`;
         }
@@ -146,16 +153,21 @@ const Canvas = () => {
     };
     return (
         <div id='canvas-container'>
-            <canvas ref={canvasRef} 
-                id='canvas-window'
+            <div id='background-layer' ref={backgroundRef} 
                 style={{
                     background: `${canvasBackground === '' ? 'black' : canvasBackground} center / ${canvasZoom}% no-repeat`,
                 }}
-                onMouseMove={handleMouseMove}
-                onMouseDown={handleMouseDown} 
-                onMouseUp={handleMouseUp}>
-            </canvas>
-            {backgroundSelectFlag ? <BackgroundBox isVisible={true}/> : ''}
+            >
+                
+                <canvas ref={canvasRef} 
+                    id='canvas-window'
+                    onMouseMove={handleMouseMove}
+                    onMouseDown={handleMouseDown} 
+                    onMouseUp={handleMouseUp}>
+                </canvas><Note isPreview={false} boxColor={'rgba(255,255,255,1)'} textColor={'rgba(255,40,255,1)'}/>
+                {backgroundSelectFlag ? <BackgroundBox isVisible={true}/> : ''}
+            </div>
+            
         </div>
     )
 }

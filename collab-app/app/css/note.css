@@ -1,6 +1,13 @@
+:root {
+    --lime-green: #32cd32;
+    --soft-blue: #add8e6;
+    --raspberry: #d21f3c;
+}
+
 #note-container {
     padding: 0px;
     overflow: hidden;
+    border: 1px solid blue;
 }
 
 #note-content {
@@ -13,6 +20,7 @@
     padding: 1px;
     margin: 0px;
     overflow: hidden;
+    resize: both;
 }
 
 .preview-centered {
@@ -37,4 +45,23 @@
     width: fit-content;
     height: fit-content;
     transform: translate(-50%, -50%);
+}
+
+.edit-buttons {
+    display: block;
+    min-width: 20px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+}
+
+#move-handle {
+    background-color: var(--soft-blue);
+}
+
+#post-button {
+    background-color: var(--lime-green);
+}
+
+#cancel-button {
+    background-color: var(--raspberry);
 }

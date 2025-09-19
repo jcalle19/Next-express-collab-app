@@ -2,8 +2,17 @@
     width: 69.5vw;
     height: 100vh;
     position: relative;
+    border: 2px solid blue;
 }
 
+#background-layer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/*Dimensions of canvas are set within canvas.jsx using the respective useRef*/
 #canvas-window {
     position: relative;
     display: block;
@@ -15,9 +24,4 @@
     border: 1px dashed grey;
     padding: 0px;
     margin: 0px;
-}
-
-#canvas-window canvas {
-    width: 100%;
-    height: 100%;
 }
