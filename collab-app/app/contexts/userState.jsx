@@ -21,6 +21,7 @@ export const StateProvider = ({children}) => {
     const tokenSetRef = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
+    const canvasOffsetRef = useRef({left: 0, top: 0});
     const [canvasBackground, updateBackground] = useState('');
     const [canvasZoom, updateZoom] = useState(100); 
     const [penColor, setPenColor] = useState(parseColor('#ffffff'));
@@ -298,6 +299,7 @@ export const StateProvider = ({children}) => {
         chatMessages,
         roomUsersRef,
         chatMessagesRef,
+        canvasOffsetRef,
         canvasBackground,
         canvasZoom,
         penColor,

@@ -21,7 +21,7 @@ const Canvas = () => {
     const [windowSizeY, changeWindowYSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
     const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
-            lineFlag, clearFlag, penInfoRef} = useStateContext();
+            lineFlag, clearFlag, penInfoRef, canvasOffsetRef} = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -33,6 +33,9 @@ const Canvas = () => {
         changeWindowXSize(window.innerWidth);
         changeWindowYSize(window.innerHeight);
         window.addEventListener('resize', windowResize);
+        return ()=>{
+            window.removeEventListener('resize', windowResize);
+        }
     }, []);
 
     /* Need to make canvas scale equally with x and y */
@@ -56,7 +59,13 @@ const Canvas = () => {
         scaleXRef.current = canvas.width / canvas.clientWidth;
         scaleYRef.current = canvas.height / canvas.clientHeight;
         penInfoRef.current.scale = canvas.clientHeight / canvas.height;
+        
+        //Passed down to grandchild note components
+        let canvasRect = canvas.getBoundingClientRect();
+        canvasOffsetRef.current.left = canvasRect.left;
+        canvasOffsetRef.current.top = canvasRect.top;
     },[windowSizeX, windowSizeY]);
+
     /*----- Menu Button Effects -----*/
     useEffect(()=> {
         let last = lineStorageRef.current.pop();
@@ -158,13 +167,13 @@ const Canvas = () => {
                     background: `${canvasBackground === '' ? 'black' : canvasBackground} center / ${canvasZoom}% no-repeat`,
                 }}
             >
-                
                 <canvas ref={canvasRef} 
                     id='canvas-window'
                     onMouseMove={handleMouseMove}
                     onMouseDown={handleMouseDown} 
                     onMouseUp={handleMouseUp}>
-                </canvas><Note isPreview={false} boxColor={'rgba(255,255,255,1)'} textColor={'rgba(255,40,255,1)'}/>
+                </canvas>
+                <NoteArea/>
                 {backgroundSelectFlag ? <BackgroundBox isVisible={true}/> : ''}
             </div>
             

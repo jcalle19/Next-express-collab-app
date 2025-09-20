@@ -7,18 +7,7 @@ const NoteArea = () => {
 
     return (
         <div style={{width: '100%', height: '100%'}}>
-            {Array.from(roomNotes.entries()).map(([key, noteInfo]) => 
-                <Note key={key} isPreview={false} 
-                      editable={true}
-                      boxColor={noteInfo.boxColor} 
-                      textColor={noteInfo.textColor} 
-                      fontSize={noteInfo.fontSize} 
-                      width={noteInfo.width} 
-                      height={noteInfo.height} 
-                      left={noteInfo.left} 
-                      top={noteInfo.top}
-                />
-            )}
+            <Note isPreview={false} boxColor={'rgba(255,255,255,1)'} textColor={'rgba(255,40,255,1)'}/>
         </div>
     )
 }
