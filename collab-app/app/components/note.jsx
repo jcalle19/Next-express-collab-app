@@ -3,22 +3,43 @@ import {useStateContext} from '../contexts/userState.jsx'
 import Icon from '../components/icon.jsx'
 import '../css/note.css'
 
-const Note = ({isPreview, editable, boxColor, textColor, fontSize, width, height, left, top, offset}) => {
-    const {textEditFlag, penInfoRef, userObj, addNote, canvasOffsetRef} = useStateContext();
-    const [text, setText] = useState('Sample');
+const Note = ({isPreview, editable, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
+    const {textEditFlag, penInfoRef, userObj, addNote, canvasOffsetRef, 
+           canvasSizeRef, canvasSize} = useStateContext();
+    const [text, setText] = useState(content);
     const [translating, toggleMoving] = useState(false);
-    const [translateX, setXCoord] = useState(0);
-    const [translateY, setYCoord] = useState(0);
+    const [translateX, setXCoord] = useState(left); //percentage * pixel
+    const [translateY, setYCoord] = useState(top);
+    const [size, setSize] = useState({ width: widthPercent, height: heightPercent}); //%
+    const textareaRef = useRef(null);
     const handleRadius = 10;
     const noteRef = useRef(null);
+
+    //detecting size change
+    useEffect(() => {
+      if (!textareaRef.current) return;
+
+      // Create observer
+      const observer = new ResizeObserver((entries) => {
+        const entry = entries[0];
+        const { width, height } = entry.contentRect;
+        const { width: cw, height: ch } = canvasSizeRef.current;
+        console.log(cw, ch);
+      });
+      observer.observe(textareaRef.current);
+      return () => {
+        observer.disconnect();
+      };
+    }, []);
 
     /*Defining functions here to avoid stale values*/
     useEffect(() => {
       const handleMouseMove = (e) => {
         if (translatingRef.current) {
-          setXCoord(e.clientX - canvasOffsetRef.current.left - handleRadius);
-          setYCoord(e.clientY - canvasOffsetRef.current.top - handleRadius);
-          console.log(e.clientX, e.clientY);
+          const xPixels = e.clientX - canvasOffsetRef.current.left - handleRadius;
+          const yPixels = e.clientY - canvasOffsetRef.current.top - handleRadius;
+          setXCoord(xPixels / canvasSizeRef.current.width);
+          setYCoord(yPixels / canvasSizeRef.current.height);
         }
       };
 
@@ -42,6 +63,7 @@ const Note = ({isPreview, editable, boxColor, textColor, fontSize, width, height
     }, [translating]);
 
     const createNote = () => {
+      //default note
       const noteInfo = {user: userObj.current.id, 
                         editable: false, 
                         text: 'Edit Text', 
@@ -57,7 +79,13 @@ const Note = ({isPreview, editable, boxColor, textColor, fontSize, width, height
     return (
       <div id='note-container' ref={noteRef}
            className={`${isPreview ? 'preview-centered' : ''} grid grid-cols-[1fr_15fr]`}
-           style={{position: `${isPreview ? 'relative' : 'absolute'}`, left: `${isPreview ? '' : `${translateX}px`}`, top: `${isPreview ? '' : `${translateY}px`}`}}
+           style={{position: `${isPreview ? 'relative' : 'absolute'}`, 
+                   left: `${isPreview ? '' : `${100 * translateX / 2}%`}`, //divided by 2 to account for notearea size
+                   top: `${isPreview ? '' : `${100 * translateY}%`}`,
+                   maxWidth: `${canvasSizeRef.current.width}px`,
+                   width: `${size.width * canvasSizeRef.current.width}px`,
+                   height: `${size.height * canvasSizeRef.current.height}px`,
+                  }}
       >
           <div id='button-area' className='col-start-1'>
             { isPreview ? 
@@ -78,7 +106,7 @@ const Note = ({isPreview, editable, boxColor, textColor, fontSize, width, height
                 </div>
             }
           </div>
-          <textarea readOnly={isPreview || !textEditFlag}
+          <textarea readOnly={isPreview || !textEditFlag} ref={textareaRef}
                     id='note-content' 
                     className='col-start-2'
                     value={text}

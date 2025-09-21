@@ -22,6 +22,10 @@ export const StateProvider = ({children}) => {
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
     const canvasOffsetRef = useRef({left: 0, top: 0});
+    const canvasSizeRef = useRef({width: 0, height: 0});
+    const [canvasSize, updateSize] = useState({width: 0, height: 0});
+    const [windowSizeX, changeWindowXSize] = useState(0);
+    const [windowSizeY, changeWindowYSize] = useState(0);
     const [canvasBackground, updateBackground] = useState('');
     const [canvasZoom, updateZoom] = useState(100); 
     const [penColor, setPenColor] = useState(parseColor('#ffffff'));
@@ -239,6 +243,11 @@ export const StateProvider = ({children}) => {
         }
     }
 
+    const windowResize = () => {
+        changeWindowXSize(window.innerWidth);
+        changeWindowYSize(window.innerHeight);
+    }
+
     const addMessage = (user, msg) => {
         //Functional update to add to most current message list
         socketRef.current.emit('broadcast-msg', user, msg);
@@ -299,7 +308,11 @@ export const StateProvider = ({children}) => {
         chatMessages,
         roomUsersRef,
         chatMessagesRef,
+        windowSizeX,
+        windowSizeY,
+        canvasSize,
         canvasOffsetRef,
+        canvasSizeRef,
         canvasBackground,
         canvasZoom,
         penColor,
@@ -322,6 +335,8 @@ export const StateProvider = ({children}) => {
         leaveRoom,
         addMessage,
         addNote,
+        windowResize,
+        updateSize,
         loadRoomState,
         setBackground,
         setPenColor,

@@ -17,11 +17,10 @@ const Canvas = () => {
     const currentLineRef = useRef([]);
     const scaleXRef = useRef(1);
     const scaleYRef = useRef(1);
-    const [windowSizeX, changeWindowXSize] = useState(0);
-    const [windowSizeY, changeWindowYSize] = useState(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
     const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
-            lineFlag, clearFlag, penInfoRef, canvasOffsetRef} = useStateContext();
+            lineFlag, clearFlag, penInfoRef, canvasOffsetRef, canvasSizeRef, 
+            windowSizeX, windowSizeY, windowResize, updateSize} = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -30,8 +29,7 @@ const Canvas = () => {
         canvas.width = 2600;
         canvas.height = 2000;
         ctxRef.current = canvas.getContext('2d');
-        changeWindowXSize(window.innerWidth);
-        changeWindowYSize(window.innerHeight);
+        windowResize();
         window.addEventListener('resize', windowResize);
         return ()=>{
             window.removeEventListener('resize', windowResize);
@@ -64,6 +62,10 @@ const Canvas = () => {
         let canvasRect = canvas.getBoundingClientRect();
         canvasOffsetRef.current.left = canvasRect.left;
         canvasOffsetRef.current.top = canvasRect.top;
+        console.log(canvasRect.width, canvasRect.height);
+        canvasSizeRef.current.width = canvasRect.width;
+        canvasSizeRef.current.height = canvasRect.height;
+        updateSize({width: canvasRect.width, height: canvasRect.height});
     },[windowSizeX, windowSizeY]);
 
     /*----- Menu Button Effects -----*/
@@ -96,11 +98,6 @@ const Canvas = () => {
     },[clearFlag]);
 
     /*-------------------------------*/
-
-    const windowResize = () => {
-        changeWindowXSize(window.innerWidth);
-        changeWindowYSize(window.innerHeight);
-    }
 
     const handleMouseDown = (e) => {
         e.preventDefault();

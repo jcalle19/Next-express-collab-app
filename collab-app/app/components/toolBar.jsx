@@ -136,6 +136,7 @@ const ToolBar = () => {
                     </div>
                     <div id='comment-window' className='grid col-start-2 grid-cols-1 glassy no-margin-right'>
                         <Note isPreview={true} 
+                              content={'Sample'}
                               boxColor={`rgba(${boxColor.red},${boxColor.green},${boxColor.blue},${boxColor.alpha})`}
                               textColor={`rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`}
                               fontSize={previewFontSize}
