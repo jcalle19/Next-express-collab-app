@@ -15,6 +15,7 @@ const NoteArea = () => {
                   textColor={'rgba(255,40,255,1)'}
                   widthPercent={.5}
                   heightPercent={.5}
+                  fontSize={50}
                   left={0}
                   top={0}
             />

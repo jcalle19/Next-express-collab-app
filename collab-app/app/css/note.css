@@ -14,8 +14,8 @@
     padding: 0px;
     overflow: hidden;
     border: 1px solid blue;
-    width: fit-content;
-    height: fit-content;
+    min-width: fit-content;
+    min-height: fit-content;
 }
 
 #note-content {

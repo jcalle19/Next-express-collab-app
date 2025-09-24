@@ -62,7 +62,6 @@ const Canvas = () => {
         let canvasRect = canvas.getBoundingClientRect();
         canvasOffsetRef.current.left = canvasRect.left;
         canvasOffsetRef.current.top = canvasRect.top;
-        console.log(canvasRect.width, canvasRect.height);
         canvasSizeRef.current.width = canvasRect.width;
         canvasSizeRef.current.height = canvasRect.height;
         updateSize({width: canvasRect.width, height: canvasRect.height});
