@@ -3,16 +3,17 @@ import {useStateContext} from '../contexts/userState.jsx'
 import Icon from '../components/icon.jsx'
 import '../css/note.css'
 
-const Note = ({isPreview, editable, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
-    const {textEditFlag, penInfoRef, userObj, addNote, canvasOffsetRef, 
+const Note = ({isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
+    const {textEditFlag, userObj, addNote, canvasOffsetRef, 
            canvasSizeRef, canvasSize} = useStateContext();
     const [text, setText] = useState(content);
-    const [resizing, toggleResizing] = useState(false);
+    const [resizing, toggleResizing] = useState(true);
     const [translating, toggleMoving] = useState(false);
     const [translateX, setXCoord] = useState(left); //percentage * pixel
     const [translateY, setYCoord] = useState(top);
     const [size, setSize] = useState({ width: widthPercent, height: heightPercent}); //%
-    const percRef = useRef({width: widthPercent, height: heightPercent});
+    const areaOffsetRef = useRef({x: widthPercent * canvasSizeRef.current.width / 2, 
+                                  y: heightPercent * canvasSizeRef.current.height / 2});
     const textareaRef = useRef(null);
 
     //Log desired size percentage on manual textarea resize
@@ -23,9 +24,8 @@ const Note = ({isPreview, editable, content, boxColor, textColor, fontSize, widt
         const entry = entries[0];
         const { width, height } = entry.contentRect;
         const { width: cw, height: ch } = canvasSizeRef.current;
-        percRef.current.width = width / cw;
-        percRef.current.height = height / ch;
-        console.log(penInfoRef.current.scale);
+        areaOffsetRef.current.x = (width / cw) * canvasSizeRef.current.width / 2;
+        areaOffsetRef.current.y = (height / ch) * canvasSizeRef.current.height / 2;
       });
       observer.observe(textareaRef.current);
       return () => {
@@ -36,8 +36,12 @@ const Note = ({isPreview, editable, content, boxColor, textColor, fontSize, widt
     //set 
     useEffect(()=> {
       if (!resizing) {
-        setSize({width: percRef.current.width, height: percRef.current.height});
-        console.log(percRef.current.width, percRef.current.height);
+        const { width, height } = textareaRef.current.getBoundingClientRect();
+        setSize({
+          width: width / canvasSizeRef.current.width,
+          height: height / canvasSizeRef.current.height
+        });
+        console.log('setting size');
       }
     },[resizing]);
 
@@ -45,16 +49,16 @@ const Note = ({isPreview, editable, content, boxColor, textColor, fontSize, widt
     useEffect(() => {
       const handleMouseMove = (e) => {
         if (translatingRef.current) {
-          const xPixels = e.clientX - canvasOffsetRef.current.left;
-          const yPixels = e.clientY - canvasOffsetRef.current.top;
+          const xPixels = e.clientX - canvasOffsetRef.current.left - areaOffsetRef.current.x;
+          const yPixels = e.clientY - canvasOffsetRef.current.top - areaOffsetRef.current.y;
           setXCoord(xPixels / canvasSizeRef.current.width);
           setYCoord(yPixels / canvasSizeRef.current.height);
         }
       };
 
       const handleMouseUp = () => {
-        toggleMoving(false);
         toggleResizing(false);
+        toggleMoving(false);
       };
 
       window.addEventListener('mousemove', handleMouseMove);
@@ -75,7 +79,6 @@ const Note = ({isPreview, editable, content, boxColor, textColor, fontSize, widt
     const createNote = () => {
       //default note
       const noteInfo = {user: userObj.current.id, 
-                        editable: false, 
                         text: 'Edit Text', 
                         boxColor: boxColor, 
                         textColor: textColor, 
@@ -93,34 +96,47 @@ const Note = ({isPreview, editable, content, boxColor, textColor, fontSize, widt
            style={{position: `${isPreview ? 'relative' : 'absolute'}`, 
                    left: `${isPreview ? '' : `${100 * translateX / 2}%`}`, //divided by 2 to account for notearea size
                    top: `${isPreview ? '' : `${100 * translateY}%`}`,
-                   minWidth: `${isPreview ? '100%' : 'fit-content'}`,
                    minHeight: `${isPreview ? '100%' : 'fit-content'}`,
+                   minWidth: `${isPreview ? '100%' : ''}`,
+                   userSelect: `${textEditFlag ? '' : 'none'}`,
+                   zIndex: `${textEditFlag || isPreview ? '10' : '-1'}`,
                   }}
       >
           {isPreview ?
             <div id='button-area' className='col-start-1'>
-                  <div id='confirm-button' className='grid grid-rows-3 glassy' style={{borderColor: `${textColor}`}} onClick={createNote}>
-                    <p>&lt;</p>
-                    <p>&lt;</p>
-                    <p>&lt;</p>
-                  </div>            
+                  <div id='confirm-button' className='grid grid-rows-3 glassy' style={{borderColor: `${textColor}`}} onClick={createNote}></div>            
             </div> : <div style={{display: 'none'}}></div>
           }
-          <textarea readOnly={isPreview || !textEditFlag} ref={textareaRef}
+          <textarea readOnly={isPreview || !textEditFlag || translating} //disable when dragEditFlag is true
+                    ref={textareaRef}
                     id='note-content' 
                     className={`col-start-${isPreview ? '2' : '1'} `}
                     value={text}
                     onChange={(e)=>setText(e.target.value)}
                     style={{border: `2px solid ${boxColor}`, 
                             backgroundColor: boxColor, 
+                            outline: 'none',
                             color: textColor,
                             maxWidth: `${canvasSizeRef.current.width}px`,
-                            width: `${size.width * canvasSizeRef.current.width}px`,
-                            height: `${size.height * canvasSizeRef.current.height}px`,
-                            fontSize: `${fontSize * 10}%`,
-                            resize: `${isPreview ? 'none' : 'both'}`,
+                            width: `${Math.ceil(size.width * canvasSizeRef.current.width)}px`,
+                            height: `${Math.ceil(size.height * canvasSizeRef.current.height)}px`,
+                            fontSize: `${Math.ceil(fontSize / 1000 * canvasSizeRef.current.width)}px`,
+                            letterSpacing: `0px`,
+                            resize: `${isPreview || !textEditFlag ? 'none' : 'both'}`,
+                            padding: '0px',
+                            pointerEvents: `${textEditFlag ? '' : 'none'}`,
+                            userSelect: `${textEditFlag ? '' : 'none'}`,
                           }}
-          ></textarea>
+          />
+          {textEditFlag && !isPreview ? 
+            <div id='move-handle' className='edit-buttons row-start-1' 
+                 onDragStart={(e) => e.preventDefault()}
+                 onMouseDown={()=>toggleMoving(true)} 
+                 style={{backgroundColor: `${translating ? 'indigo' : 'blue'}`}}
+            >
+              <Icon src={`/toolbar-icons/drag.svg`} width='90%' height='90%'/>
+            </div> : <div style={{display: 'none'}}></div>
+          }
       </div>
     )
 }

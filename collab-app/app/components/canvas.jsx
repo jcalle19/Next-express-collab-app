@@ -19,7 +19,7 @@ const Canvas = () => {
     const scaleYRef = useRef(1);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
     const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
-            lineFlag, clearFlag, penInfoRef, canvasOffsetRef, canvasSizeRef, 
+            lineFlag, clearFlag, textEditFlag, penInfoRef, canvasOffsetRef, canvasSizeRef, 
             windowSizeX, windowSizeY, windowResize, updateSize} = useStateContext();
 
     useEffect(()=>{
@@ -161,6 +161,7 @@ const Canvas = () => {
             <div id='background-layer' ref={backgroundRef} 
                 style={{
                     background: `${canvasBackground === '' ? 'black' : canvasBackground} center / ${canvasZoom}% no-repeat`,
+                    overflow: `hidden`,
                 }}
             >
                 <canvas ref={canvasRef} 

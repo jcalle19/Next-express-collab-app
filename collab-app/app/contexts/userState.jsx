@@ -301,6 +301,7 @@ export const StateProvider = ({children}) => {
         userObj,
         roomOptions,
         roomUsers,
+        roomNotes,
         socketRef,
         socketRefReady,
         socketReady,
