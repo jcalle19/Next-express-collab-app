@@ -38,7 +38,7 @@ export const StateProvider = ({children}) => {
     const [undoFlag, updateUndo] = useState(false);
     const [redoFlag, updateRedo] = useState(false);
     const [clearFlag, updateClear] = useState(false);
-    const [textEditFlag, updateTextFlag] = useState(true);
+    const [textEditFlag, updateTextFlag] = useState(false);
     const [sliderThumbColor, updateSliderColor] = useState('white');
     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
@@ -190,18 +190,17 @@ export const StateProvider = ({children}) => {
 
     useEffect(() => {
         roomUsersRef.current = roomUsersKeys;
-        console.log('New list of users: ', roomUsersKeys);
+        //console.log('New list of users: ', roomUsersKeys);
     }, [roomUsersKeys]);
 
     useEffect(() => {
         chatMessagesRef.current = chatMessages;
-        console.log('New list of chat messages: ', chatMessagesRef.current);
+        //console.log('New list of chat messages: ', chatMessagesRef.current);
     }, [chatMessages]);
 
     /*-------------- Add host verification to these ones --------------*/
     useEffect(() => {
         if (canvasBackground !== '' && userObj.current.isHost) {
-            console.log(canvasBackground);
             socketRef.current.emit('update-background', userObj.current.roomId, canvasBackground);
         }
     }, [canvasBackground]);

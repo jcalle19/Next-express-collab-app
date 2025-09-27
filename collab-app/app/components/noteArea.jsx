@@ -8,9 +8,39 @@ const NoteArea = () => {
 
     useEffect(()=>{
         console.log(roomNotes);
-    },[]);
+    },[roomNotes]);
     return (
-        <div id='note-area'>
+        <div id='note-area'>         
+            {Array.from(roomNotes).map(([key, noteInfo]) => 
+                <Note isPreview={false} key={key}
+                  content={noteInfo.content} 
+                  boxColor={noteInfo.boxColor} 
+                  textColor={noteInfo.textColor}
+                  widthPercent={noteInfo.width}
+                  heightPercent={noteInfo.height}
+                  fontSize={Number(noteInfo.fontSize)}
+                  left={noteInfo.left}
+                  top={noteInfo.top}
+                />
+            )}
+        </div>
+    )
+}
+
+export default NoteArea
+/*
+            {roomNotes.map(([id, noteInfo]) => 
+                <Note isPreview={false} 
+                  content={noteInfo.content} 
+                  boxColor={noteInfo.boxColor} 
+                  textColor={noteInfo.textColor}
+                  widthPercent={noteInfo.width}
+                  heightPercent={noteInfo.height}
+                  fontSize={Number(noteInfo.fontSize)}
+                  left={noteInfo.left}
+                  top={noteInfo.top}
+                />
+            )}
             
             <Note isPreview={false} 
                   content={'sample'} 
@@ -22,13 +52,4 @@ const NoteArea = () => {
                   left={0}
                   top={0}
             />
-        </div>
-    )
-}
-
-export default NoteArea
-/*
-            {[...roomNotes].map(([user, userInfo]) => 
-                userInfo.id != userObj.current.id ? <UserIcon key={userInfo.id} x={userInfo.xCoord} y={userInfo.yCoord}/> : ''
-                )
-            }*/
+            */

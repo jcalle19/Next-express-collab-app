@@ -41,7 +41,6 @@ const Note = ({isPreview, content, boxColor, textColor, fontSize, widthPercent, 
           width: width / canvasSizeRef.current.width,
           height: height / canvasSizeRef.current.height
         });
-        console.log('setting size');
       }
     },[resizing]);
 
