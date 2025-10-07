@@ -58,11 +58,3 @@
     cursor: grab;
     transition: background-color .1s;
 }
-
-#post-button {
-    background-color: var(--lime-green);
-}
-
-#cancel-button {
-    background-color: var(--raspberry);
-}

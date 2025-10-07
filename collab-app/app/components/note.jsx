@@ -3,9 +3,9 @@ import {useStateContext} from '../contexts/userState.jsx'
 import Icon from '../components/icon.jsx'
 import '../css/note.css'
 
-const Note = ({isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
+const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
     const {textEditFlag, userObj, addNote, canvasOffsetRef, 
-           canvasSizeRef, canvasSize} = useStateContext();
+           canvasSizeRef, canvasSize, socketRef} = useStateContext();
     const [text, setText] = useState(content);
     const [resizing, toggleResizing] = useState(true);
     const [translating, toggleMoving] = useState(false);
@@ -14,7 +14,16 @@ const Note = ({isPreview, content, boxColor, textColor, fontSize, widthPercent, 
     const [size, setSize] = useState({ width: widthPercent, height: heightPercent}); //%
     const areaOffsetRef = useRef({x: widthPercent * canvasSizeRef.current.width / 2, 
                                   y: heightPercent * canvasSizeRef.current.height / 2});
+    const coordRef = useRef({x: left, y: top});
     const textareaRef = useRef(null);
+
+    //change info -> transmit to server -> server relays map to clients -> map updates props -> comp syncs with new props
+    useEffect(() => {
+      setXCoord(left);
+      setYCoord(top);
+      setSize({ width: widthPercent, height: heightPercent});
+      setText(content);
+    }, [left, top, widthPercent, heightPercent, content]);
 
     //Log desired size percentage on manual textarea resize
     useEffect(() => {
@@ -44,6 +53,28 @@ const Note = ({isPreview, content, boxColor, textColor, fontSize, widthPercent, 
       }
     },[resizing]);
 
+    const transmitInfo = () => {
+      //package into image object
+      //transmit to server
+      
+      const retObj = {
+        boxColor: boxColor,
+        fontSize: fontSize,
+        height: size.height,
+        left: coordRef.x,
+        top: coordRef.y,
+        text: text,
+        textColor: textColor,
+        width: size.width
+      }
+      if (!retObj.width || !retObj.height) {
+        return;
+      }
+      else {
+        socketRef.current.emit('update-notes', userObj.current.roomId, id, retObj);
+      }
+    }
+
     /*Defining functions here to avoid stale values*/
     useEffect(() => {
       const handleMouseMove = (e) => {
@@ -56,8 +87,10 @@ const Note = ({isPreview, content, boxColor, textColor, fontSize, widthPercent, 
       };
 
       const handleMouseUp = () => {
+        const transmitFlag = resizing || translating;
         toggleResizing(false);
         toggleMoving(false);
+        if (transmitFlag) transmitInfo();
       };
 
       window.addEventListener('mousemove', handleMouseMove);
@@ -74,11 +107,15 @@ const Note = ({isPreview, content, boxColor, textColor, fontSize, widthPercent, 
     useEffect(() => {
       translatingRef.current = translating;
     }, [translating]);
-    
+
+    useEffect(() => {
+      coordRef.x = translateX;
+      coordRef.y = translateY;
+    }, [translateX, translateY]);
+
     const createNote = () => {
       //default note
-      const noteInfo = {user: userObj.current.id, 
-                        text: 'Edit Text', 
+      const noteInfo = {text: 'Edit Text', 
                         boxColor: boxColor, 
                         textColor: textColor, 
                         fontSize: fontSize, 
@@ -139,15 +176,4 @@ const Note = ({isPreview, content, boxColor, textColor, fontSize, widthPercent, 
       </div>
     )
 }
-/*
-<div className='grid grid-rows-3 grid-cols-1' style={{width: '100%', height: '60px'}}>
-                  <div id='move-handle' className='edit-buttons row-start-1' 
-                       onDragStart={(e) => e.preventDefault()}
-                       onMouseDown={()=>toggleMoving(true)} 
-                       style={{backgroundColor: `${translating ? 'red' : 'blue'}`}}
-                  ></div>
-                  <div id='post-button' className='edit-buttons row-start-2'></div>
-                  <div id='cancel-button' className='edit-buttons row-start-3'></div>
-                </div>
-*/
 export default Note

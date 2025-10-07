@@ -181,10 +181,15 @@ const socket_functions = (io) => {
             broadcastInfo(roomId, false, 'update-background');
         });
 
+        socket.on('update-notes', (roomId, noteId, noteInfo) => {
+            roomMap.get(roomId).notes.set(noteId, noteInfo);
+            broadcastInfo(roomId, false, 'update-notes');
+        });
+
         socket.on('update-zoom', (roomId, zoom)=> {
             roomMap.get(roomId).zoom = zoom;
             broadcastInfo(roomId, false, 'update-zoom');
-        })
+        });
     });
 }
 

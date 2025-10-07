@@ -144,7 +144,7 @@ export const StateProvider = ({children}) => {
                 roomOptions.current = roomInfo.options;
                 updateKeys(Array.from(members.values()));
                 updateMessages(chatMessages);
-                updateRoomNotes(roomInfo.notes);
+                updateRoomNotes(new Map(roomInfo.notes));
                 updateBackground(roomInfo.background);
                 updateZoom(roomInfo.zoom);
             } else {
@@ -337,6 +337,7 @@ export const StateProvider = ({children}) => {
         addNote,
         windowResize,
         updateSize,
+        updateRoomNotes,
         loadRoomState,
         setBackground,
         setPenColor,

@@ -121,8 +121,8 @@ const ToolBar = () => {
                             <div id='line-toggle' className={`row-start-2 col-start-2 glassy ${flagMap.get('line')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('line')}>
                                 <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
                             </div>
-                            <div id='text-edit-toggle' className={`row-start-2 col-start-3 glassy ${flagMap.get('text')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('text')}>
-                                <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%'/>
+                            <div id='text-edit-toggle' className={`glassy row-start-2 col-start-3 ${flagMap.get('text')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('text')}>
+                                <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%' className='row-start-1'/>
                             </div>
                         </div>
                     </div>
