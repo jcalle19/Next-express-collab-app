@@ -25,9 +25,8 @@ const ColorSelect = () => {
                  onClick={()=>{setLabel('pen')}}>Pen</div>
             <div className={`test-border col-start-6 col-span-5 row-start-1 glassy ${currLabel === 'box' ? 'set-inspecting' : ''}`} 
                  onClick={()=>{setLabel('box')}}>Box</div>
-            <div className={`test-border col-start-11 col-span-5 row-start-1 glassy ${currLabel === 'text' ? 'set-in9specting' : ''}`} 
+            <div className={`test-border col-start-11 col-span-5 row-start-1 glassy ${currLabel === 'text' ? 'set-inspecting' : ''}`} 
                  onClick={()=>{setLabel('text')}}>Text</div>
-
             <div className='col-start-1 col-span-3 row-start-2 glassy'>
                 <MyColorSlider orientation="vertical" color={currColor} value={currColor} onChange={currSetter} channel="red"/>
             </div>

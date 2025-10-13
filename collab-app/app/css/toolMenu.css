@@ -12,7 +12,6 @@
 
 #side-bar-overlay {
     background: rgba(0, 0, 0, 0.6);
-    border-radius: 16px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -21,11 +20,11 @@
 }
 
 #edit-section {
-    height: 60vh;
+    height: 50%;
 }
 
 #chat-section {
-    height: 40vh;
+    height: 50%;
 }
 
 #width-preview {
@@ -63,15 +62,6 @@
     border: 1px solid grey;
     top: 50%;
     transform: translateY(-50%);
-}
-
-#pen-row {
-    height: 40vh;
-}
-
-#comment-row {
-    margin-top: -1px;
-    height: 20vh;
 }
 
 #update-button {

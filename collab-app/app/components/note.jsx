@@ -5,7 +5,7 @@ import '../css/note.css'
 
 const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
     const {textEditFlag, userObj, addNote, canvasOffsetRef, 
-           canvasSizeRef, canvasSize, socketRef} = useStateContext();
+           canvasSizeRef, canvasSize, socketRef, roomNotes} = useStateContext();
     const [text, setText] = useState(content);
     const [resizing, toggleResizing] = useState(true);
     const [translating, toggleMoving] = useState(false);
@@ -14,14 +14,14 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
     const [size, setSize] = useState({ width: widthPercent, height: heightPercent}); //%
     const areaOffsetRef = useRef({x: widthPercent * canvasSizeRef.current.width / 2, 
                                   y: heightPercent * canvasSizeRef.current.height / 2});
-    const coordRef = useRef({x: left, y: top});
+    const infoRef = useRef({x: left, y: top, width: widthPercent, height: heightPercent});
     const textareaRef = useRef(null);
 
     //change info -> transmit to server -> server relays map to clients -> map updates props -> comp syncs with new props
     useEffect(() => {
       setXCoord(left);
       setYCoord(top);
-      setSize({ width: widthPercent, height: heightPercent});
+      setSize({ width: widthPercent, height: heightPercent });
       setText(content);
     }, [left, top, widthPercent, heightPercent, content]);
 
@@ -42,37 +42,41 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
       };
     }, []);
 
-    //set 
     useEffect(()=> {
+      transmitInfo(translateX,translateY,size.width,size.height,text);
+    },[text]);
+
+    useEffect(()=> {
+      //When user is done resizing store size value and transmit changes
       if (!resizing) {
         const { width, height } = textareaRef.current.getBoundingClientRect();
+        const newWidth = width / canvasSizeRef.current.width;
+        const newHeight = height / canvasSizeRef.current.height
         setSize({
-          width: width / canvasSizeRef.current.width,
-          height: height / canvasSizeRef.current.height
+          width: newWidth,
+          height: newHeight,
         });
+        transmitInfo(translateX, translateY, newWidth, newHeight);
       }
     },[resizing]);
 
-    const transmitInfo = () => {
-      //package into image object
-      //transmit to server
-      
+    const transmitInfo = (x,y,width,height) => {
+      console.log(content);
+      //return on first component mount call
+      if (!id) return;
+
       const retObj = {
         boxColor: boxColor,
         fontSize: fontSize,
-        height: size.height,
-        left: coordRef.x,
-        top: coordRef.y,
-        text: text,
+        height: height,
+        left: x,
+        top: y,
+        content: text,
         textColor: textColor,
-        width: size.width
+        width: width,
       }
-      if (!retObj.width || !retObj.height) {
-        return;
-      }
-      else {
-        socketRef.current.emit('update-notes', userObj.current.roomId, id, retObj);
-      }
+      
+      socketRef.current.emit('update-notes', userObj.current.roomId, id, retObj);
     }
 
     /*Defining functions here to avoid stale values*/
@@ -87,10 +91,8 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
       };
 
       const handleMouseUp = () => {
-        const transmitFlag = resizing || translating;
         toggleResizing(false);
         toggleMoving(false);
-        if (transmitFlag) transmitInfo();
       };
 
       window.addEventListener('mousemove', handleMouseMove);
@@ -106,16 +108,12 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
 
     useEffect(() => {
       translatingRef.current = translating;
+      if (!translating) transmitInfo(translateX, translateY, size.width, size.height);
     }, [translating]);
-
-    useEffect(() => {
-      coordRef.x = translateX;
-      coordRef.y = translateY;
-    }, [translateX, translateY]);
 
     const createNote = () => {
       //default note
-      const noteInfo = {text: 'Edit Text', 
+      const noteInfo = {content: 'Edit Text', 
                         boxColor: boxColor, 
                         textColor: textColor, 
                         fontSize: fontSize, 
@@ -128,7 +126,7 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
     return (
       <div id='note-container'
            onMouseDown={()=>{toggleResizing(true)}}
-           className={`${isPreview ? 'preview-centered grid grid-cols-[1fr_15fr]' : ''} `}
+           className={`${isPreview ? ' preview-centered grid grid-cols-[1fr_2fr]' : ''} `}
            style={{position: `${isPreview ? 'relative' : 'absolute'}`, 
                    left: `${isPreview ? '' : `${100 * translateX / 2}%`}`, //divided by 2 to account for notearea size
                    top: `${isPreview ? '' : `${100 * translateY}%`}`,
@@ -139,22 +137,27 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
                   }}
       >
           {isPreview ?
-            <div id='button-area' className='col-start-1'>
-                  <div id='confirm-button' className='grid grid-rows-3 glassy' style={{borderColor: `${textColor}`}} onClick={createNote}></div>            
+            <div id='button-area' className='grid grid-rows-2 col-start-1'>
+              <div id='trash-button' className='glassy row-start-1'>
+                <Icon src={`/toolbar-icons/trash.svg`} width='90%' height='90%'/>
+              </div>
+              <div id='confirm-button' className='glassy row-start-2' onClick={createNote}>
+                <Icon src={`/toolbar-icons/relocate.svg`} width='90%' height='90%'/>
+              </div>
             </div> : <div style={{display: 'none'}}></div>
           }
           <textarea readOnly={isPreview || !textEditFlag || translating} //disable when dragEditFlag is true
                     ref={textareaRef}
                     id='note-content' 
-                    className={`col-start-${isPreview ? '2' : '1'} `}
+                    className={`col-start-${isPreview ? '2' : '1'}`}
                     value={text}
                     onChange={(e)=>setText(e.target.value)}
                     style={{border: `2px solid ${boxColor}`, 
                             backgroundColor: boxColor, 
                             outline: 'none',
                             color: textColor,
-                            maxWidth: `${canvasSizeRef.current.width}px`,
-                            width: `${Math.ceil(size.width * canvasSizeRef.current.width)}px`,
+                            maxWidth: `${isPreview ? '100%' : `${canvasSizeRef.current.width}px`}`,
+                            width: `${isPreview ? '100%' : `${Math.ceil(size.width * canvasSizeRef.current.width)}px`}`,
                             height: `${Math.ceil(size.height * canvasSizeRef.current.height)}px`,
                             fontSize: `${Math.ceil(fontSize / 1000 * canvasSizeRef.current.width)}px`,
                             letterSpacing: `0px`,

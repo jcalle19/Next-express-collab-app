@@ -11,6 +11,7 @@ import ChatBox from './chatBox.jsx'
 import Icon from './icon.jsx'
 import * as THREE from 'three'; // Import Three.js
 import HALO from 'vanta/dist/vanta.halo.min';
+import WAVES from 'vanta/dist/vanta.waves.min';
 
 const ToolBar = () => {
     /*Vanta.js Background Stuff*/
@@ -74,79 +75,79 @@ const ToolBar = () => {
     return (
         <div ref={vantaRef} id='side-bar-container' className='grid grid-cols-1 grid-rows-[8fr_4fr]'>
             <div id='side-bar-overlay'>
-                <section id='edit-section' className='grid grid-cols-1 grid-rows-[3fr_2fr]'>
-                <div id='pen-row' className='grid grid-cols-2 grid-rows-1'>
-                    <div id='pen-col-1' className='grid grid-cols-1 grid-rows-[1fr_2fr_4fr]'>
-                        <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1'>
-                            <div id='undo' className='col-start-1 glassy' onClick={()=>triggerFlag('undo')}>
-                                <Icon src={`/${iconFolder}/left-arrow.svg`} width='85%' height='85%'/>
+                <section id='edit-section' className='grid grid-cols-1 grid-rows-[3fr_1fr]'>
+                    <div id='pen-row' className='grid grid-cols-2 grid-rows-1'>
+                        <div id='pen-col-1' className='grid grid-cols-1 grid-rows-[1fr_2fr_4fr]'>
+                            <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1'>
+                                <div id='undo' className='col-start-1 glassy' onClick={()=>triggerFlag('undo')}>
+                                    <Icon src={`/${iconFolder}/left-arrow.svg`} width='85%' height='85%'/>
+                                </div>
+                                
+                                <div id='redo' className='col-start-2 glassy' onClick={()=>triggerFlag('redo')}>
+                                    <Icon src={`/${iconFolder}/right-arrow.svg`} width='85%' height='85%'/>
+                                </div>
                             </div>
-                            
-                            <div id='redo' className='col-start-2 glassy' onClick={()=>triggerFlag('redo')}>
-                                <Icon src={`/${iconFolder}/right-arrow.svg`} width='85%' height='85%'/>
+                            <div id='width-row' className='grid grid-cols-1 grid-rows-[1fr_2fr]'>
+                                <div className='row-start-1 glassy'>
+                                    <div id='width-preview'
+                                        style={{height: `${previewWidth ? previewWidth : '2'}px`,
+                                                borderRadius: `${previewWidth / 2}px`,
+                                                backgroundColor: `${penInfoRef.current.color}`
+                                        }}
+                                    ></div>
+                                </div>
+                                <div className='row-start-2 glassy'>
+                                    <input 
+                                        id="width-slider" 
+                                        type="range" min="2" 
+                                        max="100" value={sliderValue} 
+                                        onChange={(e) => handleSliderChange(e.target.value)}
+                                        style={{'--slider-thumb-color' : `${penInfoRef.current.color}`}}
+                                    />
+                                </div>
+                            </div>
+                            <div id='draw-mode-row' className='grid grid-cols-3 grid-rows-[1fr_2fr]'>
+                                <div id='background-set' className='row-start-1 col-start-1 glassy' onClick={()=>triggerFlag('background')}>
+                                    <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>
+                                </div>
+                                <div id='zoom-in' className='row-start-1 col-start-2 glassy' onClick={zoomIn}>
+                                    <Icon src={`/${iconFolder}/zoom-in.svg`} width='55%' height='55%'/>
+                                </div>
+                                <div id='zoom-out' className='row-start-1 col-start-3 glassy' onClick={zoomOut}>
+                                    <Icon src={`/${iconFolder}/zoom-out.svg`} width='55%' height='55%'/>
+                                </div>
+                                <div id='highlight-toggle' className={`row-start-2 col-start-1 glassy ${flagMap.get('highlight')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('highlight')}>
+                                    <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
+                                </div>
+                                <div id='line-toggle' className={`row-start-2 col-start-2 glassy ${flagMap.get('line')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('line')}>
+                                    <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
+                                </div>
+                                <div id='text-edit-toggle' className={`glassy row-start-2 col-start-3 ${flagMap.get('text')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('text')}>
+                                    <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%' className='row-start-1'/>
+                                </div>
                             </div>
                         </div>
-                        <div id='width-row' className='grid grid-cols-1 grid-rows-[1fr_2fr]'>
-                            <div className='row-start-1 glassy'>
-                                <div id='width-preview'
-                                    style={{height: `${previewWidth ? previewWidth : '2'}px`,
-                                            borderRadius: `${previewWidth / 2}px`,
-                                            backgroundColor: `${penInfoRef.current.color}`
-                                    }}
-                                ></div>
-                            </div>
-                            <div className='row-start-2 glassy'>
-                                <input 
-                                    id="width-slider" 
-                                    type="range" min="2" 
-                                    max="100" value={sliderValue} 
-                                    onChange={(e) => handleSliderChange(e.target.value)}
-                                    style={{'--slider-thumb-color' : `${penInfoRef.current.color}`}}
-                                />
-                            </div>
-                        </div>
-                        <div id='draw-mode-row' className='grid grid-cols-3 grid-rows-[1fr_2fr]'>
-                            <div id='background-set' className='row-start-1 col-start-1 glassy' onClick={()=>triggerFlag('background')}>
-                                <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>
-                            </div>
-                            <div id='zoom-in' className='row-start-1 col-start-2 glassy' onClick={zoomIn}>
-                                <Icon src={`/${iconFolder}/zoom-in.svg`} width='55%' height='55%'/>
-                            </div>
-                            <div id='zoom-out' className='row-start-1 col-start-3 glassy' onClick={zoomOut}>
-                                <Icon src={`/${iconFolder}/zoom-out.svg`} width='55%' height='55%'/>
-                            </div>
-                            <div id='highlight-toggle' className={`row-start-2 col-start-1 glassy ${flagMap.get('highlight')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('highlight')}>
-                                <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
-                            </div>
-                            <div id='line-toggle' className={`row-start-2 col-start-2 glassy ${flagMap.get('line')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('line')}>
-                                <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
-                            </div>
-                            <div id='text-edit-toggle' className={`glassy row-start-2 col-start-3 ${flagMap.get('text')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('text')}>
-                                <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%' className='row-start-1'/>
-                            </div>
+                        <div id='pen-col-2' className='relative col-start-2'>
+                            <ColorSelect/>
                         </div>
                     </div>
-                    <div id='pen-col-2' className='relative col-start-2 no-margin-right'>
-                        <ColorSelect/>
+                    <div id='comment-row' className='grid grid-cols-[1fr_8fr] grid-rows-1' onClick={()=>triggerFlag('clear')}>
+                        <div id='clear-button' className='col-start-1 glassy'>
+                            <Icon src={`/${iconFolder}/trash.svg`} width='50%' height='35%'/>
+                        </div>
+                        <div id='comment-window' className='grid col-start-2 grid-cols-1 no-margin-right'>
+                            <Note isPreview={true} 
+                                content={':D'}
+                                boxColor={`rgba(${boxColor.red},${boxColor.green},${boxColor.blue},${boxColor.alpha})`}
+                                textColor={`rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`}
+                                fontSize={previewFontSize}
+                            />
+                        </div>
                     </div>
-                </div>
-                <div id='comment-row' className='grid grid-cols-[1fr_10fr] grid-rows-1' onClick={()=>triggerFlag('clear')}>
-                    <div id='clear-button' className='col-start-1 glassy'>
-                        <Icon src={`/${iconFolder}/trash.svg`} width='50%' height='35%'/>
-                    </div>
-                    <div id='comment-window' className='grid col-start-2 grid-cols-1 glassy no-margin-right'>
-                        <Note isPreview={true} 
-                              content={'Sample'}
-                              boxColor={`rgba(${boxColor.red},${boxColor.green},${boxColor.blue},${boxColor.alpha})`}
-                              textColor={`rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`}
-                              fontSize={previewFontSize}
-                        />
-                    </div>
-                </div>
-            </section>
-            <section id='chat-section'>
-                <ChatBox/>
-            </section>
+                </section>
+                <section id='chat-section'>
+                    <ChatBox/>
+                </section>
             </div>
         </div>
     )
