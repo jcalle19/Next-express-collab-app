@@ -6,7 +6,7 @@
     position: absolute;
     right: 0px;
     width: 30vw;
-    height: 100vh;
+    height: 100vh !important;
     overflow: hidden;
 }
 
@@ -20,11 +20,11 @@
 }
 
 #edit-section {
-    height: 50%;
+    height: 50% !important;
 }
 
 #chat-section {
-    height: 50%;
+    height: 50% !important;
 }
 
 #width-preview {

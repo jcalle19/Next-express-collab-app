@@ -21,14 +21,14 @@ const ColorSelect = () => {
 
     return (
         <div className='grid grid-rows-[1fr_7fr_1fr] grid-cols-[repeat(15,minmax(0,1fr))] h-full'>
-            <div className={`test-border col-start-1 col-span-5 row-start-1 glassy ${currLabel === 'pen' ? 'set-inspecting' : ''}`}
+            <div className={`col-start-1 col-span-5 row-start-1 glassy ${currLabel === 'pen' ? 'set-inspecting' : ''}`}
                  onClick={()=>{setLabel('pen')}}>Pen</div>
-            <div className={`test-border col-start-6 col-span-5 row-start-1 glassy ${currLabel === 'box' ? 'set-inspecting' : ''}`} 
+            <div className={`col-start-6 col-span-5 row-start-1 glassy ${currLabel === 'box' ? 'set-inspecting' : ''}`} 
                  onClick={()=>{setLabel('box')}}>Box</div>
-            <div className={`test-border col-start-11 col-span-5 row-start-1 glassy ${currLabel === 'text' ? 'set-inspecting' : ''}`} 
+            <div className={`col-start-11 col-span-5 row-start-1 glassy ${currLabel === 'text' ? 'set-inspecting' : ''}`} 
                  onClick={()=>{setLabel('text')}}>Text</div>
             <div className='col-start-1 col-span-3 row-start-2 glassy'>
-                <MyColorSlider orientation="vertical" color={currColor} value={currColor} onChange={currSetter} channel="red"/>
+                <MyColorSlider orientation="vertical" value={currColor} onChange={currSetter} channel="red"/>
             </div>
             <div className='col-start-4 col-span-3 row-start-2 glassy'>
                 <MyColorSlider orientation="vertical" value={currColor} onChange={currSetter} channel="green"/>
@@ -44,25 +44,23 @@ const ColorSelect = () => {
                     style={{backgroundColor: `rgba(${currColor.red}, ${currColor.green}, ${currColor.blue}, ${currColor.alpha})`}}>
                 </div>
             </div>
-            <div id='rgb-output' className={`col-start-1 row-start-3 col-span-full glassy ${currLabel === 'text' ? 'grid grid-rows-2' : ''}`}>
-                <p className={`${currLabel === 'text' ? 'col-start-1' : ''}`}>
+            <div id='rgb-output' className={`col-start-1 row-start-3 col-span-full glassy grid grid-rows-2`}>
+                <p className={`${currLabel === 'text' ? 'row-span-1' : 'row-span-2'}`}>
                     {`R: ${currColor.red} G: ${currColor.green} B: ${currColor.blue} ${currLabel === 'text' ? `S: ${previewFontSize}` : ''}`}
                 </p>
-                {currLabel === 'text' ? 
-                    <div>
-                        <input 
-                            id="width-slider" 
-                            type="range" min="2" 
-                            max="100" value={previewFontSize} 
-                            onChange={(e) => setPreviewFontSize(e.target.value)}
-                            style={{'--slider-thumb-color' : `rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`,
-                                    height: '75%',
-                            }}
-                        />
-                    </div> : ''}
+                <div className='row-start-2' id='slider-container' style={{display: `${currLabel === 'text' ? 'block' : 'none'}`}}>
+                    <input 
+                        id="font-slider" 
+                       type="range" min="2" 
+                        max="100" value={previewFontSize} 
+                        onChange={(e) => setPreviewFontSize(e.target.value)}
+                        style={{'--slider-thumb-color' : `rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`,
+                            height: '75%',
+                        }}
+                    />
+                </div>
             </div>
         </div>
     )
 }
-//H: {currColor.hue} S: {currColor.saturation} B: {currColor.brightness} A: {currColor.alpha}
 export default ColorSelect;
