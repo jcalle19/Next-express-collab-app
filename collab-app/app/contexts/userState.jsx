@@ -39,6 +39,7 @@ export const StateProvider = ({children}) => {
     const [redoFlag, updateRedo] = useState(false);
     const [clearFlag, updateClear] = useState(false);
     const [textEditFlag, updateTextFlag] = useState(false);
+    const [noteDeleteFlag, updateDeleteFlag] = useState(false);
     const [sliderThumbColor, updateSliderColor] = useState('white');
     const [socketReady, updateSocketStatus] = useState(false);
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
@@ -66,6 +67,7 @@ export const StateProvider = ({children}) => {
         ['redo', [redoFlag, updateRedo]],
         ['clear', [clearFlag, updateClear]],
         ['text', [textEditFlag, updateTextFlag]],
+        ['delete', [noteDeleteFlag, updateDeleteFlag]],
         ['highlight', [highlightFlag, triggerHighlight]],
         ['line', [lineFlag, triggerLineTool]],
         ['background', [backgroundSelectFlag, triggerBackgroundFlag]],
@@ -326,6 +328,7 @@ export const StateProvider = ({children}) => {
         lineFlag,
         clearFlag,
         textEditFlag,
+        noteDeleteFlag,
         flagMap,
         sliderThumbColor,
         penInfoRef,

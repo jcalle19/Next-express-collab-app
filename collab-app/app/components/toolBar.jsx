@@ -133,7 +133,7 @@ const ToolBar = () => {
                     </div>
                     <div id='comment-row' className='grid grid-cols-[1fr_8fr] grid-rows-1' onClick={()=>triggerFlag('clear')}>
                         <div id='clear-button' className='col-start-1 glassy'>
-                            <Icon src={`/${iconFolder}/trash.svg`} width='50%' height='35%'/>
+                            <Icon src={`/${iconFolder}/clear.svg`} width='50%' height='35%'/>
                         </div>
                         <div id='comment-window' className='grid col-start-2 grid-cols-1 no-margin-right'>
                             <Note isPreview={true} 

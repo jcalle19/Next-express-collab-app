@@ -5,16 +5,17 @@ import '../css/note.css'
 
 const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
     const {textEditFlag, userObj, addNote, canvasOffsetRef, 
-           canvasSizeRef, canvasSize, socketRef, roomNotes} = useStateContext();
+           canvasSizeRef, canvasSize, socketRef, 
+           noteDeleteFlag, triggerFlag} = useStateContext();
     const [text, setText] = useState(content);
     const [resizing, toggleResizing] = useState(true);
     const [translating, toggleMoving] = useState(false);
     const [translateX, setXCoord] = useState(left); //percentage * pixel
     const [translateY, setYCoord] = useState(top);
     const [size, setSize] = useState({ width: widthPercent, height: heightPercent}); //%
+    const [noteFocused, setFocus] = useState(false);
     const areaOffsetRef = useRef({x: widthPercent * canvasSizeRef.current.width / 2, 
                                   y: heightPercent * canvasSizeRef.current.height / 2});
-    const infoRef = useRef({x: left, y: top, width: widthPercent, height: heightPercent});
     const textareaRef = useRef(null);
 
     //change info -> transmit to server -> server relays map to clients -> map updates props -> comp syncs with new props
@@ -42,12 +43,13 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
       };
     }, []);
 
+    //sends update to text to the server
     useEffect(()=> {
       transmitInfo(translateX,translateY,size.width,size.height,text);
     },[text]);
 
     useEffect(()=> {
-      //When user is done resizing store size value and transmit changes
+      //When user is done resizing -> store size value and transmit changes
       if (!resizing) {
         const { width, height } = textareaRef.current.getBoundingClientRect();
         const newWidth = width / canvasSizeRef.current.width;
@@ -132,17 +134,19 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
                    top: `${isPreview ? '' : `${100 * translateY}%`}`,
                    minHeight: `${isPreview ? '100%' : 'fit-content'}`,
                    minWidth: `${isPreview ? '100%' : ''}`,
-                   userSelect: `${textEditFlag ? '' : 'none'}`,
+                   userSelect: `${textEditFlag || noteDeleteFlag ? '' : 'none'}`,
                    zIndex: `${textEditFlag || isPreview ? '10' : '-1'}`,
                   }}
       >
           {isPreview ?
             <div id='button-area' className='grid grid-rows-2 col-start-1'>
-              <div id='trash-button' className='glassy row-start-1'>
-                <Icon src={`/toolbar-icons/trash.svg`} width='90%' height='90%'/>
+              <div id='confirm-button' className='glassy row-start-1' onClick={createNote}>
+                <Icon src={`/toolbar-icons/relocate.svg`} width='35%' height='35%'/>
               </div>
-              <div id='confirm-button' className='glassy row-start-2' onClick={createNote}>
-                <Icon src={`/toolbar-icons/relocate.svg`} width='90%' height='90%'/>
+              <div id='trash-button' className={`glassy row-start-2 ${noteDeleteFlag ? 'set-inspecting' : ''}`}
+                onClick={()=>triggerFlag('delete')}
+              >
+                <Icon src={`/toolbar-icons/trash.svg`} width='35%' height='35%'/>
               </div>
             </div> : <div style={{display: 'none'}}></div>
           }
