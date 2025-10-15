@@ -190,6 +190,11 @@ const socket_functions = (io) => {
             roomMap.get(roomId).zoom = zoom;
             broadcastInfo(roomId, false, 'update-zoom');
         });
+
+        socket.on('delete-note', (roomId, noteId) => {
+            roomMap.get(roomId).notes.delete(noteId);
+            broadcastInfo(roomId, false, 'update-notes');
+        });
     });
 }
 

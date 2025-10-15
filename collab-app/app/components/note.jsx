@@ -5,8 +5,7 @@ import '../css/note.css'
 
 const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
     const {textEditFlag, userObj, addNote, canvasOffsetRef, 
-           canvasSizeRef, canvasSize, socketRef, 
-           noteDeleteFlag, triggerFlag} = useStateContext();
+           canvasSizeRef, socketRef, noteDeleteFlag, triggerFlag} = useStateContext();
     const [text, setText] = useState(content);
     const [resizing, toggleResizing] = useState(true);
     const [translating, toggleMoving] = useState(false);
@@ -62,25 +61,6 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
       }
     },[resizing]);
 
-    const transmitInfo = (x,y,width,height) => {
-      console.log(content);
-      //return on first component mount call
-      if (!id) return;
-
-      const retObj = {
-        boxColor: boxColor,
-        fontSize: fontSize,
-        height: height,
-        left: x,
-        top: y,
-        content: text,
-        textColor: textColor,
-        width: width,
-      }
-      
-      socketRef.current.emit('update-notes', userObj.current.roomId, id, retObj);
-    }
-
     /*Defining functions here to avoid stale values*/
     useEffect(() => {
       const handleMouseMove = (e) => {
@@ -113,21 +93,47 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
       if (!translating) transmitInfo(translateX, translateY, size.width, size.height);
     }, [translating]);
 
+    const transmitInfo = (x,y,width,height) => {
+      console.log(content);
+      //return on first component mount call
+      if (!id) return;
+
+      const retObj = {
+        boxColor: boxColor,
+        fontSize: fontSize,
+        height: height,
+        left: x,
+        top: y,
+        content: text,
+        textColor: textColor,
+        width: width,
+      }
+      
+      socketRef.current.emit('update-notes', userObj.current.roomId, id, retObj);
+    }
+
     const createNote = () => {
       //default note
       const noteInfo = {content: 'Edit Text', 
                         boxColor: boxColor, 
                         textColor: textColor, 
-                        fontSize: fontSize, 
-                        top: 0, left: 0, 
+                        fontSize: fontSize,         
+                        top: 0, left: 0,
                         width: .20, height: .20
                       };
       addNote(userObj.current, noteInfo);
     }
 
+    const deleteNote = () => {
+      if (noteDeleteFlag && noteFocused) socketRef.current.emit('delete-note', userObj.current.roomId, id);
+    }
+
     return (
       <div id='note-container'
-           onMouseDown={()=>{toggleResizing(true)}}
+           onMouseDown={()=>toggleResizing(true)}
+           onMouseEnter={()=>setFocus(true)}
+           onMouseLeave={()=>setFocus(false)}
+           onClick={deleteNote}
            className={`${isPreview ? ' preview-centered grid grid-cols-[1fr_2fr]' : ''} `}
            style={{position: `${isPreview ? 'relative' : 'absolute'}`, 
                    left: `${isPreview ? '' : `${100 * translateX / 2}%`}`, //divided by 2 to account for notearea size
@@ -135,7 +141,9 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
                    minHeight: `${isPreview ? '100%' : 'fit-content'}`,
                    minWidth: `${isPreview ? '100%' : ''}`,
                    userSelect: `${textEditFlag || noteDeleteFlag ? '' : 'none'}`,
-                   zIndex: `${textEditFlag || isPreview ? '10' : '-1'}`,
+                   outline: `${noteFocused && noteDeleteFlag && !isPreview ? '5px dashed red' : ``}`,
+                   lineHeight: '0px',
+                   zIndex: `${textEditFlag || isPreview || noteDeleteFlag ? '10' : '-1'}`,
                   }}
       >
           {isPreview ?
@@ -156,15 +164,15 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
                     className={`col-start-${isPreview ? '2' : '1'}`}
                     value={text}
                     onChange={(e)=>setText(e.target.value)}
-                    style={{border: `2px solid ${boxColor}`, 
+                    style={{border: `1px solid ${boxColor}`,
                             backgroundColor: boxColor, 
-                            outline: 'none',
                             color: textColor,
                             maxWidth: `${isPreview ? '100%' : `${canvasSizeRef.current.width}px`}`,
                             width: `${isPreview ? '100%' : `${Math.ceil(size.width * canvasSizeRef.current.width)}px`}`,
                             height: `${Math.ceil(size.height * canvasSizeRef.current.height)}px`,
                             fontSize: `${Math.ceil(fontSize / 1000 * canvasSizeRef.current.width)}px`,
                             letterSpacing: `0px`,
+                            lineHeight: 'normal',
                             resize: `${isPreview || !textEditFlag ? 'none' : 'both'}`,
                             padding: '0px',
                             pointerEvents: `${textEditFlag ? '' : 'none'}`,
