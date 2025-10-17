@@ -31,23 +31,25 @@ const UserPanel = ({user}) => {
     }
 
     return (
-        <div className='user-panel grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-1'>
+        <div className='user-panel grid grid-cols-[1fr_1fr_1fr_1fr_1fr] grid-rows-1'>
             <div className='col-start-1'>{user.user}</div>
             <div className={`perm-button ${user.canDraw ? 'set-inspecting-borderless' : ''} col-start-2`} 
                  onClick={()=>handleToggle('toggle-drawing', user.canDraw, user)}>
-                <Icon src={`/${iconFolder}/pen.svg`} width='85%' height='90%'/>
+                <Icon src={`/${iconFolder}/pen.svg`} width='65%' height='60%'/>
             </div>
             <div className={`perm-button ${user.canChat ? 'set-inspecting-borderless' : ''} col-start-3`} 
                  onClick={()=>handleToggle('toggle-chat', user.canChat, user)}>
-                <Icon src={`/${iconFolder}/chat.svg`} width='85%' height='90%'/>
+                <Icon src={`/${iconFolder}/chat.svg`} width='65%' height='60%'/>
             </div>
             <div className={`perm-button ${user.isAdmin ? 'set-inspecting-borderless' : ''} col-start-4`} 
-                 onClick={()=>handleToggle('toggle-admin', user.isAdmin, user)}>
-                <Icon src={`/${iconFolder}/${user.isHost ? 'host' : 'admin'}.svg`} width='85%' height='90%'/>
+                 onClick={()=>handleToggle('toggle-admin', user.isAdmin, user)}
+                 style={{backgroundColor: `${user.isHost ? 'gold' : ''}`}}
+            >
+                <Icon src={`/${iconFolder}/${user.isHost ? 'host' : 'admin'}.svg`} width='65%' height='60%'/>
             </div>
             { userObj.current.isAdmin || userObj.current.isHost ?
                 <div className='perm-button col-start-5' onClick={()=>handleKick(user)}>
-                    <Icon src={`/${iconFolder}/kick.svg`} width='85%' height='80%'/>
+                    <Icon src={`/${iconFolder}/kick.svg`} width='65%' height='60%'/>
                 </div> : <div></div>
             }
         </div>

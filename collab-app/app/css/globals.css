@@ -10,6 +10,7 @@
   --lime-green: #32cd32;
   --soft-blue: #add8e6;
   --raspberry: #d21f3c;
+  --menu-color: rgba(15,15,15,1);
 }
 
 @media (prefers-color-scheme: dark) {

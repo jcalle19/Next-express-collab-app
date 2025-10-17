@@ -27,7 +27,7 @@ const ChatBox = () => {
     }
 
     return (
-        <div className={'chat-window'}>
+        <div className='chat-window'>
             <section id='nav-menu' className='grid grid-cols-3 grid-rows-1'>
                 <div className={`text-center glassy ${activeTab === 'chat' ? 'set-inspecting' : ''}`} onClick={() => handleToggleTab('chat')}>
                     <Icon src={`/${iconFolder}/chat.svg`} width='85%' height='60%'/>
@@ -45,7 +45,7 @@ const ChatBox = () => {
                         chatMessages.length > 0 ? chatMessages.map((chat) => (<Message key={chat.key} user={chat.name} message={chat.msg}/>)) : ''
                     }
                 </div>
-                <div id='input-container' className='grid grid-cols-5 glassy'>
+                <div id='input-container' className='grid grid-cols-5'>
                     <form id='msg-input' className='col-span-4'>
                         <input
                             type='text'
