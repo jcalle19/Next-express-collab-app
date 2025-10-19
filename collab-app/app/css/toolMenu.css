@@ -65,6 +65,16 @@
     transform: translateY(-50%);
 }
 
+#comment-row {
+    position: relative;
+    padding: 0px;
+}
+
+#comment-window {
+    position: relative;
+    padding: 0px;
+}
+
 #update-button {
     border-color: var(--lime-green);
     height: 100%;

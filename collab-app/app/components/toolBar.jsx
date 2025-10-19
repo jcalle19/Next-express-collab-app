@@ -135,7 +135,7 @@ const ToolBar = () => {
                         <div id='clear-button' className='col-start-1 glassy'>
                             <Icon src={`/${iconFolder}/clear.svg`} width='50%' height='35%'/>
                         </div>
-                        <div id='comment-window' className='grid col-start-2 grid-cols-1 no-margin-right'>
+                        <div id='comment-window' className='grid col-start-2 grid-cols-1'>
                             <Note isPreview={true} 
                                 content={':D'}
                                 boxColor={`rgba(${boxColor.red},${boxColor.green},${boxColor.blue},${boxColor.alpha})`}

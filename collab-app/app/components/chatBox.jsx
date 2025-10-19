@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useStateContext } from '../contexts/userState.jsx'
 import Message from './message.jsx'
 import Icon from './icon.jsx'
@@ -12,6 +12,7 @@ import '../css/chatBox.css'
 const ChatBox = () => {
     const [chatMsg, updateMsg] = useState('');
     const [activeTab, setActiveTab] = useState('chat');
+    const lastUser = useRef('');
     const { userObj, socketRef, roomUsersKeys, chatMessages, chatMessagesRef, addMessage } = useStateContext();
     const iconFolder = 'toolbar-icons';
 
@@ -24,6 +25,12 @@ const ChatBox = () => {
 
     const handleToggleTab = (tab) => {
         setActiveTab(tab);
+    }
+
+    const checkLastUser = (currUser) => {
+        let nameFlag = true;
+        lastUser.current === currUser ? nameFlag = false : lastUser.current = currUser;
+        return nameFlag;
     }
 
     return (
@@ -42,7 +49,14 @@ const ChatBox = () => {
             <section id='msg-container' className={`${activeTab === 'chat' ? '' : 'hidden'}`}>
                 <div id='msg-field' className='glassy'>
                     {
-                        chatMessages.length > 0 ? chatMessages.map((chat) => (<Message key={chat.key} user={chat.name} message={chat.msg}/>)) : ''
+                        chatMessages.length > 0 ? chatMessages.map((chat) => (
+                            <Message key={chat.key} 
+                                    user={chat.name} 
+                                    message={chat.msg} 
+                                    self={chat.id === userObj.current.id ? true : false} 
+                                    showName={checkLastUser(chat.id)}
+                            />
+                        )) : ''
                     }
                 </div>
                 <div id='input-container' className='grid grid-cols-5'>

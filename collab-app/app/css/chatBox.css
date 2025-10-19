@@ -16,10 +16,15 @@
 }
 
 #msg-field {
-    background: black;
+    background: linear-gradient(45deg, var(--raspberry) 2%, black 2%, black 98%, var(--lime-green) 98%);
     width: 100%;
     height: 40vh;
     z-index: 1;
+    border-right: 4px solid var(--lime-green);
+    border-left: 4px solid var(--raspberry);
+    border-top: 4px solid var(--lime-green);
+    border-bottom:4px solid var(--raspberry);
+    overflow-y: scroll;
 }
 
 #people-field, #room-field {
@@ -32,6 +37,7 @@
 #input-container {
     height: 5vh;
     background-color: var(--menu-color);
+    background: linear-gradient(45deg, var(--raspberry) 0%, var(--raspberry) 26.67%, var(--electric-blue) 26.67%, var(--electric-blue) 52.33%, var(--lime-green) 53.33%);
 }
 
 #people-container {

@@ -1,0 +1,24 @@
+.fit-content {
+    width: fit-content;
+}
+
+.self-info {
+    position: relative;
+    left: calc(100% - 10px);
+    transform: translateX(-100%);
+}
+
+.other-info {
+    position: relative;
+    left: 10px;
+}
+
+.name {
+}
+
+.message {
+    padding: 5px;
+    border-radius: 10px;
+    max-width: 80%;
+    overflow-wrap: break-word;
+}

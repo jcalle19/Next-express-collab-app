@@ -81,7 +81,7 @@ const socket_functions = (io) => {
             console.log(`received ${msg} from ${userObj.roomId}`);
             if (roomMap.get(userObj.roomId).options.canChat || userObj.isHost) {
                 let messagesArray = roomMap.get(userObj.roomId).chat;
-                messagesArray.push({key: randomId(), name: userObj.user, msg: msg});
+                messagesArray.push({key: randomId(), id: userObj.id, name: userObj.user, msg: msg});
                 broadcastInfo(userObj.roomId, false, 'broadcast-msg');
             }
         });

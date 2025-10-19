@@ -156,7 +156,7 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
               >
                 <Icon src={`/toolbar-icons/trash.svg`} width='35%' height='35%'/>
               </div>
-            </div> : <div style={{display: 'none'}}></div>
+            </div> : ''
           }
           <textarea readOnly={isPreview || !textEditFlag || translating} //disable when dragEditFlag is true
                     ref={textareaRef}

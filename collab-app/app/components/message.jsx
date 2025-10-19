@@ -1,10 +1,19 @@
-import React from 'react'
+import {useEffect} from 'react';
+import '../css/message.css';
 
-const Message = ({user, message}) => {
+const Message = ({user, message, self, showName}) => {
+
   return (
-    <div>
-        <p>{user}: </p>
-        <p>{message === undefined ? 'error' : message}</p>
+    <div style={{
+          position: 'relative',
+          paddingBottom: '2px',
+         }}>
+        {showName ? <div className={`fit-content name ${self ? 'self-info' : 'other-info'}`}>{user}</div> : ''}
+        <div className={`fit-content message ${self ? 'self-info' : 'other-info'}`}
+             style={{backgroundColor: `${self ? 'var(--electric-blue)' : 'var(--raspberry)'}`}}
+        >
+          {message === undefined ? 'error' : message}
+        </div>
     </div>
   )
 }
