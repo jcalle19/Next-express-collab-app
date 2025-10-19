@@ -16,7 +16,11 @@
 }
 
 #msg-field {
-    background: linear-gradient(45deg, var(--raspberry) 2%, black 2%, black 98%, var(--lime-green) 98%);
+    overflow-y: auto;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    background: linear-gradient(45deg, var(--raspberry) 1%, black 1%, black 99%, var(--lime-green) 99%);
     width: 100%;
     height: 40vh;
     z-index: 1;
@@ -24,7 +28,7 @@
     border-left: 4px solid var(--raspberry);
     border-top: 4px solid var(--lime-green);
     border-bottom:4px solid var(--raspberry);
-    overflow-y: scroll;
+    scrollbar-color: var(--lime-green) transparent;
 }
 
 #people-field, #room-field {

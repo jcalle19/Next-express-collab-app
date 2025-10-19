@@ -12,12 +12,12 @@ import '../css/chatBox.css'
 const ChatBox = () => {
     const [chatMsg, updateMsg] = useState('');
     const [activeTab, setActiveTab] = useState('chat');
-    const lastUser = useRef('');
     const { userObj, socketRef, roomUsersKeys, chatMessages, chatMessagesRef, addMessage } = useStateContext();
     const iconFolder = 'toolbar-icons';
+    let lastUser = '';
 
     const handleSubmit = () => {
-        if (userObj.current.canChat) {
+        if (userObj.current.canChat && chatMsg !== '') {
             addMessage(userObj.current, chatMsg);
         }
         updateMsg('');
@@ -29,7 +29,7 @@ const ChatBox = () => {
 
     const checkLastUser = (currUser) => {
         let nameFlag = true;
-        lastUser.current === currUser ? nameFlag = false : lastUser.current = currUser;
+        lastUser === currUser ? nameFlag = false : lastUser = currUser;
         return nameFlag;
     }
 
@@ -48,17 +48,20 @@ const ChatBox = () => {
             </section>
             <section id='msg-container' className={`${activeTab === 'chat' ? '' : 'hidden'}`}>
                 <div id='msg-field' className='glassy'>
+                    <div>
                     {
                         chatMessages.length > 0 ? chatMessages.map((chat) => (
                             <Message key={chat.key} 
-                                    user={chat.name} 
-                                    message={chat.msg} 
-                                    self={chat.id === userObj.current.id ? true : false} 
-                                    showName={checkLastUser(chat.id)}
+                                user={chat.name} 
+                                message={chat.msg} 
+                                self={chat.id === userObj.current.id ? true : false} 
+                                showName={checkLastUser(chat.id)}
                             />
                         )) : ''
                     }
+                    </div>
                 </div>
+                
                 <div id='input-container' className='grid grid-cols-5'>
                     <form id='msg-input' className='col-span-4'>
                         <input

@@ -10,7 +10,10 @@ const Message = ({user, message, self, showName}) => {
          }}>
         {showName ? <div className={`fit-content name ${self ? 'self-info' : 'other-info'}`}>{user}</div> : ''}
         <div className={`fit-content message ${self ? 'self-info' : 'other-info'}`}
-             style={{backgroundColor: `${self ? 'var(--electric-blue)' : 'var(--raspberry)'}`}}
+             style={{
+              backgroundColor: `${self ? 'var(--electric-blue)' : 'var(--raspberry)'}`,
+              borderRadius: `10px 10px ${self ? '0px 10px' : '10px 0px'}`,
+             }}
         >
           {message === undefined ? 'error' : message}
         </div>

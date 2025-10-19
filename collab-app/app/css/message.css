@@ -18,7 +18,6 @@
 
 .message {
     padding: 5px;
-    border-radius: 10px;
     max-width: 80%;
     overflow-wrap: break-word;
 }
