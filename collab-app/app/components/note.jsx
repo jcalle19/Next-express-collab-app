@@ -134,7 +134,7 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
            onMouseEnter={()=>setFocus(true)}
            onMouseLeave={()=>setFocus(false)}
            onClick={deleteNote}
-           className={`${isPreview ? ' preview-centered grid grid-cols-[1fr_2fr]' : ''} `}
+           className={`${isPreview ? 'grid grid-cols-3' : ''} `} //removed preview-centered due to pixel error
            style={{position: `${isPreview ? 'relative' : 'absolute'}`, 
                    left: `${isPreview ? '' : `${100 * translateX / 2}%`}`, //divided by 2 to account for notearea size
                    top: `${isPreview ? '' : `${100 * translateY}%`}`,
@@ -161,7 +161,7 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
           <textarea readOnly={isPreview || !textEditFlag || translating} //disable when dragEditFlag is true
                     ref={textareaRef}
                     id='note-content' 
-                    className={`col-start-${isPreview ? '2' : '1'}`}
+                    className={`col-start-${isPreview ? '2 col-span-2' : '1'}`}
                     value={text}
                     onChange={(e)=>setText(e.target.value)}
                     style={{border: `1px solid ${boxColor}`,

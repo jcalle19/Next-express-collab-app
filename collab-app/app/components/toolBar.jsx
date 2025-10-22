@@ -73,10 +73,10 @@ const ToolBar = () => {
     }
     
     return (
-        <div ref={vantaRef} id='side-bar-container' className='grid grid-cols-1 grid-rows-[8fr_4fr]'>
-            <div id='side-bar-overlay'>
-                <section id='edit-section' className='grid grid-cols-1 grid-rows-[3fr_1fr]'>
-                    <div id='pen-row' className='grid grid-cols-2 grid-rows-1'>
+        <div ref={vantaRef} id='side-bar-container'>
+            <div id='side-bar-overlay' className='grid grid-cols-1 grid-rows-2'>
+                <section id='edit-section' className='grid grid-cols-1 grid-rows-4'>
+                    <div id='pen-row' className='grid grid-cols-2 grid-rows-1 row-start-1 row-span-3'>
                         <div id='pen-col-1' className='grid grid-cols-1 grid-rows-[1fr_2fr_4fr]'>
                             <div id='undo-redo-row' className='grid grid-cols-2 grid-rows-1'>
                                 <div id='undo' className='col-start-1 glassy' onClick={()=>triggerFlag('undo')}>
@@ -131,11 +131,11 @@ const ToolBar = () => {
                             <ColorSelect/>
                         </div>
                     </div>
-                    <div id='comment-row' className='grid grid-cols-[1fr_8fr] grid-rows-1' onClick={()=>triggerFlag('clear')}>
-                        <div id='clear-button' className='col-start-1 glassy'>
+                    <div id='comment-row' className='grid grid-cols-9 grid-rows-1 row-start-4' onClick={()=>triggerFlag('clear')}>
+                        <div id='clear-button' className='col-start-1 col-span-1 glassy'>
                             <Icon src={`/${iconFolder}/clear.svg`} width='50%' height='35%'/>
                         </div>
-                        <div id='comment-window' className='grid col-start-2 grid-cols-1'>
+                        <div id='comment-window' className='grid col-start-2 col-span-8 grid-cols-1'>
                             <Note isPreview={true} 
                                 content={':D'}
                                 boxColor={`rgba(${boxColor.red},${boxColor.green},${boxColor.blue},${boxColor.alpha})`}
@@ -145,7 +145,7 @@ const ToolBar = () => {
                         </div>
                     </div>
                 </section>
-                <section id='chat-section'>
+                <section id='chat-section' className='row-start-2'>
                     <ChatBox/>
                 </section>
             </div>
