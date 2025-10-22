@@ -25,6 +25,9 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
       setText(content);
     }, [left, top, widthPercent, heightPercent, content]);
 
+    useEffect(()=> {
+      console.log(textEditFlag);
+        }, [textEditFlag]);
     //Log desired size percentage on manual textarea resize
     useEffect(() => {
       if (!textareaRef.current) return;
@@ -185,7 +188,7 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
                  onMouseDown={()=>toggleMoving(true)} 
                  style={{backgroundColor: `${translating ? 'indigo' : 'blue'}`}}
             >
-              <Icon src={`/toolbar-icons/drag.svg`} width='90%' height='90%'/>
+              <Icon src={`/toolbar-icons/drag.svg`} width='20px' height='20px'/>
             </div> : <div style={{display: 'none'}}></div>
           }
       </div>
