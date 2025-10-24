@@ -75,6 +75,7 @@ const ChatBox = () => {
                 </div>
             </section>
             <section id='people-container' className={`${activeTab === 'people' ? '' : 'hidden'}`}>
+                <div id='color-heading'>Permissions</div>
                 <div id='people-field' className='glassy'>
                     {roomUsersKeys.map((user) => (
                         <UserPanel key={user.id} user={user}/>

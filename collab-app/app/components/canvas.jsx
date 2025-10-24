@@ -20,7 +20,7 @@ const Canvas = () => {
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
     const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
             lineFlag, clearFlag, textEditFlag, penInfoRef, canvasOffsetRef, canvasSizeRef, 
-            windowSizeX, windowSizeY, windowResize, updateSize} = useStateContext();
+            windowSizeX, windowSizeY, windowResize, updateSize, socketRef} = useStateContext();
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -110,7 +110,7 @@ const Canvas = () => {
         if (!drawingRef.current || highlightFlag || lineFlag) return; //only draw line from point a to b if highlighting, otherwise, draw wherever mouse is
         newRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
         drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current); // local drawing
-        //socket.emit('draw-line', { from: prevPos, to: newPos }); // send to others
+        socketRef.current.emit('draw-line', prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha); // send to others
         prevRef.current = newRef.current;
     };
 

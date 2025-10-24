@@ -1,7 +1,65 @@
-.leave-button {
+#leave-button {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     border: 1px solid white;
+    width: 60%;
+    height: 60%;
 }
 
-.room-panel * {
-    font-size: min(1vw, 2vh) !important;
+.room-panel {
+    height: 90%;
+}
+.room-panel *:not(Icon){
+    font-size: min(1.25vw, 2.75vh);
+    text-align: center;
+}
+
+#room-heading {
+    box-shadow: -2px 0 0 var(--electric-blue);
+    background: linear-gradient(45deg, var(--electric-blue) 0%, var(--electric-blue) 33.33%, var(--raspberry) 33.33%, var(--raspberry) 66.67%, var(--lime-green) 66.67%);
+}
+
+#id-button {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--raspberry);
+    border-radius: 10px;
+    width: 75%;
+    height: fit-content;
+    margin-top: 10px;
+    transition: background-color .1s;
+}
+
+#id-button:hover {
+    background-color: var(--electric-blue);
+    cursor: pointer;
+}
+
+#id-button:active {
+    background-color: var(--lime-green);
+}
+
+#id-heading {
+    font-size: min(1.75vw, 3.5vh);
+}
+
+.switch-container {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1px solid red;
+}
+
+#leave-button {
+    transition: background-color .1s;
+}
+#leave-button:hover {
+    background-color: var(--raspberry);
+}
+
+#leave-button:active {
+    background-color: var(--lime-green);
 }

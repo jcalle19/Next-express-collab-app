@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import '../css/globals.css'
 import '../css/switch.css'
+
 
 const Switch = ({state, target, func, action}) => {
 
@@ -11,7 +12,10 @@ const Switch = ({state, target, func, action}) => {
     return (
         <div className='switch-container' onClick={handleClick}>
             <div className='switch-toggle'
-                style={{left: `${!state ? '0%' : '55%'}`}}
+                style={{
+                    left: `${!state ? '1%' : '55%'}`,
+                    backgroundColor: `${!state ? 'var(--raspberry)' : 'var(--lime-green)'}`,
+                }}
             ></div>
         </div>
     )
