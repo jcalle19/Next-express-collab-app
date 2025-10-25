@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { compressToUTF16, decompressFromUTF16 } from 'lz-string'
 import { useStateContext } from '../contexts/userState.jsx'
 import '../css/canvas.css'
 import BackgroundBox from './backgroundBox.jsx'
@@ -15,12 +16,16 @@ const Canvas = () => {
     const lineStorageRef = useRef([]);
     const removedLineRef = useRef([]);
     const currentLineRef = useRef([]);
+    const sendingLineRef = useRef([]);
+    const lastEmitRef = useRef(0);
     const scaleXRef = useRef(1);
     const scaleYRef = useRef(1);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
     const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
             lineFlag, clearFlag, textEditFlag, penInfoRef, canvasOffsetRef, canvasSizeRef, 
-            windowSizeX, windowSizeY, windowResize, updateSize, socketRef} = useStateContext();
+            windowSizeX, windowSizeY, windowResize, updateSize, incomingLineRef, socketRef} = useStateContext();
+
+    const EMIT_INTERVAL = 16;
 
     useEffect(()=>{
         const canvas = canvasRef.current;
@@ -29,11 +34,41 @@ const Canvas = () => {
         canvas.width = 2600;
         canvas.height = 2000;
         ctxRef.current = canvas.getContext('2d');
+
+        // render loop (runs ~60fps)
+        let animId;
+        const render = () => {
+            animId = requestAnimationFrame(render);
+            if (incomingLineRef.current.length > 0) { //could optimize with a while loop
+                const stroke = incomingLineRef.current.shift();
+                stroke.forEach((line, index) => {
+                    drawLine(line.prev, line.new, line.color, line.size, line.join, line.cap, line.alpha, ctxRef.current, false);
+                });
+            }
+        };
+        render();
+
         windowResize();
         window.addEventListener('resize', windowResize);
         return ()=>{
+            cancelAnimationFrame(animId);
             window.removeEventListener('resize', windowResize);
+            //store canvas in server
         }
+    }, []);
+
+    //Batched sending to server
+    useEffect(()=>{
+        const tick = () => {
+            requestAnimationFrame(tick);
+            const now = performance.now();
+            if (now - lastEmitRef.current > EMIT_INTERVAL && sendingLineRef.current.length > 0) {
+                socketRef.current.emit('draw-line', userObj.current.roomId, sendingLineRef.current); // send to otherss
+                sendingLineRef.current = [];
+                lastEmitRef.current = now;
+            }
+        }
+        tick();
     }, []);
 
     /* Need to make canvas scale equally with x and y */
@@ -109,8 +144,7 @@ const Canvas = () => {
     const handleMouseMove = (e) => {
         if (!drawingRef.current || highlightFlag || lineFlag) return; //only draw line from point a to b if highlighting, otherwise, draw wherever mouse is
         newRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
-        drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current); // local drawing
-        socketRef.current.emit('draw-line', prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha); // send to others
+        drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current, true); // local drawing
         prevRef.current = newRef.current;
     };
 
@@ -121,7 +155,7 @@ const Canvas = () => {
         if (highlightFlag || lineFlag) {
             let lineScale = highlightFlag ? 10 : 1; //10 times size if highlight, regular if line tool
             newRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
-            drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size * lineScale, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current);
+            drawLine(prevRef.current, newRef.current, penInfoRef.current.color, penInfoRef.current.size * lineScale, ctxRef.current.lineJoin, ctxRef.current.lineCap, ctxRef.current.globalAlpha, ctxRef.current, true);
             prevRef.current = newRef.current;
         }
 
@@ -129,7 +163,7 @@ const Canvas = () => {
         currentLineRef.current = [];
     };
 
-    const drawLine = (from, to, color, size, join, cap, alpha, ctx) => {
+    const drawLine = (from, to, color, size, join, cap, alpha, ctx, transmit) => {
         if (!ctx) return;
         ctx.strokeStyle = color; //penInfoRef.current.color;
         ctx.lineWidth = size; //penInfoRef.current.size;
@@ -140,13 +174,24 @@ const Canvas = () => {
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
         ctx.stroke();
-        currentLineRef.current.push({prev: from, new: to, color: color, size: size, join: join, cap: cap, alpha: alpha});
+        const strokeInfo = {prev: from, new: to, color: color, size: size, join: join, cap: cap, alpha: alpha};
+        currentLineRef.current.push(strokeInfo);
+        
+        if (transmit) {
+            currentLineRef.current.push(strokeInfo);
+            sendingLineRef.current.push(strokeInfo);
+        }
     };
+
+    //separated function to avoid infinite loop
+    const drawFromServer = (strokeInfo) => {
+        console.log(strokeInfo);
+    }
 
     const redrawCanvas = () => {
         clearCanvas();
         lineStorageRef.current.forEach(line => line.forEach(path => {
-            drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current);
+            drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current, false);
             currentLineRef.current = [];
         }));
     }

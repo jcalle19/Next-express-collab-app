@@ -97,7 +97,6 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
     }, [translating]);
 
     const transmitInfo = (x,y,width,height) => {
-      console.log(content);
       //return on first component mount call
       if (!id) return;
 

@@ -18,6 +18,7 @@ export const StateProvider = ({children}) => {
     const socketRefReady = useRef(false);
     const roomUsersRef = useRef([]);
     const chatMessagesRef = useRef([]);
+    const incomingLineRef = useRef([]);
     const tokenSetRef = useRef(false);
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const mouseLocationRef = useRef({x: 0, y: 0});
@@ -134,6 +135,10 @@ export const StateProvider = ({children}) => {
             }
         });
         
+        socketRef.current.on('draw-from-server', (strokeBatch) => {
+            incomingLineRef.current.push(strokeBatch);
+        });
+
         socketRef.current.on('update-room', (token, userInfo) => {
             roomUsers.current.set(token, userInfo);
         });
@@ -310,6 +315,7 @@ export const StateProvider = ({children}) => {
         chatMessages,
         roomUsersRef,
         chatMessagesRef,
+        incomingLineRef,
         windowSizeX,
         windowSizeY,
         canvasSize,

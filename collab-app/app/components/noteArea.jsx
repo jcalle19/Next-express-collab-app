@@ -4,11 +4,7 @@ import '../css/note.css'
 import Note from './note.jsx'
 
 const NoteArea = () => {
-    const {userObj, roomNotes} = useStateContext();
-    
-    useEffect(()=>{
-        console.log(roomNotes);
-    },[roomNotes]);
+    const {roomNotes} = useStateContext();
 
     return (
         <div id='note-area'>         

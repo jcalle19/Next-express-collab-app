@@ -41,6 +41,7 @@ const socket_functions = (io) => {
                                  options: roomOptions,
                                  admins: new Set(), 
                                  members: new Map(), 
+                                 drawings: new Map(), //for temporarily holding the canvas on refresh
                                  notes: new Map(),
                                  chat: [],
                                  background: '',
@@ -97,6 +98,10 @@ const socket_functions = (io) => {
         socket.on('request-sync', (roomId)=> {
             broadcastInfo(roomId, socket, 'request-sync');
         }); 
+
+        socket.on('draw-line', (roomId, strokeBatch)=> {
+            socket.broadcast.to(roomId).emit('draw-from-server', strokeBatch);
+        });
 
         socket.on('check-token', (roomId, token) => {
             if (!roomMap.get(roomId).members.has(token)) {
