@@ -173,6 +173,14 @@ const socket_functions = (io) => {
             }
         });
 
+        socket.on('store-lines', (roomId, compressedInfo, token) => {
+            let mapAccess = roomMap.get(roomId);
+            if (!mapAccess.members.has(token)) {
+                mapAccess.drawings.set(token, compressedInfo);
+                console.log(compressedInfo.length, ' <--- compressed size');
+            }
+        });
+
         socket.on('update-options', (roomId, roomOptions, hostId)=> {
             const mapAccess = roomMap.get(roomId);
             if (mapAccess.hostId === hostId) {

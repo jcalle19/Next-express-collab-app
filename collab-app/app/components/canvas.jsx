@@ -53,7 +53,7 @@ const Canvas = () => {
         return ()=>{
             cancelAnimationFrame(animId);
             window.removeEventListener('resize', windowResize);
-            //store canvas in server
+            storeCompressedCanvas();
         }
     }, []);
 
@@ -63,7 +63,7 @@ const Canvas = () => {
             requestAnimationFrame(tick);
             const now = performance.now();
             if (now - lastEmitRef.current > EMIT_INTERVAL && sendingLineRef.current.length > 0) {
-                socketRef.current.emit('draw-line', userObj.current.roomId, sendingLineRef.current); // send to otherss
+                socketRef.current.emit('draw-line', userObj.current.roomId, sendingLineRef.current); // send to others (add token check)
                 sendingLineRef.current = [];
                 lastEmitRef.current = now;
             }
@@ -132,6 +132,17 @@ const Canvas = () => {
     },[clearFlag]);
 
     /*-------------------------------*/
+
+    const storeCompressedCanvas = () => {
+        let currToken = sessionStorage.getItem('roomToken');
+        let jsonString = JSON.stringify(lineStorageRef);
+        let compressed = LZString.compressToUTF16(jsonString);
+        socketRef.current.emit('store-lines', userObj.current.roomId, compressed, currToken);
+    }
+
+    const restoreCompressedCanvas = () => {
+        let currToken = sessionStorage.getItem('roomToken');
+    }
 
     const handleMouseDown = (e) => {
         e.preventDefault();
