@@ -1,83 +1,22 @@
-'use client';
+'use client'
 
-import {createContext, useState, useContext, useEffect, useRef} from "react"
-import {parseColor} from 'react-aria-components'
+import {createContext, useContext, useRef, useState, useEffect, useMemo} from 'react';
+import {useStateRefContext} from './stateRefContext.jsx';
+import {useStateContext} from './stateContext.jsx';
 import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
 
-const stateContext = createContext()
+const socketContext = createContext();
+export const useSocketContext = () => useContext(socketContext);
 
-export const useStateContext = () => useContext(stateContext);
-
-export const StateProvider = ({children}) => {
+export const socketProvider = ({children}) => {
+    const {userObj, roomOptions, roomUsers, tokenSetRef} = useStateRefContext();
+    const {updateKeys, updateMessages, updateRoomNotes} = useStateContext();
     const router = useRouter();
-    const userObj = useRef({id: '', socketId: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isHost: false, isAdmin: false});
-    const roomOptions = useRef({canJoin: true, canDraw: true, canChat: true});
-    const roomUsers = useRef(new Map()); //Holding player data, will constantly update
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
-    const roomUsersRef = useRef([]);
-    const chatMessagesRef = useRef([]);
-    const incomingLineRef = useRef([]);
-    const tokenSetRef = useRef(false);
-    const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
-    const canvasOffsetRef = useRef({left: 0, top: 0});
-    const canvasSizeRef = useRef({width: 0, height: 0});
-    const [canvasSize, updateSize] = useState({width: 0, height: 0});
-    const [windowSizeX, changeWindowXSize] = useState(0);
-    const [windowSizeY, changeWindowYSize] = useState(0);
-    const [canvasBackground, updateBackground] = useState('');
-    const [canvasZoom, updateZoom] = useState(100); 
-    const [penColor, setPenColor] = useState(parseColor('#ffffff'));
-    const [boxColor, setBoxColor] = useState(parseColor('#000000'));
-    const [textColor, setTextColor] = useState(parseColor('#ffffff'));
-    const [previewFontSize, setPreviewFontSize] = useState('50');
-    const [backgroundSelectFlag, updateBackgroundSelect] = useState(false);
-    const [lineFlag, updateLineFlag] = useState(false);
-    const [highlightFlag, updateHighlight] = useState(false);
-    const [undoFlag, updateUndo] = useState(false);
-    const [redoFlag, updateRedo] = useState(false);
-    const [clearFlag, updateClear] = useState(false);
-    const [textEditFlag, updateTextFlag] = useState(false);
-    const [noteDeleteFlag, updateDeleteFlag] = useState(false);
     const [socketReady, updateSocketStatus] = useState(false);
-    const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
-    const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
-    const [roomNotes, updateRoomNotes] = useState(new Map());
-
-    const triggerBackgroundFlag = (flag) => {
-        if (userObj.current.isHost) {
-           updateBackgroundSelect(flag) ;
-        }
-    }
-
-    const triggerHighlight = (flag) => {
-        updateHighlight(flag);
-        updateLineFlag(false);
-    }
-
-    const triggerLineTool = (flag) => {
-        updateLineFlag(flag);
-        updateHighlight(false);
-    }
-
-    const flagMap = new Map([
-        ['undo', [undoFlag, updateUndo]],
-        ['redo', [redoFlag, updateRedo]],
-        ['clear', [clearFlag, updateClear]],
-        ['text', [textEditFlag, updateTextFlag]],
-        ['delete', [noteDeleteFlag, updateDeleteFlag]],
-        ['highlight', [highlightFlag, triggerHighlight]],
-        ['line', [lineFlag, triggerLineTool]],
-        ['background', [backgroundSelectFlag, triggerBackgroundFlag]],
-    ]);
-
-    const triggerFlag = (flagName) => {
-        let mapAccess = flagMap.get(flagName);
-        let varValue = mapAccess[0];
-        let funcRef = mapAccess[1];
-        funcRef(!varValue);
-    }
+    const incomingLineRef = useRef([]);
 
     useEffect(() => {
         //Socket stuff
@@ -150,8 +89,8 @@ export const StateProvider = ({children}) => {
                 updateKeys(Array.from(members.values()));
                 updateMessages(chatMessages);
                 updateRoomNotes(new Map(roomInfo.notes));
-                updateBackground(roomInfo.background);
-                updateZoom(roomInfo.zoom);
+                //updateBackground(roomInfo.background);
+                //updateZoom(roomInfo.zoom);
             } else {
                 disconnectUser();
             }
@@ -193,30 +132,16 @@ export const StateProvider = ({children}) => {
         };
     },[]);
 
-    useEffect(() => {
-        roomUsersRef.current = roomUsersKeys;
-        //console.log('New list of users: ', roomUsersKeys);
-    }, [roomUsersKeys]);
+    const addMessage = (user, msg) => {
+        //Functional update to add to most current message list
+        socketRef.current.emit('broadcast-msg', user, msg);
+    }
 
-    useEffect(() => {
-        chatMessagesRef.current = chatMessages;
-        //console.log('New list of chat messages: ', chatMessagesRef.current);
-    }, [chatMessages]);
+    const addNote = (user, noteInfo) => {
+        socketRef.current.emit('broadcast-note', user, noteInfo);
+    }
 
-    /*-------------- Add host verification to these ones --------------*/
-    useEffect(() => {
-        if (canvasBackground !== '' && userObj.current.isHost) {
-            socketRef.current.emit('update-background', userObj.current.roomId, canvasBackground);
-        }
-    }, [canvasBackground]);
-
-    useEffect(() => {
-        if (userObj.current.roomId !== '' && userObj.current.isHost) {
-            socketRef.current.emit('update-zoom', userObj.current.roomId, canvasZoom);
-        }
-    }, [canvasZoom]);
-
-    const createRoom = () => {
+     const createRoom = () => {
         if (socketRef.current) {
             let roomId = randomId();
             let hostId = randomId();
@@ -247,42 +172,17 @@ export const StateProvider = ({children}) => {
         }
     }
 
-    const windowResize = () => {
-        changeWindowXSize(window.innerWidth);
-        changeWindowYSize(window.innerHeight);
-    }
-
-    const addMessage = (user, msg) => {
-        //Functional update to add to most current message list
-        socketRef.current.emit('broadcast-msg', user, msg);
-    }
-
-    const addNote = (user, noteInfo) => {
-        socketRef.current.emit('broadcast-note', user, noteInfo);
-    }
-
     const loadRoomState = (roomId) => {
         const roomToken = sessionStorage.getItem('roomToken');
         tokenSetRef.current = true;
         socketRef.current.emit('request-user-info', roomToken, roomId, userObj.current.socketId);
     }
 
-    const setBackground = (url) => {
-        updateBackground(url);
+    const disconnectUser = () => {
+        leaveRoom();
+        router.push('/home');
     }
-
-    const zoomIn = () => {
-        if (canvasZoom + 25 < 450) {
-            updateZoom(canvasZoom + 25);
-        }
-    }
-
-    const zoomOut = () => {
-        if (canvasZoom - 25 > 0) {
-            updateZoom(canvasZoom - 25);
-        }
-    }
-
+    
     const randomId = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
@@ -292,64 +192,21 @@ export const StateProvider = ({children}) => {
         return result;
     }
 
-    const disconnectUser = () => {
-        leaveRoom();
-        router.push('/home');
-    }
-
-    const state = {
-        userObj,
-        roomOptions,
-        roomUsers,
-        roomNotes,
+    const value=useMemo(()=>({
         socketRef,
-        socketRefReady,
         socketReady,
-        roomUsersKeys,
-        chatMessages,
-        roomUsersRef,
-        chatMessagesRef,
-        incomingLineRef,
-        windowSizeX,
-        windowSizeY,
-        canvasSize,
-        canvasOffsetRef,
-        canvasSizeRef,
-        canvasBackground,
-        canvasZoom,
-        penColor,
-        boxColor,
-        textColor,
-        previewFontSize,
-        backgroundSelectFlag,
-        undoFlag,
-        redoFlag,
-        highlightFlag,
-        lineFlag,
-        clearFlag,
-        textEditFlag,
-        noteDeleteFlag,
-        flagMap,
-        penInfoRef,
+        socketRefReady,
+        updateSocketStatus,
+        addMessage,
+        addNote,
         createRoom,
         joinRoom,
         leaveRoom,
-        addMessage,
-        addNote,
-        windowResize,
-        updateSize,
         loadRoomState,
-        setBackground,
-        setPenColor,
-        setBoxColor,
-        setTextColor,
-        setPreviewFontSize,
-        triggerFlag,
-        zoomIn,
-        zoomOut,
-    }
+        incomingLineRef,
+    }),[socketReady]);
 
-    return <stateContext.Provider value={state}>
+    return <socketContext.Provider value={value}>
         {children}
-    </stateContext.Provider>
+    </socketContext.Provider>
 }

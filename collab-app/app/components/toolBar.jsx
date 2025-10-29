@@ -21,7 +21,7 @@ const ToolBar = () => {
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
-    const { flagMap, zoomIn, zoomOut, sliderThumbColor, penInfoRef, 
+    const { flagMap, zoomIn, zoomOut, penColor, penInfoRef, 
             boxColor, textColor, previewFontSize, triggerFlag} = useStateContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
@@ -35,7 +35,7 @@ const ToolBar = () => {
         sliderPxRef.current = minSize + ((sliderValue / 100) * maxSize);
         changeWidth(penInfoRef.current.size  * penInfoRef.current.scale);
         penInfoRef.current.size = sliderPxRef.current; //multiplying by 2 to account for symmetry of radial gradient to make more accurate
-    },[sliderValue, sliderThumbColor]);
+    },[sliderValue, penColor]);
 
     /*Template Code*/
     useEffect(() => {

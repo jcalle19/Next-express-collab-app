@@ -1,12 +1,13 @@
 import {useState, useEffect} from 'react'
 import {useStateContext} from '../contexts/userState.jsx'
+import {parseColor} from 'react-aria-components'
 import MyColorSlider from './myColorSlider.jsx'
 import '../css/colorSelector.css'
 import '../css/globals.css'
 
 const ColorSelect = () => {
-    const {penInfoRef, penColor, setPenColor, boxColor, setBoxColor, 
-           textColor, setTextColor, previewFontSize, setPreviewFontSize} = useStateContext();
+    const {penInfoRef, previewFontSize, penColor, setPenColor, boxColor, setBoxColor, textColor, setTextColor, setPreviewFontSize} = useStateContext();
+    
     const [currLabel, setLabel] = useState('pen');
 
     const [currColor, currSetter] = {

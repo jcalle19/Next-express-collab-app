@@ -10,7 +10,7 @@ import '../css/roomPage.css';
 const CursorArea = ({id}) => {
   const [coords, setCoords] = useState([0,0]);
   const [mapSnapshot, takeSnapshot] = useState(new Map());
-  const {userObj, socketRef, roomUsers, mouseLocationRef } = useStateContext();
+  const {userObj, socketRef, roomUsers} = useStateContext();
 
   //Rendering snapshot of current user locations
   useEffect(() => {
@@ -25,8 +25,6 @@ const CursorArea = ({id}) => {
   //Gets client's location separately for smooth mouse.
   const getMouseLocation = (e) => {
     setCoords([e.clientX, e.clientY]);
-    mouseLocationRef.current.x = e.clientX;
-    mouseLocationRef.current.y = e.clientY;
     if (socketRef.current !== null) {
       userObj.current.xCoord = e.clientX;
       userObj.current.yCoord = e.clientY;

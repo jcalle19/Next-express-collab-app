@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { compressToUTF16, decompressFromUTF16 } from 'lz-string'
+//import { compressToUTF16, decompressFromUTF16 } from 'lz-string'
 import { useStateContext } from '../contexts/userState.jsx'
 import '../css/canvas.css'
 import BackgroundBox from './backgroundBox.jsx'
@@ -136,8 +136,8 @@ const Canvas = () => {
     const storeCompressedCanvas = () => {
         let currToken = sessionStorage.getItem('roomToken');
         let jsonString = JSON.stringify(lineStorageRef);
-        let compressed = LZString.compressToUTF16(jsonString);
-        socketRef.current.emit('store-lines', userObj.current.roomId, compressed, currToken);
+        //let compressed = LZString.compressToUTF16(jsonString);
+        //socketRef.current.emit('store-lines', userObj.current.roomId, compressed, currToken);
     }
 
     const restoreCompressedCanvas = () => {
