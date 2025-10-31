@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { useStateContext } from '../contexts/userState.jsx'
+//import { useStateContext } from '../contexts/userState.jsx'
+import { useDrawingContext } from '../contexts/drawingContext.jsx'
+import { useSocketContext } from '../contexts/socketContext.jsx'
 import Icon from './icon.jsx'
 import '../css/backgroundBox.css'
 
 const BackgroundBox = ({isVisible}) => {
-    const { setBackground, triggerFlag} = useStateContext();
+    //const { setBackground, triggerFlag} = useStateContext();
+    const { setBackground } = useSocketContext();
+    const { triggerFlag } = useDrawingContext();
 
     const [blackSelected, updateBlack] = useState(false);
     const [whiteSelected, updateWhite] = useState(false);

@@ -1,7 +1,7 @@
 'use client'
 
 import {createContext, useContext, useRef, useState, useEffect, useMemo} from 'react';
-import {useStateRefContext} from './stateRefContext.jsx';
+import {useRefContext} from './refContext.jsx';
 import {useStateContext} from './stateContext.jsx';
 import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
@@ -9,14 +9,18 @@ import { useRouter } from 'next/navigation';
 const socketContext = createContext();
 export const useSocketContext = () => useContext(socketContext);
 
-export const socketProvider = ({children}) => {
-    const {userObj, roomOptions, roomUsers, tokenSetRef} = useStateRefContext();
+export const SocketProvider = ({children}) => {
+    const {userObj, roomOptions, roomUsers, tokenSetRef,
+           socketRef, socketRefReady,incomingLineRef} = useRefContext();
     const {updateKeys, updateMessages, updateRoomNotes} = useStateContext();
-    const router = useRouter();
-    const socketRef = useRef(null);
-    const socketRefReady = useRef(false);
     const [socketReady, updateSocketStatus] = useState(false);
-    const incomingLineRef = useRef([]);
+
+    //canvas exceptions
+    const [canvasBackground, updateBackground] = useState(''); //*
+    const [canvasZoom, updateZoom] = useState(100);
+
+    const router = useRouter();
+    
 
     useEffect(() => {
         //Socket stuff
@@ -89,8 +93,8 @@ export const socketProvider = ({children}) => {
                 updateKeys(Array.from(members.values()));
                 updateMessages(chatMessages);
                 updateRoomNotes(new Map(roomInfo.notes));
-                //updateBackground(roomInfo.background);
-                //updateZoom(roomInfo.zoom);
+                updateBackground(roomInfo.background);
+                updateZoom(roomInfo.zoom);
             } else {
                 disconnectUser();
             }
@@ -131,6 +135,36 @@ export const socketProvider = ({children}) => {
             }
         };
     },[]);
+
+    /*-------------- Add host verification to these ones --------------*/
+    useEffect(() => {
+        if (canvasBackground !== '' && userObj.current.isHost) {
+            socketRef.current.emit('update-background', userObj.current.roomId, canvasBackground);
+        }
+    }, [canvasBackground]);
+    
+    useEffect(() => {
+        if (userObj.current.roomId !== '' && userObj.current.isHost) {
+            socketRef.current.emit('update-zoom', userObj.current.roomId, canvasZoom);
+        }
+    }, [canvasZoom]);
+
+    const setBackground = (url) => {
+        updateBackground(url);
+    }
+
+    const zoomIn = () => {
+        if (canvasZoom + 25 < 450) {
+            updateZoom(canvasZoom + 25);
+        }
+    }
+
+    const zoomOut = () => {
+        if (canvasZoom - 25 > 0) {
+            updateZoom(canvasZoom - 25);
+        }
+    }
+    /*--------------------------------------------------------------------*/
 
     const addMessage = (user, msg) => {
         //Functional update to add to most current message list
@@ -182,7 +216,7 @@ export const socketProvider = ({children}) => {
         leaveRoom();
         router.push('/home');
     }
-    
+
     const randomId = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
@@ -193,9 +227,7 @@ export const socketProvider = ({children}) => {
     }
 
     const value=useMemo(()=>({
-        socketRef,
         socketReady,
-        socketRefReady,
         updateSocketStatus,
         addMessage,
         addNote,
@@ -203,7 +235,11 @@ export const socketProvider = ({children}) => {
         joinRoom,
         leaveRoom,
         loadRoomState,
-        incomingLineRef,
+        canvasZoom,
+        canvasBackground,
+        setBackground,
+        zoomIn,
+        zoomOut,
     }),[socketReady]);
 
     return <socketContext.Provider value={value}>

@@ -1,13 +1,13 @@
 'use client'
 
 import {createContext, useContext, useState, useEffect, useMemo} from 'react'
-import {useStateRefContext} from './stateRefContext.jsx'
+import {useRefContext} from './refContext.jsx'
 
 const stateContext = createContext();
 export const useStateContext = () => useContext(stateContext);
 
 export const RoomStateProvider = ({children}) => {
-    const { userObj,roomOptions,roomUsers,roomUsersRef,chatMessagesRef,tokenSetRef } = useStateRefContext();
+    const {roomUsersRef,chatMessagesRef} = useRefContext();
     const [roomUsersKeys, updateKeys] = useState([]); //Array of objects structured as follows {key: x, username: x}
     const [chatMessages, updateMessages] = useState([]); //Array of objects structured as follows: {key: x, username: x, content: x}
     const [roomNotes, updateRoomNotes] = useState(new Map());
