@@ -1,11 +1,11 @@
 import React from 'react'
 import Icon from './icon.jsx'
-import { useStateContext } from '../contexts/userState.jsx'
+import { useRefContext } from '../contexts/refContext.jsx'
 import '../css/globals.css'
 import '../css/userPanel.css'
 
 const UserPanel = ({user}) => {
-    const { userObj, socketRef } = useStateContext();
+    const { userObj, socketRef } = useRefContext();
     const iconFolder = 'toolbar-icons';
 
     const handleToggle = (permission, value, user) => {

@@ -238,9 +238,10 @@ export const SocketProvider = ({children}) => {
         canvasZoom,
         canvasBackground,
         setBackground,
+        loadRoomState,
         zoomIn,
         zoomOut,
-    }),[socketReady]);
+    }),[socketReady, canvasBackground, canvasZoom]);
 
     return <socketContext.Provider value={value}>
         {children}

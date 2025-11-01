@@ -1,8 +1,9 @@
 `use client`;
 
 import { useState, useEffect, useRef } from 'react'
-import { useStateContext } from '../contexts/userState.jsx'
-import {parseColor} from 'react-aria-components'
+import { useRefContext } from '../contexts/refContext.jsx'
+import { useDrawingContext } from '../contexts/drawingContext.jsx'
+import { useSocketContext } from '../contexts/socketContext.jsx' 
 import '../css/toolMenu.css'
 import '../css/globals.css'
 import ColorSelect from './colorSelect.jsx'
@@ -11,7 +12,6 @@ import ChatBox from './chatBox.jsx'
 import Icon from './icon.jsx'
 import * as THREE from 'three'; // Import Three.js
 import HALO from 'vanta/dist/vanta.halo.min';
-import WAVES from 'vanta/dist/vanta.waves.min';
 
 const ToolBar = () => {
     /*Vanta.js Background Stuff*/
@@ -21,8 +21,9 @@ const ToolBar = () => {
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
-    const { flagMap, zoomIn, zoomOut, penColor, penInfoRef, 
-            boxColor, textColor, previewFontSize, triggerFlag} = useStateContext();
+    const { flagMap, penColor, boxColor, textColor, triggerFlag, previewFontSize } = useDrawingContext();
+    const { zoomIn, zoomOut } = useSocketContext();
+    const { penInfoRef, userObj } = useRefContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
     const maxSize = 48;
@@ -107,24 +108,33 @@ const ToolBar = () => {
                                     />
                                 </div>
                             </div>
-                            <div id='draw-mode-row' className='grid grid-cols-3 grid-rows-[1fr_2fr]'>
-                                <div id='background-set' className='row-start-1 col-start-1 glassy' onClick={()=>triggerFlag('background')}>
-                                    <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>
+                            <div id='draw-mode-row' className={`grid grid-cols-1 grid-rows-[1fr_2fr]`}>
+                                {userObj.current.isHost ? 
+                                <div className='row-start-1 grid grid-cols-3'>
+                                    <div id='background-set' className='col-start-1 glassy' onClick={()=>triggerFlag('background')}>
+                                        <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>
+                                    </div>
+                                    <div id='zoom-in' className='col-start-2 glassy' onClick={zoomIn}>
+                                        <Icon src={`/${iconFolder}/zoom-in.svg`} width='55%' height='55%'/>
+                                    </div>
+                                    <div id='zoom-out' className='col-start-3 glassy' onClick={zoomOut}>
+                                        <Icon src={`/${iconFolder}/zoom-out.svg`} width='55%' height='55%'/>
+                                    </div>
+                                </div> : 
+                                <div className='row-start-1 glassy'>
+                                    <Icon src={`/${iconFolder}/lock.svg`} width='55%' height='55%'/>
                                 </div>
-                                <div id='zoom-in' className='row-start-1 col-start-2 glassy' onClick={zoomIn}>
-                                    <Icon src={`/${iconFolder}/zoom-in.svg`} width='55%' height='55%'/>
-                                </div>
-                                <div id='zoom-out' className='row-start-1 col-start-3 glassy' onClick={zoomOut}>
-                                    <Icon src={`/${iconFolder}/zoom-out.svg`} width='55%' height='55%'/>
-                                </div>
-                                <div id='highlight-toggle' className={`row-start-2 col-start-1 glassy ${flagMap.get('highlight')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('highlight')}>
-                                    <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
-                                </div>
-                                <div id='line-toggle' className={`row-start-2 col-start-2 glassy ${flagMap.get('line')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('line')}>
-                                    <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
-                                </div>
-                                <div id='text-edit-toggle' className={`glassy row-start-2 col-start-3 ${flagMap.get('text')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('text')}>
-                                    <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%' className='row-start-1'/>
+                                }
+                                <div className='row-start-2 grid grid-cols-3'>
+                                    <div id='highlight-toggle' className={`col-start-1 glassy ${flagMap.get('highlight')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('highlight')}>
+                                        <Icon src={`/${iconFolder}/marker-pen.svg`} width='35%' height='35%'/>
+                                    </div>
+                                    <div id='line-toggle' className={`col-start-2 glassy ${flagMap.get('line')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('line')}>
+                                        <Icon src={`/${iconFolder}/line.svg`} width='35%' height='35%'/>
+                                    </div>
+                                    <div id='text-edit-toggle' className={`col-start-3 glassy ${flagMap.get('text')[0] ? 'set-inspecting' : ''}`} onClick={()=>triggerFlag('text')}>
+                                        <Icon src={`/${iconFolder}/edit.svg`} width='35%' height='35%' className='row-start-1'/>
+                                    </div>
                                 </div>
                             </div>
                         </div>

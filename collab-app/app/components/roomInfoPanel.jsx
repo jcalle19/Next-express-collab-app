@@ -4,11 +4,15 @@ import Switch from './switch.jsx'
 import Icon from './icon.jsx'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
-import { useStateContext } from '../contexts/userState.jsx'
+//import { useStateContext } from '../contexts/userState.jsx'
+import { useRefContext } from '../contexts/refContext.jsx'
+import { useSocketContext } from '../contexts/socketContext.jsx'
 import { useRouter } from 'next/navigation'
 
 const RoomInfoPanel = () => {
-    const { userObj, roomOptions, socketRef, leaveRoom } = useStateContext();
+    //const { userObj, roomOptions, socketRef, leaveRoom } = useStateContext();
+    const { userObj, roomOptions, socketRef } = useRefContext();
+    const { leaveRoom } = useSocketContext();
     const [rerender, forceRerender] = useState(false);
     const router = useRouter();
 

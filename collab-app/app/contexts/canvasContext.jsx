@@ -9,20 +9,6 @@ export const CanvasProvider = ({children}) => {
     const [windowSizeX, changeWindowXSize] = useState(0); //*
     const [windowSizeY, changeWindowYSize] = useState(0); //*
     const [canvasSize, updateSize] = useState({width: 0, height: 0});
-    const [clearFlag, updateClear] = useState(false);
-
-    /*-------------- Add host verification to these ones --------------*/
-    useEffect(() => {
-        if (canvasBackground !== '' && userObj.current.isHost) {
-            socketRef.current.emit('update-background', userObj.current.roomId, canvasBackground);
-        }
-    }, [canvasBackground]);
-    
-    useEffect(() => {
-        if (userObj.current.roomId !== '' && userObj.current.isHost) {
-            socketRef.current.emit('update-zoom', userObj.current.roomId, canvasZoom);
-        }
-    }, [canvasZoom]);
 
     const windowResize = () => {
         changeWindowXSize(window.innerWidth);
@@ -33,8 +19,8 @@ export const CanvasProvider = ({children}) => {
         windowSizeX, changeWindowXSize,
         windowSizeY, changeWindowYSize,
         canvasSize, updateSize,
-        clearFlag, updateClear,
-    }),[windowSizeX,windowSizeY, canvasSize, undoFlag, redoFlag, clearFlag]);
+        windowResize,
+    }),[windowSizeX ,windowSizeY, canvasSize]);
 
     return <canvasContext.Provider value={value}>
         {children}

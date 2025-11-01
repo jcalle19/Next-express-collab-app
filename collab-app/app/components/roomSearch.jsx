@@ -1,14 +1,16 @@
 import React from 'react'
 import {useState} from 'react'
 import { useRouter } from 'next/navigation';
-import { useStateContext } from '../contexts/userState.jsx'
+import { useRefContext } from '../contexts/refContext.jsx'
+import { useSocketContext } from '../contexts/socketContext.jsx'
 import globals from '../css/globals.css'
 import comps from '../css/homecomps.css'
 
 const RoomForm = () => {
+    const { createRoom, joinRoom } = useSocketContext();
+    const { userObj } = useRefContext();
     const [nameInput, updateUsername] = useState('');
     const [searchCode, updateSearchCode] = useState('');
-    const { createRoom, joinRoom, userObj } = useStateContext();
     const router = useRouter();
 
     //Add user to room map in socket_handler.js

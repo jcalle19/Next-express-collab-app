@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 //import { compressToUTF16, decompressFromUTF16 } from 'lz-string'
 import { useStateContext } from '../contexts/userState.jsx'
+import { useRefContext } from '../contexts/refContext.jsx'
+import { useDrawingContext } from '../contexts/drawingContext.jsx'
+import { useCanvasContext } from '../contexts/canvasContext.jsx'
+import { useSocketContext } from '../contexts/socketContext.jsx'
 import '../css/canvas.css'
 import BackgroundBox from './backgroundBox.jsx'
 import NoteArea from './noteArea.jsx'
@@ -21,9 +25,13 @@ const Canvas = () => {
     const scaleXRef = useRef(1);
     const scaleYRef = useRef(1);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
-            lineFlag, clearFlag, textEditFlag, penInfoRef, canvasOffsetRef, canvasSizeRef, 
-            windowSizeX, windowSizeY, windowResize, updateSize, incomingLineRef, socketRef} = useStateContext();
+    /*const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
+            lineFlag, clearFlag, penInfoRef, canvasOffsetRef, canvasSizeRef, 
+            windowSizeX, windowSizeY, windowResize, updateSize, incomingLineRef, socketRef} = useStateContext();*/
+    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef } = useRefContext();
+    const { highlightFlag, lineFlag, undoFlag, redoFlag, backgroundSelectFlag, clearFlag } = useDrawingContext();
+    const { windowSizeX, windowSizeY, windowResize, updateSize } = useCanvasContext();
+    const { canvasBackground, canvasZoom } = useSocketContext();
 
     const EMIT_INTERVAL = 16;
 

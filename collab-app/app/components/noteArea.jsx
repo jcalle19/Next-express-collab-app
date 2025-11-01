@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react'
-import {useStateContext} from '../contexts/userState.jsx'
+//import {useStateContext} from '../contexts/userState.jsx'
+import {useStateContext} from '../contexts/stateContext.jsx'
 import '../css/note.css'
 import Note from './note.jsx'
 

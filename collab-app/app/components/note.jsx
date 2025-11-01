@@ -1,11 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import {useStateContext} from '../contexts/userState.jsx'
+import {useRefContext} from '../contexts/refContext.jsx'
+import {useDrawingContext} from '../contexts/drawingContext.jsx'
+import {useSocketContext} from '../contexts/socketContext.jsx'
 import Icon from './icon.jsx'
 import '../css/note.css'
 
 const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
-    const {textEditFlag, userObj, addNote, canvasOffsetRef, 
-           canvasSizeRef, socketRef, noteDeleteFlag, triggerFlag} = useStateContext();
+    /*const {textEditFlag, userObj, addNote, canvasOffsetRef, 
+           canvasSizeRef, socketRef, noteDeleteFlag, triggerFlag} = useStateContext();*/
+    const {userObj, canvasOffsetRef, canvasSizeRef, socketRef} = useRefContext();
+    const {textEditFlag, noteDeleteFlag, triggerFlag} = useDrawingContext();
+    const {addNote} = useSocketContext();
+
     const [text, setText] = useState(content);
     const [resizing, toggleResizing] = useState(true);
     const [translating, toggleMoving] = useState(false);

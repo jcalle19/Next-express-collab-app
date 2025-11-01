@@ -1,3 +1,4 @@
+//UNUSED
 import { useState, useEffect, useRef} from 'react'
 import { useStateContext } from '../contexts/userState.jsx';
 import '../css/colorPicker.css'

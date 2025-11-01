@@ -1,11 +1,14 @@
 'use client'
 
 import {createContext, useContext, useState, useMemo} from 'react';
+import {useRefContext} from './refContext.jsx';
+import {parseColor} from 'react-aria-components';
 
 const drawingContext = createContext();
 export const useDrawingContext = () => useContext(drawingContext);
 
 export const DrawingProvider = ({children}) => {
+    const { userObj } = useRefContext();
     const [highlightFlag, updateHighlight] = useState(false); //*
     const [backgroundSelectFlag, updateBackgroundSelect] = useState(false);
     const [lineFlag, updateLineFlag] = useState(false); //*
@@ -13,21 +16,11 @@ export const DrawingProvider = ({children}) => {
     const [noteDeleteFlag, updateDeleteFlag] = useState(false); //*
     const [undoFlag, updateUndo] = useState(false); //*
     const [redoFlag, updateRedo] = useState(false); //*
+    const [clearFlag, updateClear] = useState(false);
     const [previewFontSize, setPreviewFontSize] = useState('50'); //*
     const [penColor, setPenColor] = useState(parseColor('#ffffff')); //*
     const [boxColor, setBoxColor] = useState(parseColor('#000000')); //*
     const [textColor, setTextColor] = useState(parseColor('#ffffff')); //*
-
-    const flagMap = new Map([
-        ['undo', [undoFlag, updateUndo]],
-        ['redo', [redoFlag, updateRedo]],
-        ['clear', [clearFlag, updateClear]],
-        ['text', [textEditFlag, updateTextFlag]],
-        ['delete', [noteDeleteFlag, updateDeleteFlag]],
-        ['highlight', [highlightFlag, triggerHighlight]],
-        ['line', [lineFlag, triggerLineTool]],
-        ['background', [backgroundSelectFlag, triggerBackgroundFlag]],
-    ]);
 
     const triggerHighlight = (flag) => {
         updateHighlight(flag);
@@ -45,6 +38,17 @@ export const DrawingProvider = ({children}) => {
         }
     }
 
+    const flagMap = new Map([
+        ['undo', [undoFlag, updateUndo]],
+        ['redo', [redoFlag, updateRedo]],
+        ['clear', [clearFlag, updateClear]],
+        ['text', [textEditFlag, updateTextFlag]],
+        ['delete', [noteDeleteFlag, updateDeleteFlag]],
+        ['highlight', [highlightFlag, triggerHighlight]],
+        ['line', [lineFlag, triggerLineTool]],
+        ['background', [backgroundSelectFlag, triggerBackgroundFlag]],
+    ]);
+
     const triggerFlag = (flagName) => {
         let mapAccess = flagMap.get(flagName);
         let varValue = mapAccess[0];
@@ -61,8 +65,10 @@ export const DrawingProvider = ({children}) => {
         noteDeleteFlag, updateDeleteFlag,
         highlightFlag, updateHighlight,
         backgroundSelectFlag, updateBackgroundSelect,
+        textEditFlag, updateTextFlag,
         undoFlag, updateUndo,
         redoFlag, updateRedo,
+        clearFlag, updateClear,
         triggerFlag,
         flagMap,
     }),[previewFontSize, penColor, boxColor, textColor, lineFlag, noteDeleteFlag, highlightFlag, backgroundSelectFlag, flagMap]);

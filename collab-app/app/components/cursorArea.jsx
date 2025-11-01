@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useStateContext } from '../contexts/userState.jsx'
+import { useRefContext } from '../contexts/refContext.jsx'
 import UserIcon from './userIcons.jsx';
 import Canvas from './canvas.jsx';
 import '../css/roomPage.css';
@@ -10,8 +11,9 @@ import '../css/roomPage.css';
 const CursorArea = ({id}) => {
   const [coords, setCoords] = useState([0,0]);
   const [mapSnapshot, takeSnapshot] = useState(new Map());
-  const {userObj, socketRef, roomUsers} = useStateContext();
-
+  //const {userObj, socketRef, roomUsers} = useStateContext();
+  const { userObj, socketRef, roomUsers} = useRefContext();
+  
   //Rendering snapshot of current user locations
   useEffect(() => {
     //refreshing to display updated roomInfo

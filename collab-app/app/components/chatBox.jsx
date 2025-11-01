@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react'
-import { useStateContext } from '../contexts/userState.jsx'
+//import { useStateContext } from '../contexts/userState.jsx'
+import { useRefContext } from '../contexts/refContext.jsx'
+import { useStateContext } from '../contexts/stateContext.jsx'
+import { useSocketContext } from '../contexts/socketContext.jsx'
+
 import Message from './message.jsx'
 import Icon from './icon.jsx'
 import RoomInfoPanel from './roomInfoPanel.jsx'
@@ -12,7 +16,10 @@ import '../css/chatBox.css'
 const ChatBox = () => {
     const [chatMsg, updateMsg] = useState('');
     const [activeTab, setActiveTab] = useState('chat');
-    const { userObj, socketRef, roomUsersKeys, chatMessages, chatMessagesRef, addMessage } = useStateContext();
+    //const { userObj, socketRef, roomUsersKeys, chatMessages, chatMessagesRef, addMessage } = useStateContext();
+    const { userObj, socketRef, chatMessagesRef } = useRefContext();
+    const { roomUsersKeys, chatMessages } = useStateContext();
+    const { addMessage } = useSocketContext();
     const iconFolder = 'toolbar-icons';
     let lastUser = '';
 
