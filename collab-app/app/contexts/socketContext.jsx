@@ -14,11 +14,12 @@ export const SocketProvider = ({children}) => {
            socketRef, socketRefReady,incomingLineRef} = useRefContext();
     const {updateKeys, updateMessages, updateRoomNotes} = useStateContext();
     const [socketReady, updateSocketStatus] = useState(false);
+    const [hostFlag, setHostFlag] = useState(false);
 
     //canvas exceptions
     const [canvasBackground, updateBackground] = useState(''); //*
     const [canvasZoom, updateZoom] = useState(100);
-
+    
     const router = useRouter();
     
 
@@ -46,6 +47,7 @@ export const SocketProvider = ({children}) => {
         });
 
         socketRef.current.on('confirm-room-join', (status, roomId, roomToken) => {
+            console.log('joining room');
             if (status) {
                 sessionStorage.setItem('roomToken', roomToken);
                 if (userObj.current.isHost) {
@@ -95,6 +97,7 @@ export const SocketProvider = ({children}) => {
                 updateRoomNotes(new Map(roomInfo.notes));
                 updateBackground(roomInfo.background);
                 updateZoom(roomInfo.zoom);
+                setHostFlag(userObj.current.isHost);
             } else {
                 disconnectUser();
             }
@@ -198,7 +201,7 @@ export const SocketProvider = ({children}) => {
             const token = sessionStorage.getItem('roomToken');
             socketRef.current.emit('clear-room', userObj.current.roomId);
             socketRef.current.emit('user-left', userObj.current.roomId, token);
-            userObj.current = {id: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isAdmin: false};
+            userObj.current = {id: '', user: '', roomId: '', xCoord: '', yCoord: '', canDraw: true, canChat: true, isHost: false, isAdmin: false};
             roomUsers.current = new Map();
             updateKeys([]);
             updateMessages([]);
@@ -208,8 +211,9 @@ export const SocketProvider = ({children}) => {
 
     const loadRoomState = (roomId) => {
         const roomToken = sessionStorage.getItem('roomToken');
+        const hostId = sessionStorage.getItem('hostId');
         tokenSetRef.current = true;
-        socketRef.current.emit('request-user-info', roomToken, roomId, userObj.current.socketId);
+        socketRef.current.emit('request-user-info', roomToken, hostId, roomId, userObj.current.socketId);
     }
 
     const disconnectUser = () => {
@@ -241,7 +245,8 @@ export const SocketProvider = ({children}) => {
         loadRoomState,
         zoomIn,
         zoomOut,
-    }),[socketReady, canvasBackground, canvasZoom]);
+        hostFlag,
+    }),[socketReady, canvasBackground, canvasZoom, hostFlag]);
 
     return <socketContext.Provider value={value}>
         {children}

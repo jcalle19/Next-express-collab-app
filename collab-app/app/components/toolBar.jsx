@@ -22,7 +22,7 @@ const ToolBar = () => {
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
     const { flagMap, penColor, boxColor, textColor, triggerFlag, previewFontSize } = useDrawingContext();
-    const { zoomIn, zoomOut } = useSocketContext();
+    const { zoomIn, zoomOut, hostFlag } = useSocketContext();
     const { penInfoRef, userObj } = useRefContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
@@ -30,6 +30,7 @@ const ToolBar = () => {
 
     useEffect(() => {
         window.addEventListener('resize', percentToPixel);
+        console.log(userObj.current.isHost);
     }, []);
 
     useEffect(() => {
@@ -74,7 +75,7 @@ const ToolBar = () => {
     }
     
     return (
-        <div ref={vantaRef} id='side-bar-container' style={{overflow: 'visible'}}>
+        <div ref={vantaRef} id='side-bar-container'>
             <div id='side-bar-toggle'></div>
             <div id='side-bar-overlay' className='grid grid-cols-1 grid-rows-2'>
                 <section id='edit-section' className='grid grid-cols-1 grid-rows-4'>
@@ -109,7 +110,7 @@ const ToolBar = () => {
                                 </div>
                             </div>
                             <div id='draw-mode-row' className={`grid grid-cols-1 grid-rows-[1fr_2fr]`}>
-                                {userObj.current.isHost ? 
+                                {hostFlag ? 
                                 <div className='row-start-1 grid grid-cols-3'>
                                     <div id='background-set' className='col-start-1 glassy' onClick={()=>triggerFlag('background')}>
                                         <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>

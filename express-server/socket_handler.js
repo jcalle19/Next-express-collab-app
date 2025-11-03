@@ -126,10 +126,11 @@ const socket_functions = (io) => {
             socket.leave(room);
         });
 
-        socket.on('request-user-info', (roomToken, roomId, socketId) => {
+        socket.on('request-user-info', (roomToken, hostId, roomId, socketId) => {
             try {
                 let userInfo = roomMap.get(roomId).members.get(roomToken);
                 if (userInfo && userInfo.roomId === roomId) {
+                    if (hostId === roomMap.get(roomId).hostId) userInfo.isHost = true;
                     userInfo.socketId = socketId;
                     socket.join(roomId);
                     socket.emit('receive-user-info', true, userInfo);

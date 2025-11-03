@@ -5,8 +5,7 @@
 #side-bar-toggle {
     position: absolute;
     transform: translateX(-100%);
-    border-radius: 15px 0px 0px 15px;
-    width: 15px;
+    width: 1.5%;
     height: 100vh;
     background: linear-gradient(45deg, var(--raspberry) 0%, var(--raspberry) 33%, var(--electric-blue) 33%, var(--electric-blue) 66%, var(--lime-green) 66%);
     z-index: 10000;
@@ -16,17 +15,18 @@
     position: absolute;
     right: 0px;
     width: 30vw;
-    height: 100vh !important;
-    overflow: hidden;
+    height: 100vh;
+    overflow: visible;
 }
 
 #side-bar-overlay {
+    box-sizing: border-box;
     background: rgba(0, 0, 0, 0.6);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     width: 30vw;
-    height: 100vh;
+    height: 100%;
 }
 
 #width-preview {
@@ -61,7 +61,7 @@
     width: 5%;
     height: 100%;
     background-color: var(--slider-thumb-color);
-    border: 1px solid grey;
+    border: 10% solid grey;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -80,4 +80,11 @@
     border-color: var(--lime-green);
     height: 100%;
     width: 100%;
+}
+
+#edit-section {
+    max-height: 50vh;
+}
+#chat-section {
+    max-height: 50vh;
 }

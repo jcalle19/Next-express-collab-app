@@ -18,7 +18,8 @@
 
 #room-heading {
     box-shadow: -2px 0 0 var(--electric-blue);
-    background: linear-gradient(45deg, var(--electric-blue) 0%, var(--electric-blue) 33.33%, var(--raspberry) 33.33%, var(--raspberry) 66.67%, var(--lime-green) 66.67%);
+    background-color: var(--menu-color);
+    /*background: linear-gradient(45deg, var(--electric-blue) 0%, var(--electric-blue) 33.33%, var(--raspberry) 33.33%, var(--raspberry) 66.67%, var(--lime-green) 66.67%);*/
 }
 
 #id-button {

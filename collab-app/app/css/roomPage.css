@@ -4,6 +4,7 @@
 }
 
 .window-container {
+    box-sizing: border-box;
     position: relative;
     width: 100vw;
     height: 100vh;
@@ -21,57 +22,4 @@
 
 .transparent {
     opacity: 0;
-}
-
-#tool-bar-container {
-    position: relative;
-    top: 5%;
-    left: 5%;
-    width: 100px;
-    height: 100px;
-    z-index: 2;
-}
-
-.tool-bar {
-    position: absolute;
-    margin: 0px;
-    min-width: 45px;
-    border: var(--current-theme-border);
-    border-radius: 50px;
-    transition: width .5s, height .5s, left .5s, transform .5s, border-radius .5s;
-    overflow: hidden;
-}
-
-.tool-bar-close {
-    background-color: var(--window-bg-color);
-    width: 3vw;
-    height: 3vw;
-    min-width: 30px;
-    min-height: 30px;
-    left: 290%;
-}
-
-.tool-bar-expand {
-    width: 3vw;
-    height: 45vh;
-    min-height: calc(fit-content + 2vh);
-    left: 0%;
-}
-
-.tool-bar-content {
-    background-color: var(--window-bg-color);
-    width: 250px;
-    height: 60vh;
-    border-radius: 25px;
-}
-
-#tool-grid {
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 50%;
-    width: 80%;
-    padding-top: 3vh;
-    padding-bottom: 3vh;
-    transition: opacity .5s, padding-top .5s;
 }
