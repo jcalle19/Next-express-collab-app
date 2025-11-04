@@ -16,6 +16,7 @@ const randomId = () => {
     };
 
 const socket_functions = (io) => {
+    //this socket function is redundant and can be replaced simply by emitting 'sync-with-server'
     const broadcastInfo = (roomId, socket, event) => {
         console.log(`broadcast source: ${roomId}, ${event}`);
         const roomInfo = {
@@ -24,6 +25,7 @@ const socket_functions = (io) => {
             notes: Array.from(roomMap.get(roomId).notes),
             options: roomMap.get(roomId).options,
             background: roomMap.get(roomId).background,
+            canvases: Array.from(roomMap.get(roomId).canvases),
             zoom: roomMap.get(roomId).zoom,
         }
         //might be being called twice, have to look further
@@ -41,7 +43,7 @@ const socket_functions = (io) => {
                                  options: roomOptions,
                                  admins: new Set(), 
                                  members: new Map(), 
-                                 drawings: new Map(), //for temporarily holding the canvas on refresh
+                                 canvases: new Map(), //for temporarily holding the canvas on refresh
                                  notes: new Map(),
                                  chat: [],
                                  background: '',
@@ -115,6 +117,7 @@ const socket_functions = (io) => {
                     notes: Array.from(roomMap.get(roomId).notes),
                     options: roomMap.get(roomId).options,
                     background: roomMap.get(roomId).background,
+                    canvases: Array.from(roomMap.get(roomId).canvases),
                     zoom: roomMap.get(roomId).zoom,
                 }
                 socket.emit('token-valid', true, roomInfo);
@@ -174,14 +177,6 @@ const socket_functions = (io) => {
             }
         });
 
-        socket.on('store-lines', (roomId, compressedInfo, token) => {
-            let mapAccess = roomMap.get(roomId);
-            if (!mapAccess.members.has(token)) {
-                mapAccess.drawings.set(token, compressedInfo);
-                console.log(compressedInfo.length, ' <--- compressed size');
-            }
-        });
-
         socket.on('update-options', (roomId, roomOptions, hostId)=> {
             const mapAccess = roomMap.get(roomId);
             if (mapAccess.hostId === hostId) {
@@ -198,6 +193,16 @@ const socket_functions = (io) => {
         socket.on('update-notes', (roomId, noteId, noteInfo) => {
             roomMap.get(roomId).notes.set(noteId, noteInfo);
             broadcastInfo(roomId, false, 'update-notes');
+        });
+
+        socket.on('update-canvas', (roomId, roomToken, data) => {
+            if (!roomMap.get(roomId).members.has(roomToken)) {
+                socket.leave(roomId);
+                socket.emit('token-valid', false, '');
+            } else {
+                const canvasAccess = roomMap.get(roomId).canvases;
+                canvasAccess.set(roomToken, data);
+            }
         });
 
         socket.on('update-zoom', (roomId, zoom)=> {

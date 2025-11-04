@@ -32,9 +32,6 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
       setText(content);
     }, [left, top, widthPercent, heightPercent, content]);
 
-    useEffect(()=> {
-      console.log(textEditFlag);
-        }, [textEditFlag]);
     //Log desired size percentage on manual textarea resize
     useEffect(() => {
       if (!textareaRef.current) return;

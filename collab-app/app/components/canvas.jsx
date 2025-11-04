@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
-//import { compressToUTF16, decompressFromUTF16 } from 'lz-string'
-import { useStateContext } from '../contexts/userState.jsx'
+import { compressToUTF16, decompressFromUTF16 } from 'lz-string'
 import { useRefContext } from '../contexts/refContext.jsx'
 import { useDrawingContext } from '../contexts/drawingContext.jsx'
 import { useCanvasContext } from '../contexts/canvasContext.jsx'
 import { useSocketContext } from '../contexts/socketContext.jsx'
+import { useStateContext } from '../contexts/stateContext.jsx'
 import '../css/canvas.css'
 import BackgroundBox from './backgroundBox.jsx'
 import NoteArea from './noteArea.jsx'
-import Note from './note.jsx'
 
 const Canvas = () => {
     const canvasRef = useRef(null);
@@ -18,20 +17,22 @@ const Canvas = () => {
     const newRef = useRef(null);
     const drawingRef = useRef(false);
     const lineStorageRef = useRef([]);
+    const externalLineStorageRef = useRef([]); //holds new lines that occur after room canvases update
     const removedLineRef = useRef([]);
     const currentLineRef = useRef([]);
     const sendingLineRef = useRef([]);
     const lastEmitRef = useRef(0);
     const scaleXRef = useRef(1);
     const scaleYRef = useRef(1);
+    const strokeCount = useRef(0);
+    const lastStrokeCount = useRef(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    /*const { userObj, canvasBackground, canvasZoom, highlightFlag, backgroundSelectFlag, undoFlag, redoFlag, 
-            lineFlag, clearFlag, penInfoRef, canvasOffsetRef, canvasSizeRef, 
-            windowSizeX, windowSizeY, windowResize, updateSize, incomingLineRef, socketRef} = useStateContext();*/
-    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef } = useRefContext();
+    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef, roomCanvasesRef } = useRefContext();
     const { highlightFlag, lineFlag, undoFlag, redoFlag, backgroundSelectFlag, clearFlag } = useDrawingContext();
     const { windowSizeX, windowSizeY, windowResize, updateSize } = useCanvasContext();
     const { canvasBackground, canvasZoom } = useSocketContext();
+    const { redrawFlag, triggerRedraw } = useStateContext();
+    
 
     const EMIT_INTERVAL = 16;
 
@@ -49,6 +50,7 @@ const Canvas = () => {
             animId = requestAnimationFrame(render);
             if (incomingLineRef.current.length > 0) { //could optimize with a while loop
                 const stroke = incomingLineRef.current.shift();
+                externalLineStorageRef.current.push(stroke);
                 stroke.forEach((line, index) => {
                     drawLine(line.prev, line.new, line.color, line.size, line.join, line.cap, line.alpha, ctxRef.current, false);
                 });
@@ -64,6 +66,15 @@ const Canvas = () => {
             storeCompressedCanvas();
         }
     }, []);
+
+    useEffect(()=>{
+        if (redrawFlag) {
+            //redrawCanvas();
+            drawFromServer();
+            externalLineStorageRef.current = []; //refresh when stored canvases 'catch up' to the new strokes
+            triggerRedraw(false);
+        }
+    },[redrawFlag]);
 
     //Batched sending to server
     useEffect(()=>{
@@ -143,13 +154,8 @@ const Canvas = () => {
 
     const storeCompressedCanvas = () => {
         let currToken = sessionStorage.getItem('roomToken');
-        let jsonString = JSON.stringify(lineStorageRef);
-        //let compressed = LZString.compressToUTF16(jsonString);
-        //socketRef.current.emit('store-lines', userObj.current.roomId, compressed, currToken);
-    }
-
-    const restoreCompressedCanvas = () => {
-        let currToken = sessionStorage.getItem('roomToken');
+        const compressed = compressToUTF16(JSON.stringify(lineStorageRef.current));
+        socketRef.current.emit('update-canvas', userObj.current.roomId, currToken, compressed);
     }
 
     const handleMouseDown = (e) => {
@@ -179,6 +185,10 @@ const Canvas = () => {
         }
 
         lineStorageRef.current.push(currentLineRef.current);
+        if (strokeCount.current - lastStrokeCount.current >= 100) {
+            storeCompressedCanvas();
+            lastStrokeCount.current = strokeCount.current;
+        }
         currentLineRef.current = [];
     };
 
@@ -194,25 +204,41 @@ const Canvas = () => {
         ctx.lineTo(to.x, to.y);
         ctx.stroke();
         const strokeInfo = {prev: from, new: to, color: color, size: size, join: join, cap: cap, alpha: alpha};
-        currentLineRef.current.push(strokeInfo);
-        
+
         if (transmit) {
             currentLineRef.current.push(strokeInfo);
             sendingLineRef.current.push(strokeInfo);
+            strokeCount.current += 1;
         }
     };
 
-    //separated function to avoid infinite loop
-    const drawFromServer = (strokeInfo) => {
-        console.log(strokeInfo);
+    const drawEach = (list) => {
+        list.forEach(line => line.forEach(path => {
+            drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current, false);
+        }));
+    }
+
+    const drawFromServer = () => {
+        const roomToken = sessionStorage.getItem('roomToken');
+        const canvases = roomCanvasesRef.current;
+        let decompressed;
+        canvases.forEach((compressed, key) => {
+            decompressed = JSON.parse(decompressFromUTF16(compressed));
+            lineStorageRef.current = (roomToken === key ? decompressed : lineStorageRef.current);
+            drawEach(decompressed);
+        })
     }
 
     const redrawCanvas = () => {
         clearCanvas();
         lineStorageRef.current.forEach(line => line.forEach(path => {
             drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current, false);
-            currentLineRef.current = [];
+            //currentLineRef.current = []; <- i don't think i need it but ill keep it here in case i do
         }));
+        externalLineStorageRef.current.forEach(line => line.forEach(path => {
+            drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current, false);
+        }));
+        drawFromServer();
     }
 
     //AI function, keep an eye on this one

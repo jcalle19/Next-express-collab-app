@@ -5,14 +5,15 @@ import {useRefContext} from './refContext.jsx';
 import {useStateContext} from './stateContext.jsx';
 import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
+import { textureLevel } from 'three/tsl';
 
 const socketContext = createContext();
 export const useSocketContext = () => useContext(socketContext);
 
 export const SocketProvider = ({children}) => {
     const {userObj, roomOptions, roomUsers, tokenSetRef,
-           socketRef, socketRefReady,incomingLineRef} = useRefContext();
-    const {updateKeys, updateMessages, updateRoomNotes} = useStateContext();
+           socketRef, socketRefReady,incomingLineRef, roomCanvasesRef} = useRefContext();
+    const {updateKeys, updateMessages, updateRoomNotes, triggerRedraw} = useStateContext();
     const [socketReady, updateSocketStatus] = useState(false);
     const [hostFlag, setHostFlag] = useState(false);
 
@@ -92,11 +93,13 @@ export const SocketProvider = ({children}) => {
                 const chatMessages = roomInfo.chat;
                 roomUsers.current = members;
                 roomOptions.current = roomInfo.options;
+                roomCanvasesRef.current = new Map(roomInfo.canvases);
                 updateKeys(Array.from(members.values()));
                 updateMessages(chatMessages);
                 updateRoomNotes(new Map(roomInfo.notes));
                 updateBackground(roomInfo.background);
                 updateZoom(roomInfo.zoom);
+                triggerRedraw(true);
                 setHostFlag(userObj.current.isHost);
             } else {
                 disconnectUser();

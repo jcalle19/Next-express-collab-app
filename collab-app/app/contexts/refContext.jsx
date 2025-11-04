@@ -18,6 +18,7 @@ export const RefProvider = ({children}) => {
     const socketRef = useRef(null);
     const socketRefReady = useRef(false);
     const incomingLineRef = useRef([]);
+    const roomCanvasesRef = useRef(new Map());
 
     //Canvas things
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
@@ -30,6 +31,7 @@ export const RefProvider = ({children}) => {
         roomUsers,
         roomUsersRef,
         chatMessagesRef,
+        roomCanvasesRef,
         tokenSetRef,
         socketRef,
         socketRefReady,

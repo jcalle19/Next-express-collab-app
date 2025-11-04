@@ -30,7 +30,6 @@ const ToolBar = () => {
 
     useEffect(() => {
         window.addEventListener('resize', percentToPixel);
-        console.log(userObj.current.isHost);
     }, []);
 
     useEffect(() => {
