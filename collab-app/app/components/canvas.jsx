@@ -63,7 +63,11 @@ const Canvas = () => {
         return ()=>{
             cancelAnimationFrame(animId);
             window.removeEventListener('resize', windowResize);
-            storeCompressedCanvas();
+            lineStorageRef.current = [];
+            externalLineStorageRef.current = [];
+            removedLineRef.current = [];
+            currentLineRef.current = [];
+            sendingLineRef.current = [];
         }
     }, []);
 
@@ -156,6 +160,7 @@ const Canvas = () => {
         let currToken = sessionStorage.getItem('roomToken');
         const compressed = compressToUTF16(JSON.stringify(lineStorageRef.current));
         socketRef.current.emit('update-canvas', userObj.current.roomId, currToken, compressed);
+        console.log('updating canvas with data of size', compressed.length);
     }
 
     const handleMouseDown = (e) => {
