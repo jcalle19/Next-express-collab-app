@@ -159,6 +159,7 @@ const Canvas = () => {
     const storeCompressedCanvas = () => {
         let currToken = sessionStorage.getItem('roomToken');
         const compressed = compressToUTF16(JSON.stringify(lineStorageRef.current));
+        console.log('udpating: ', compressed.length);
         socketRef.current.emit('update-canvas', userObj.current.roomId, currToken, compressed);
         console.log('updating canvas with data of size', compressed.length);
     }
