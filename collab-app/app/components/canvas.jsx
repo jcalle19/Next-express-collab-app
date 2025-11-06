@@ -17,7 +17,6 @@ const Canvas = () => {
     const newRef = useRef(null);
     const drawingRef = useRef(false);
     const lineStorageRef = useRef([]);
-    const externalLineStorageRef = useRef([]); //holds new lines that occur after room canvases update
     const removedLineRef = useRef([]);
     const currentLineRef = useRef([]);
     const sendingLineRef = useRef([]);
@@ -50,7 +49,6 @@ const Canvas = () => {
             animId = requestAnimationFrame(render);
             if (incomingLineRef.current.length > 0) { //could optimize with a while loop
                 const stroke = incomingLineRef.current.shift();
-                externalLineStorageRef.current.push(stroke);
                 stroke.forEach((line, index) => {
                     drawLine(line.prev, line.new, line.color, line.size, line.join, line.cap, line.alpha, ctxRef.current, false);
                 });
@@ -64,7 +62,6 @@ const Canvas = () => {
             cancelAnimationFrame(animId);
             window.removeEventListener('resize', windowResize);
             lineStorageRef.current = [];
-            externalLineStorageRef.current = [];
             removedLineRef.current = [];
             currentLineRef.current = [];
             sendingLineRef.current = [];
@@ -73,9 +70,7 @@ const Canvas = () => {
 
     useEffect(()=>{
         if (redrawFlag) {
-            //redrawCanvas();
             drawFromServer();
-            externalLineStorageRef.current = []; //refresh when stored canvases 'catch up' to the new strokes
             triggerRedraw(false);
         }
     },[redrawFlag]);
@@ -127,19 +122,22 @@ const Canvas = () => {
 
     /*----- Menu Button Effects -----*/
     useEffect(()=> {
-        let last = lineStorageRef.current.pop();
-        
-        if (last) {
+        if (lineStorageRef.current.length >= 1) {
+            let last = lineStorageRef.current.pop();
             removedLineRef.current.push(last);
-            redrawCanvas();
+            //redrawCanvas();
+            storeCompressedCanvas();
+            //triggerRedraw(true);
+            socketRef.current.emit('request-sync', userObj.current.roomId); //can be slightly optimized by making a request-canvas funtion
         }
     },[undoFlag]);
 
     useEffect (()=> {
-        let last = removedLineRef.current.pop();
-        if (last) {
+        if (removedLineRef.current.length >= 1) {
+            let last = removedLineRef.current.pop();
             lineStorageRef.current.push(last);
-            redrawCanvas();
+            storeCompressedCanvas();
+            socketRef.current.emit('request-sync', userObj.current.roomId);
         }
     },[redoFlag]);
 
@@ -151,7 +149,11 @@ const Canvas = () => {
 
     useEffect (()=> {
         lineStorageRef.current.map((line) => {removedLineRef.current.push(line)});
-        clearCanvas();
+        removedLineRef.current = lineStorageRef.current;
+        lineStorageRef.current = [];
+        storeCompressedCanvas();
+        socketRef.current.emit('request-sync', userObj.current.roomId);
+        //clearCanvas();
     },[clearFlag]);
 
     /*-------------------------------*/
@@ -159,9 +161,7 @@ const Canvas = () => {
     const storeCompressedCanvas = () => {
         let currToken = sessionStorage.getItem('roomToken');
         const compressed = compressToUTF16(JSON.stringify(lineStorageRef.current));
-        console.log('udpating: ', compressed.length);
         socketRef.current.emit('update-canvas', userObj.current.roomId, currToken, compressed);
-        console.log('updating canvas with data of size', compressed.length);
     }
 
     const handleMouseDown = (e) => {
@@ -191,7 +191,7 @@ const Canvas = () => {
         }
 
         lineStorageRef.current.push(currentLineRef.current);
-        if (strokeCount.current - lastStrokeCount.current >= 100) {
+        if (strokeCount.current - lastStrokeCount.current >= 10) {
             storeCompressedCanvas();
             lastStrokeCount.current = strokeCount.current;
         }
@@ -228,11 +228,12 @@ const Canvas = () => {
         const roomToken = sessionStorage.getItem('roomToken');
         const canvases = roomCanvasesRef.current;
         let decompressed;
+        clearCanvas();
         canvases.forEach((compressed, key) => {
             decompressed = JSON.parse(decompressFromUTF16(compressed));
             lineStorageRef.current = (roomToken === key ? decompressed : lineStorageRef.current);
             drawEach(decompressed);
-        })
+        });
     }
 
     const redrawCanvas = () => {
