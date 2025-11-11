@@ -94,6 +94,7 @@ const socket_functions = (io) => {
             if (roomMap.get(userObj.roomId).options.canChat || userObj.isHost) {
                 roomMap.get(userObj.roomId).notes.set(randomId(), noteInfo);
                 broadcastInfo(userObj.roomId, false, 'broadcast-note');
+                console.log(roomMap.get(userObj.roomId).canvases.length);
             }
             
         });
@@ -192,7 +193,7 @@ const socket_functions = (io) => {
 
         socket.on('update-notes', (roomId, noteId, noteInfo) => {
             roomMap.get(roomId).notes.set(noteId, noteInfo);
-            broadcastInfo(roomId, false, 'update-notes');
+            broadcastInfo(roomId, socket, 'update-notes');
         });
 
         socket.on('update-canvas', (roomId, roomToken, data) => {

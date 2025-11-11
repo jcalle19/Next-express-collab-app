@@ -1,0 +1,12 @@
+#download-button {
+    position: absolute;
+    width: 10vw;
+    height: 5vh;
+    transform: translate(-50%, -50%);
+    background-color: var(--electric-blue);
+    user-select: none;
+}
+
+#download-button:active {
+    background-color: var(--lime-green);
+}

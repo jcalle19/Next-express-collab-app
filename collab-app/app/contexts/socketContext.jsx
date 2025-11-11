@@ -174,7 +174,7 @@ export const SocketProvider = ({children}) => {
 
     const addMessage = (user, msg) => {
         //Functional update to add to most current message list
-        socketRef.current.emit('broadcast-msg', user, msg);
+        socketRef.current.emit('broadcast-msg', user, msg); 
     }
 
     const addNote = (user, noteInfo) => {

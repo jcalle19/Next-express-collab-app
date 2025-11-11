@@ -1,5 +1,5 @@
 import React from 'react'
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import { useRouter } from 'next/navigation';
 import { useRefContext } from '../contexts/refContext.jsx'
 import { useSocketContext } from '../contexts/socketContext.jsx'
@@ -7,12 +7,16 @@ import globals from '../css/globals.css'
 import comps from '../css/homecomps.css'
 
 const RoomForm = () => {
-    const { createRoom, joinRoom } = useSocketContext();
+    const { createRoom, joinRoom, leaveRoom } = useSocketContext();
     const { userObj } = useRefContext();
     const [nameInput, updateUsername] = useState('');
     const [searchCode, updateSearchCode] = useState('');
     const router = useRouter();
 
+    useEffect(()=>{
+        if (userObj.current.roomId) leaveRoom();
+    },[]);
+    
     //Add user to room map in socket_handler.js
     const handleJoin = (e) => {
         e.preventDefault();

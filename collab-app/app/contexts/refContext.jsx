@@ -24,6 +24,7 @@ export const RefProvider = ({children}) => {
     const penInfoRef = useRef({color: 'white', size: 2, scale: 1});
     const canvasOffsetRef = useRef({left: 0, top: 0});
     const canvasSizeRef = useRef({width: 0, height: 0});
+    const clearFunctionRef = useRef(null);
 
     const value={
         userObj,
@@ -39,6 +40,7 @@ export const RefProvider = ({children}) => {
         penInfoRef,
         canvasOffsetRef,
         canvasSizeRef,
+        clearFunctionRef
     };
 
     return <refContext.Provider value={value}>

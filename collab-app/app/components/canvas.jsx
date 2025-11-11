@@ -8,6 +8,7 @@ import { useStateContext } from '../contexts/stateContext.jsx'
 import '../css/canvas.css'
 import BackgroundBox from './backgroundBox.jsx'
 import NoteArea from './noteArea.jsx'
+import DownloadButton from './downloadButton.jsx'
 
 const Canvas = () => {
     const canvasRef = useRef(null);
@@ -26,9 +27,9 @@ const Canvas = () => {
     const strokeCount = useRef(0);
     const lastStrokeCount = useRef(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef, roomCanvasesRef } = useRefContext();
-    const { highlightFlag, lineFlag, undoFlag, redoFlag, backgroundSelectFlag, clearFlag } = useDrawingContext();
-    const { windowSizeX, windowSizeY, windowResize, updateSize } = useCanvasContext();
+    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef, roomCanvasesRef, clearFunctionRef } = useRefContext();
+    const { highlightFlag, lineFlag, undoFlag, redoFlag, backgroundSelectFlag, clearFlag, updateClear } = useDrawingContext();
+    const { windowSizeX, windowSizeY, windowResize, canvasSize, updateSize } = useCanvasContext();
     const { canvasBackground, canvasZoom } = useSocketContext();
     const { redrawFlag, triggerRedraw } = useStateContext();
     
@@ -42,7 +43,7 @@ const Canvas = () => {
         canvas.width = 2600;
         canvas.height = 2000;
         ctxRef.current = canvas.getContext('2d');
-
+        clearFunctionRef.current = handleClear;
         // render loop (runs ~60fps)
         let animId;
         const render = () => {
@@ -126,7 +127,7 @@ const Canvas = () => {
             let last = lineStorageRef.current.pop();
             removedLineRef.current.push(last);
             //redrawCanvas();
-            storeCompressedCanvas();
+            storeCompressedCanvas(130);
             //triggerRedraw(true);
             socketRef.current.emit('request-sync', userObj.current.roomId); //can be slightly optimized by making a request-canvas funtion
         }
@@ -136,7 +137,7 @@ const Canvas = () => {
         if (removedLineRef.current.length >= 1) {
             let last = removedLineRef.current.pop();
             lineStorageRef.current.push(last);
-            storeCompressedCanvas();
+            storeCompressedCanvas(140);
             socketRef.current.emit('request-sync', userObj.current.roomId);
         }
     },[redoFlag]);
@@ -147,23 +148,37 @@ const Canvas = () => {
         ctxRef.current.lineCap = highlightFlag ? 'butt' : 'round';
     },[highlightFlag]);
 
+    /*
     useEffect (()=> {
-        lineStorageRef.current.map((line) => {removedLineRef.current.push(line)});
-        removedLineRef.current = lineStorageRef.current;
-        lineStorageRef.current = [];
-        storeCompressedCanvas();
-        socketRef.current.emit('request-sync', userObj.current.roomId);
-        //clearCanvas();
+        if (lineStorageRef.current.length > 0) {
+            lineStorageRef.current.map((line) => {removedLineRef.current.push(line)});
+            removedLineRef.current = lineStorageRef.current;
+            lineStorageRef.current = [];
+            storeCompressedCanvas(156);
+            socketRef.current.emit('request-sync', userObj.current.roomId);
+        }
     },[clearFlag]);
-
+*/
     /*-------------------------------*/
-
-    const storeCompressedCanvas = () => {
+    
+    const storeCompressedCanvas = (line) => {
+        console.log('called from line', line);
         let currToken = sessionStorage.getItem('roomToken');
         const compressed = compressToUTF16(JSON.stringify(lineStorageRef.current));
         socketRef.current.emit('update-canvas', userObj.current.roomId, currToken, compressed);
     }
-
+    
+    const handleClear = () => {
+        if (lineStorageRef.current.length > 0) {
+            lineStorageRef.current.map((line) => {removedLineRef.current.push(line)});
+            removedLineRef.current = lineStorageRef.current;
+            lineStorageRef.current = [];
+            storeCompressedCanvas(156);
+            socketRef.current.emit('request-sync', userObj.current.roomId);
+        }
+        console.log('calling clear');
+    }
+    
     const handleMouseDown = (e) => {
         e.preventDefault();
         if (userObj.current.canDraw) {
@@ -192,7 +207,7 @@ const Canvas = () => {
 
         lineStorageRef.current.push(currentLineRef.current);
         if (strokeCount.current - lastStrokeCount.current >= 10) {
-            storeCompressedCanvas();
+            storeCompressedCanvas(198);
             lastStrokeCount.current = strokeCount.current;
         }
         currentLineRef.current = [];
@@ -236,25 +251,13 @@ const Canvas = () => {
         });
     }
 
-    const redrawCanvas = () => {
-        clearCanvas();
-        lineStorageRef.current.forEach(line => line.forEach(path => {
-            drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current, false);
-            //currentLineRef.current = []; <- i don't think i need it but ill keep it here in case i do
-        }));
-        externalLineStorageRef.current.forEach(line => line.forEach(path => {
-            drawLine(path.prev, path.new, path.color, path.size, path.join, path.cap, path.alpha, ctxRef.current, false);
-        }));
-        drawFromServer();
-    }
-
     //AI function, keep an eye on this one
     const clearCanvas = () => {
         if (!ctxRef.current || !canvasRef.current) return;
             ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     };
     return (
-        <div id='canvas-container'>
+        <div id='canvas-container' style={{position: 'relative', overflow: 'hidden'}}>
             <div id='background-layer' ref={backgroundRef} 
                 style={{
                     background: `${canvasBackground === '' ? 'black' : canvasBackground} center / ${canvasZoom}% no-repeat`,
@@ -265,12 +268,15 @@ const Canvas = () => {
                     id='canvas-window'
                     onMouseMove={handleMouseMove}
                     onMouseDown={handleMouseDown} 
-                    onMouseUp={handleMouseUp}>
+                    onMouseUp={handleMouseUp}
+                    width={canvasRef.current ? canvasRef.current.width : '2600'}
+                    height={canvasRef.current ? canvasRef.current.height : '2000'}
+                >
                 </canvas>
                 <NoteArea/>
-                {backgroundSelectFlag ? <BackgroundBox isVisible={true}/> : ''}
             </div>
-            
+            {backgroundSelectFlag ? <BackgroundBox isVisible={true}/> : ''}
+            <DownloadButton left={'50'} top={'95'} imageRef={backgroundRef} size={canvasSize}/>
         </div>
     )
 }

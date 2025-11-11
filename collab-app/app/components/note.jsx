@@ -7,11 +7,8 @@ import Icon from './icon.jsx'
 import '../css/note.css'
 
 const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
-    /*const {textEditFlag, userObj, addNote, canvasOffsetRef, 
-           canvasSizeRef, socketRef, noteDeleteFlag, triggerFlag} = useStateContext();*/
     const {userObj, canvasOffsetRef, canvasSizeRef, socketRef} = useRefContext();
     const {textEditFlag, noteDeleteFlag, triggerFlag} = useDrawingContext();
-    const {addNote} = useSocketContext();
 
     const [text, setText] = useState(content);
     const [resizing, toggleResizing] = useState(true);
@@ -103,7 +100,6 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
     const transmitInfo = (x,y,width,height) => {
       //return on first component mount call
       if (!id) return;
-
       const retObj = {
         boxColor: boxColor,
         fontSize: fontSize,
@@ -127,7 +123,8 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
                         top: 0, left: 0,
                         width: .20, height: .20
                       };
-      addNote(userObj.current, noteInfo);
+      //addNote(userObj.current, noteInfo);
+      socketRef.current.emit('broadcast-note', userObj.current, noteInfo);
     }
 
     const deleteNote = () => {
@@ -168,7 +165,7 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
                     ref={textareaRef}
                     id='note-content' 
                     className={`col-start-${isPreview ? '2 col-span-2' : '1'}`}
-                    value={text}
+                    value={text ? text : content}
                     onChange={(e)=>setText(e.target.value)}
                     style={{border: `1px solid ${boxColor}`,
                             backgroundColor: boxColor, 

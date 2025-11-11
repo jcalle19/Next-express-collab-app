@@ -21,15 +21,16 @@ const ToolBar = () => {
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
-    const { flagMap, penColor, boxColor, textColor, triggerFlag, previewFontSize } = useDrawingContext();
+    const { flagMap, penColor, boxColor, textColor, triggerFlag, previewFontSize, updateClear } = useDrawingContext();
     const { zoomIn, zoomOut, hostFlag } = useSocketContext();
-    const { penInfoRef, userObj } = useRefContext();
+    const { penInfoRef, clearFunctionRef } = useRefContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
     const maxSize = 48;
 
     useEffect(() => {
         window.addEventListener('resize', percentToPixel);
+        console.log(clearFunctionRef.current);
     }, []);
 
     useEffect(() => {
@@ -111,7 +112,7 @@ const ToolBar = () => {
                             <div id='draw-mode-row' className={`grid grid-cols-1 grid-rows-[1fr_2fr]`}>
                                 {hostFlag ? 
                                 <div className='row-start-1 grid grid-cols-3'>
-                                    <div id='background-set' className='col-start-1 glassy' onClick={()=>triggerFlag('background')}>
+                                    <div id='background-set' className='col-start-1 glassy' onClick={clearFunctionRef.current}>
                                         <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>
                                     </div>
                                     <div id='zoom-in' className='col-start-2 glassy' onClick={zoomIn}>
