@@ -27,8 +27,8 @@ const Canvas = () => {
     const strokeCount = useRef(0);
     const lastStrokeCount = useRef(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef, roomCanvasesRef, clearFunctionRef } = useRefContext();
-    const { highlightFlag, lineFlag, undoFlag, redoFlag, backgroundSelectFlag, clearFlag, updateClear } = useDrawingContext();
+    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef, roomCanvasesRef} = useRefContext();
+    const { highlightFlag, lineFlag, undoFlag, redoFlag, backgroundSelectFlag, clearFlag } = useDrawingContext();
     const { windowSizeX, windowSizeY, windowResize, canvasSize, updateSize } = useCanvasContext();
     const { canvasBackground, canvasZoom } = useSocketContext();
     const { redrawFlag, triggerRedraw } = useStateContext();
@@ -43,7 +43,7 @@ const Canvas = () => {
         canvas.width = 2600;
         canvas.height = 2000;
         ctxRef.current = canvas.getContext('2d');
-        clearFunctionRef.current = handleClear;
+
         // render loop (runs ~60fps)
         let animId;
         const render = () => {
@@ -148,7 +148,7 @@ const Canvas = () => {
         ctxRef.current.lineCap = highlightFlag ? 'butt' : 'round';
     },[highlightFlag]);
 
-    /*
+    
     useEffect (()=> {
         if (lineStorageRef.current.length > 0) {
             lineStorageRef.current.map((line) => {removedLineRef.current.push(line)});
@@ -158,7 +158,7 @@ const Canvas = () => {
             socketRef.current.emit('request-sync', userObj.current.roomId);
         }
     },[clearFlag]);
-*/
+
     /*-------------------------------*/
     
     const storeCompressedCanvas = (line) => {
@@ -166,17 +166,6 @@ const Canvas = () => {
         let currToken = sessionStorage.getItem('roomToken');
         const compressed = compressToUTF16(JSON.stringify(lineStorageRef.current));
         socketRef.current.emit('update-canvas', userObj.current.roomId, currToken, compressed);
-    }
-    
-    const handleClear = () => {
-        if (lineStorageRef.current.length > 0) {
-            lineStorageRef.current.map((line) => {removedLineRef.current.push(line)});
-            removedLineRef.current = lineStorageRef.current;
-            lineStorageRef.current = [];
-            storeCompressedCanvas(156);
-            socketRef.current.emit('request-sync', userObj.current.roomId);
-        }
-        console.log('calling clear');
     }
     
     const handleMouseDown = (e) => {

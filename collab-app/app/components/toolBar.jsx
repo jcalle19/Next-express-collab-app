@@ -21,16 +21,15 @@ const ToolBar = () => {
     const [sliderValue, changeSlider] = useState('0');
     const [previewWidth, changeWidth] = useState('2');
     const sliderPxRef = useRef(3);
-    const { flagMap, penColor, boxColor, textColor, triggerFlag, previewFontSize, updateClear } = useDrawingContext();
+    const { flagMap, penColor, boxColor, textColor, triggerFlag, previewFontSize } = useDrawingContext();
     const { zoomIn, zoomOut, hostFlag } = useSocketContext();
-    const { penInfoRef, clearFunctionRef } = useRefContext();
+    const { penInfoRef } = useRefContext();
     const iconFolder = 'toolbar-icons'
     const minSize = 3;
     const maxSize = 48;
 
     useEffect(() => {
         window.addEventListener('resize', percentToPixel);
-        console.log(clearFunctionRef.current);
     }, []);
 
     useEffect(() => {
@@ -73,7 +72,7 @@ const ToolBar = () => {
         sliderPxRef.current = minSize + ((percent / 100) * maxSize);
         changeWidth(penInfoRef.current.size  * penInfoRef.current.scale);
     }
-    
+
     return (
         <div ref={vantaRef} id='side-bar-container'>
             <div id='side-bar-toggle'></div>
@@ -112,7 +111,7 @@ const ToolBar = () => {
                             <div id='draw-mode-row' className={`grid grid-cols-1 grid-rows-[1fr_2fr]`}>
                                 {hostFlag ? 
                                 <div className='row-start-1 grid grid-cols-3'>
-                                    <div id='background-set' className='col-start-1 glassy' onClick={clearFunctionRef.current}>
+                                    <div id='background-set' className='col-start-1 glassy' onClick={()=>triggerFlag('background')}>
                                         <Icon src={`/${iconFolder}/image.svg`} width='55%' height='55%'/>
                                     </div>
                                     <div id='zoom-in' className='col-start-2 glassy' onClick={zoomIn}>
@@ -143,8 +142,8 @@ const ToolBar = () => {
                             <ColorSelect/>
                         </div>
                     </div>
-                    <div id='comment-row' className='grid grid-cols-9 grid-rows-1 row-start-4' onClick={()=>triggerFlag('clear')}>
-                        <div id='clear-button' className='col-start-1 col-span-1 glassy'>
+                    <div id='comment-row' className='grid grid-cols-9 grid-rows-1 row-start-4' >
+                        <div id='clear-button' className='col-start-1 col-span-1 glassy' onClick={()=>triggerFlag('clear')}>
                             <Icon src={`/${iconFolder}/clear.svg`} width='50%' height='35%'/>
                         </div>
                         <div id='comment-window' className='grid col-start-2 col-span-8 grid-cols-1'>

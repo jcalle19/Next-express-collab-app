@@ -165,7 +165,7 @@ const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPerce
                     ref={textareaRef}
                     id='note-content' 
                     className={`col-start-${isPreview ? '2 col-span-2' : '1'}`}
-                    value={text ? text : content}
+                    value={content} //keep an eye on this
                     onChange={(e)=>setText(e.target.value)}
                     style={{border: `1px solid ${boxColor}`,
                             backgroundColor: boxColor, 
