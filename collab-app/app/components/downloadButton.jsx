@@ -6,52 +6,75 @@ import '../css/downloadButton.css'
 import { toPng } from 'html-to-image';
 import html2canvas from 'html2canvas';
 
-const DownloadButton = ({left, top, imageRef, size}) => {
-    const download_unused = () => {
-        if (!imageRef) return;
-        const targetWidth = 3600;
-        const targetHeight = 3000;
+const DownloadButton = ({left, top, imageRef}) => {
 
-        // Get original size of the element
-        const node = imageRef.current;
-        console.log(size.width, size.height);
-        toPng(imageRef.current, {
-            cacheBust: true,
-            pixelRatio: 1,
-            width: size.width * 1.15,
-            height: size.height * 1.15,
-        }).then((dataUrl) => {
-            const link = document.createElement('a');
-            link.download = 'my-capture.png';
-            link.href = dataUrl;
-            link.click();
-        }).catch((error) => {
-            console.error('Error capturing image:', error);
+    const generateFormattedFileName = () => {
+        const now = new Date();
+        return `canvas_${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}_${now.getHours()}${now.getMinutes()}${now.getSeconds()}.png`;
+    };
+
+    /*AI function, html2canvas was being too unpredictable and 
+    i didnt really understand it enough to fix it myself*/
+    const captureBackground = async () => {
+        if (!imageRef?.current) return;
+
+        await document.fonts.ready;
+
+        const original = imageRef.current;
+
+        // Clone entire tree
+        const clone = original.cloneNode(true);
+        clone.style.position = "fixed";
+        clone.style.top = "0";
+        clone.style.left = "0";
+        clone.style.margin = "0";
+        clone.style.transform = "none";
+        clone.style.scale = "1";
+        clone.style.width = `${original.offsetWidth}px`;
+        clone.style.height = `${original.offsetHeight}px`;
+        clone.style.zIndex = "-1";
+
+        document.body.appendChild(clone);
+
+        // --- 🔥 COPY CANVAS CONTENT HERE ---
+        const originalCanvases = original.querySelectorAll("canvas");
+        const clonedCanvases = clone.querySelectorAll("canvas");
+
+        originalCanvases.forEach((orig, i) => {
+            const cloned = clonedCanvases[i];
+            if (!cloned) return;
+
+            cloned.width = orig.width;    // match resolution
+            cloned.height = orig.height;
+
+            const ctx = cloned.getContext("2d");
+            ctx.drawImage(orig, 0, 0);
         });
-    }
+        // --- END FIX ---
 
-    const download = () => {
-        const node = imageRef.current;
-        node.style.overflow = 'visible';
-        html2canvas(node, {
-            scale: 2,   // increase quality
+        const canvas = await html2canvas(clone, {
             useCORS: true,
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'snapshot.png';
-            link.href = canvas.toDataURL();
-            link.click();
+            allowTaint: true,
+            foreignObjectRendering: true,
+            backgroundColor: null,
+            scale: 2,
         });
-        node.style.overflow = 'hidden';
-    }
-    
+
+        document.body.removeChild(clone);
+
+        const link = document.createElement("a");
+        link.download = generateFormattedFileName();
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    };
+
     return (
         <div id='download-button' style={{
                     left: `${left}%`,
                     top: `${top}%`,
                 }}
             onDragStart={(e)=>{e.preventDefault()}}
-            onClick={download}
+            onClick={captureBackground}
         >
             <Icon src={`/toolbar-icons/download.svg`} width='75%' height='75%'/>
         </div>
