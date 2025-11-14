@@ -6,6 +6,17 @@
 //Has hostIds, canvas info, and userTokens
 const roomMap = new Map();
 
+
+const safe = (handler) => {
+    return async (...args) => {
+        try {
+            await handler(...args);
+        } catch (err) {
+            console.error('Socket handler error:', err);
+        }
+    };
+}
+
 const randomId = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
