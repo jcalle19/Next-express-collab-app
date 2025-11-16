@@ -1,235 +1,96 @@
-/*files that will use these functions
--contexts/userState.jsx
--rooms/[id]/page.jsx
-*/
-
+import {util} from './util_functions.js';
 //Has hostIds, canvas info, and userTokens
 const roomMap = new Map();
 
-
-const safe = (handler) => {
-    return async (...args) => {
-        try {
-            await handler(...args);
-        } catch (err) {
-            console.error('Socket handler error:', err);
-        }
-    };
-}
-
-const randomId = () => {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let result = "";
-        for (let i = 0; i < 16; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
-    };
-
 const socket_functions = (io) => {
-    //this socket function is redundant and can be replaced simply by emitting 'sync-with-server'
-    const broadcastInfo = (roomId, socket, event) => {
-        console.log(`broadcast source: ${roomId}, ${event}`);
-        const roomInfo = {
-            members: Array.from(roomMap.get(roomId).members),
-            chat: roomMap.get(roomId).chat,
-            notes: Array.from(roomMap.get(roomId).notes),
-            options: roomMap.get(roomId).options,
-            background: roomMap.get(roomId).background,
-            canvases: Array.from(roomMap.get(roomId).canvases),
-            zoom: roomMap.get(roomId).zoom,
-        }
-        //might be being called twice, have to look further
-        if (socket) {
-            socket.emit('sync-with-server', roomInfo);
-        }
-        else {
-            io.to(roomId).emit('sync-with-server', roomInfo);  
-        }
-    };
-
     io.on('connection', function (socket) {
-        socket.on('create-room', (roomId, hostId, roomOptions) => {
-            roomMap.set(roomId, {hostId: hostId, 
-                                 options: roomOptions,
-                                 admins: new Set(), 
-                                 members: new Map(), 
-                                 canvases: new Map(), //for temporarily holding the canvas on refresh
-                                 notes: new Map(),
-                                 chat: [],
-                                 background: '',
-                                 zoom: 100,
-                                });
-            if (roomMap.get(roomId)) {
-                socket.emit('confirm-room-creation', true, {roomId: roomId, hostId: hostId});  
-            }
-            else {
-                socket.emit('confirm-room-creation', false, {roomId: '', hostId: ''});
-            }
-        });
+        socket.on('create-room', util.safe((roomId, hostId, roomOptions) => {
+            util.createRoom(socket, roomId, hostId, roomOptions);
+        }));
 
-        socket.on('user-joined', (userObj, roomToken) => {
-            if (!roomMap.get(userObj.roomId) || !roomMap.get(userObj.roomId).options.canJoin) {
-                socket.emit('confirm-room-join', false, userObj.roomId, '');
-            } else {
-                socket.join(userObj.roomId);
-                roomMap.get(userObj.roomId).members.set(roomToken, userObj);
-                socket.emit('confirm-room-join', true, userObj.roomId, roomToken);
-                console.log(`User ${userObj.user} joining room ${userObj.roomId}`);
-                broadcastInfo(userObj.roomId, false, 'user-joined');
-            }
-            
-        });
+        socket.on('user-joined', util.safe((userObj, roomToken) => {
+            util.userJoined(io, socket, userObj, roomToken);
+        }));
 
-        socket.on('user-left', (roomId, token) => {
-            roomMap.get(roomId).members.delete(token);
-            broadcastInfo(roomId, false, 'user-left');
-        });
+        socket.on('user-left', util.safe((roomId, token) => {
+            util.userLeft(io, roomId, token);
+        }));
         
-        socket.on('update-room', (userObj, token) => {
-            roomMap.get(userObj.roomId).members.set(token, userObj);
-            broadcastInfo(userObj.roomId, false, 'update-room');
-        });
+        socket.on('update-room', util.safe((userObj, token) => {
+            util.updateRoom(io, userObj, token);
+        }));
 
-        socket.on('broadcast-msg', (userObj, msg) => {
-            console.log(`received ${msg} from ${userObj.roomId}`);
-            if (roomMap.get(userObj.roomId).options.canChat || userObj.isHost) {
-                let messagesArray = roomMap.get(userObj.roomId).chat;
-                messagesArray.push({key: randomId(), id: userObj.id, name: userObj.user, msg: msg});
-                broadcastInfo(userObj.roomId, false, 'broadcast-msg');
-            }
-        });
+        socket.on('broadcast-msg', util.safe((userObj, msg) => {
+            util.broadcastMsg(io, userObj, msg);
+        }));
 
-        socket.on('broadcast-note', (userObj, noteInfo) => {
-            console.log(`received ${noteInfo} from ${userObj.user}`);
-            if (roomMap.get(userObj.roomId).options.canChat || userObj.isHost) {
-                roomMap.get(userObj.roomId).notes.set(randomId(), noteInfo);
-                broadcastInfo(userObj.roomId, false, 'broadcast-note');
-                console.log(roomMap.get(userObj.roomId).canvases.length);
-            }
-            
-        });
-        socket.on('request-sync', (roomId)=> {
-            broadcastInfo(roomId, socket, 'request-sync');
-        }); 
+        socket.on('broadcast-note', util.safe((userObj, noteInfo) => {
+            util.broadcastNote(io, userObj, noteInfo);
+        }));
+
+        socket.on('request-sync', util.safe((roomId)=> {
+            util.broadcastInfo(io, roomId, socket, 'request-sync');
+        })); 
 
         socket.on('draw-line', (roomId, strokeBatch)=> {
             socket.broadcast.to(roomId).emit('draw-from-server', strokeBatch);
         });
 
-        socket.on('check-token', (roomId, token) => {
-            if (!roomMap.get(roomId).members.has(token)) {
-                socket.leave(roomId);
-                socket.emit('token-valid', false, '');
-            } else {
-                //can probably replace with broadcast info
-                const roomInfo = {
-                    members: Array.from(roomMap.get(roomId).members),
-                    chat: roomMap.get(roomId).chat,
-                    notes: Array.from(roomMap.get(roomId).notes),
-                    options: roomMap.get(roomId).options,
-                    background: roomMap.get(roomId).background,
-                    canvases: Array.from(roomMap.get(roomId).canvases),
-                    zoom: roomMap.get(roomId).zoom,
-                }
-                socket.emit('token-valid', true, roomInfo);
-            }
-            
-        });
+        socket.on('check-token', util.safe((roomId, token) => {
+            util.checkToken(socket, roomId, token);
+        }));
 
         socket.on('clear-room', (room) => {
             socket.leave(room);
         });
 
-        socket.on('request-user-info', (roomToken, hostId, roomId, socketId) => {
-            try {
-                let userInfo = roomMap.get(roomId).members.get(roomToken);
-                if (userInfo && userInfo.roomId === roomId) {
-                    if (hostId === roomMap.get(roomId).hostId) userInfo.isHost = true;
-                    userInfo.socketId = socketId;
-                    socket.join(roomId);
-                    socket.emit('receive-user-info', true, userInfo);
-                } else {
-                    socket.emit('receive-user-info', false, 'error loading user info');
-                }
-            }
-            catch (e) {
-                socket.emit('receive-user-info', false, 'error loading user info');
-            }
-        });
+        socket.on('request-user-info', util.safe((roomToken, hostId, roomId, socketId) => {
+            util.requestUserInfo(socket, roomToken, hostId, roomId, socketId);
+        }));
 
         socket.on('kick-user', (socketId) => {
             io.to(socketId).emit('kick');
         });
 
-        socket.on('toggle-drawing', (value, userSocket, roomId, token) => {
-            if (roomMap.get(roomId).admins.has(token)) {
-                io.to(userSocket).emit('update-drawing', value);
-            }
-        });
+        socket.on('toggle-drawing', util.safe((value, userSocket, roomId, token) => {
+            util.toggleDrawing(io, value, userSocket, roomId, token);
+        }));
 
-        socket.on('toggle-chat', (value, userSocket, roomId, token) => {
-            if (roomMap.get(roomId).admins.has(token)) {
-                io.to(userSocket).emit('update-chat', value);
-            }
-        });
+        socket.on('toggle-chat', util.safe((value, userSocket, roomId, token) => {
+            util.toggleChat(io, value, userSocket, roomId, token);
+        }));
 
-        socket.on('toggle-admin', (value, userSocket, roomId, hostToken) => {
-            if (roomMap.get(roomId).hostId === hostToken) {
-                io.to(userSocket).emit('update-admin', value);
-            }
-        });
+        socket.on('toggle-admin', util.safe((value, userSocket, roomId, hostToken) => {
+            util.toggleAdmin(io, value, userSocket, roomId, hostToken);
+        }));
 
-        socket.on('edit-admins', (roomId, token, value) => {
-            if (value) {
-                roomMap.get(roomId).admins.add(token);
-            }
-            else {
-                roomMap.get(roomId).admins.delete(token);
-            }
-        });
+        socket.on('edit-admins', util.safe((roomId, token, value) => {
+            util.editAdmins(roomId, token, value);
+        }));
 
-        socket.on('update-options', (roomId, roomOptions, hostId)=> {
-            const mapAccess = roomMap.get(roomId);
-            if (mapAccess.hostId === hostId) {
-                mapAccess.options = roomOptions;
-                broadcastInfo(roomId, false, 'update-options');
-            }
-        });
+        socket.on('update-options', util.safe((roomId, roomOptions, hostId)=> {
+            util.updateOptions(io, roomId, roomOptions, hostId);
+        }));
 
-        socket.on('update-background', (roomId, background) => {
-            roomMap.get(roomId).background = background;
-            broadcastInfo(roomId, false, 'update-background');
-        });
+        socket.on('update-background', util.safe((roomId, background) => {
+            util.updateBackground(io, roomId, background);
+        }));
 
-        socket.on('update-notes', (roomId, noteId, noteInfo) => {
-            roomMap.get(roomId).notes.set(noteId, noteInfo);
-            broadcastInfo(roomId, socket, 'update-notes');
-        });
+        socket.on('update-notes', util.safe((roomId, noteId, noteInfo) => {
+            util.updateNotes(io, socket, roomId, noteId, noteInfo);
+        }));
 
-        socket.on('update-canvas', (roomId, roomToken, data) => {
-            if (!roomMap.get(roomId).members.has(roomToken)) {
-                socket.leave(roomId);
-                socket.emit('token-valid', false, '');
-            } else {
-                const canvasAccess = roomMap.get(roomId).canvases;
-                console.log('Before: ');
-                canvasAccess.forEach((value, key) => console.log(key, value.length));
-                canvasAccess.set(roomToken, data);
-                console.log('After: ');
-                canvasAccess.forEach((value, key) => console.log(key, value.length));
-            }
-        });
+        socket.on('update-canvas', util.safe((roomId, roomToken, data) => {
+            util.updateCanvas(socket, roomId, roomToken, data);
+        }));
 
-        socket.on('update-zoom', (roomId, zoom)=> {
-            roomMap.get(roomId).zoom = zoom;
-            broadcastInfo(roomId, false, 'update-zoom');
-        });
+        socket.on('update-zoom', util.safe((roomId, zoom)=> {
+            util.updateZoom(io, roomId, zoom);
+        }));
 
-        socket.on('delete-note', (roomId, noteId) => {
-            roomMap.get(roomId).notes.delete(noteId);
-            broadcastInfo(roomId, false, 'update-notes');
-        });
+        socket.on('delete-note', util.safe((roomId, noteId) => {
+            util.deleteNote(io, roomId, noteId);
+        }));
     });
 }
 

@@ -1,11 +1,9 @@
-const socket_handler = require('./socket_handler');
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const cors = require('cors');
-const apiRoutes = require('./routes/api');
+import socket_handler from './socket_handler.js';
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import cors from 'cors';
 const app = express();
-const socket_functions = socket_handler.default;
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -16,11 +14,9 @@ const io = new Server(server, {
 });
 
 const PORT = 5000;
-
-app.use('/api', apiRoutes);
 app.use(cors());
 
-socket_functions(io);
+socket_handler(io);
 
 server.listen(PORT, () => {
     console.log(`Server is listening at http://localhost:${PORT}`);
