@@ -23,3 +23,13 @@
 .transparent {
     opacity: 0;
 }
+
+#loading-cover {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 999999;
+}

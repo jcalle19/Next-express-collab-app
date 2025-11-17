@@ -27,7 +27,7 @@ const Canvas = () => {
     const strokeCount = useRef(0);
     const lastStrokeCount = useRef(0);
     const highLightFactors = {sizeFactor : 10, opacityFactor : .5};
-    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef, roomCanvasesRef} = useRefContext();
+    const { userObj, penInfoRef, canvasOffsetRef, canvasSizeRef, incomingLineRef, socketRef, roomCanvasesRef, roomOptions} = useRefContext();
     const { highlightFlag, lineFlag, undoFlag, redoFlag, backgroundSelectFlag, clearFlag } = useDrawingContext();
     const { windowSizeX, windowSizeY, windowResize, canvasSize, updateSize } = useCanvasContext();
     const { canvasBackground, canvasZoom } = useSocketContext();
@@ -170,7 +170,7 @@ const Canvas = () => {
     
     const handleMouseDown = (e) => {
         e.preventDefault();
-        if (userObj.current.canDraw) {
+        if (userObj.current.canDraw && roomOptions.current.canDraw) {
             drawingRef.current = true;
             prevRef.current = { x: e.nativeEvent.offsetX * scaleXRef.current, y: e.nativeEvent.offsetY * scaleYRef.current};
         }
@@ -258,6 +258,7 @@ const Canvas = () => {
                     onMouseMove={handleMouseMove}
                     onMouseDown={handleMouseDown} 
                     onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
                     width={canvasRef.current ? canvasRef.current.width : '2600'}
                     height={canvasRef.current ? canvasRef.current.height : '2000'}
                 >

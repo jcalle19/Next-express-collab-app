@@ -1,8 +1,25 @@
-import {util} from './util_functions.js';
-//Has hostIds, canvas info, and userTokens
-const roomMap = new Map();
+import {roomMap, util} from './util_functions.js';
+
+const ROOM_TIMEOUT = 60 * 60 * 1000; // 1 hour
 
 const socket_functions = (io) => {
+    setInterval(() => {
+        const now = Date.now();
+        console.log(roomMap.entries());
+        for (const [roomId, roomData] of roomMap.entries()) {
+            console.log(roomId, now - roomMap.get(roomId).createdAt);
+            if (now - roomData.createdAt >= ROOM_TIMEOUT) {
+
+                // Perform your action:
+                console.log(`Room ${roomId} has been open for 1 hour.`);
+
+                // Example: notify host or auto-delete
+                io.to(roomId).emit("room-closed");
+                roomMap.delete(roomId);
+            }
+        }
+    }, 60 * 1000); // check once per minute
+
     io.on('connection', function (socket) {
         socket.on('create-room', util.safe((roomId, hostId, roomOptions) => {
             util.createRoom(socket, roomId, hostId, roomOptions);

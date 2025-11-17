@@ -5,7 +5,6 @@ import {useRefContext} from './refContext.jsx';
 import {useStateContext} from './stateContext.jsx';
 import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
-import { textureLevel } from 'three/tsl';
 
 const socketContext = createContext();
 export const useSocketContext = () => useContext(socketContext);
@@ -16,7 +15,7 @@ export const SocketProvider = ({children}) => {
     const {updateKeys, updateMessages, updateRoomNotes, triggerRedraw} = useStateContext();
     const [socketReady, updateSocketStatus] = useState(false);
     const [hostFlag, setHostFlag] = useState(false);
-
+    const [validFlag, setValid] = useState(false);
     //canvas exceptions
     const [canvasBackground, updateBackground] = useState(''); //*
     const [canvasZoom, updateZoom] = useState(100);
@@ -37,6 +36,7 @@ export const SocketProvider = ({children}) => {
         });
 
         socketRef.current.on('confirm-room-creation', (status, info) => {
+            setValid(status);
             if (status) {
                 sessionStorage.setItem('hostId', info.hostId);
                 userObj.current.isAdmin = true;
@@ -49,6 +49,7 @@ export const SocketProvider = ({children}) => {
 
         socketRef.current.on('confirm-room-join', (status, roomId, roomToken) => {
             console.log('joining room');
+            setValid(status);
             if (status) {
                 sessionStorage.setItem('roomToken', roomToken);
                 if (userObj.current.isHost) {
@@ -88,6 +89,7 @@ export const SocketProvider = ({children}) => {
         });
 
         socketRef.current.on('token-valid', (valid, roomInfo) => {
+            setValid(valid);
             if (valid) {
                 const members = new Map(roomInfo.members);
                 const chatMessages = roomInfo.chat;
@@ -123,6 +125,10 @@ export const SocketProvider = ({children}) => {
             socketRef.current.emit('edit-admins', userObj.current.roomId, token, value);
         });
 
+        socketRef.current.on('room-closed', ()=>{
+            disconnectUser();
+        });
+        
         socketRef.current.on('kick', () => {
             disconnectUser();
         });
@@ -245,11 +251,12 @@ export const SocketProvider = ({children}) => {
         canvasZoom,
         canvasBackground,
         setBackground,
-        loadRoomState,
+        validFlag,
+        setValid,
         zoomIn,
         zoomOut,
         hostFlag,
-    }),[socketReady, canvasBackground, canvasZoom, hostFlag]);
+    }),[socketReady, canvasBackground, canvasZoom, hostFlag, validFlag]);
 
     return <socketContext.Provider value={value}>
         {children}

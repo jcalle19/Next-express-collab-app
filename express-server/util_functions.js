@@ -1,7 +1,7 @@
 /*This file has all the socket event functions and util functions */
 
 //Has hostIds, canvas info, and userTokens
-const roomMap = new Map();
+export const roomMap = new Map();
 
 const randomId = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -45,6 +45,7 @@ const broadcastInfo = (io, roomId, socket, event) => {
 
 const createRoom = (socket, roomId, hostId, roomOptions) => {
     roomMap.set(roomId, {hostId: hostId, 
+                                 createdAt: Date.now(),
                                  options: roomOptions,
                                  admins: new Set(), 
                                  members: new Map(), 
@@ -78,7 +79,11 @@ const userJoined = (io, socket, userObj, roomToken) => {
 
 const userLeft = (io, roomId, token) => {
     roomMap.get(roomId).members.delete(token);
-    broadcastInfo(io, roomId, false, 'user-left');
+    if (roomMap.get(roomId).members.size === 0) {
+        io.to(roomId).emit("room-closed");
+    } else {
+        broadcastInfo(io, roomId, false, 'user-left');
+    }
 }
 
 const updateRoom = (io, userObj, token) => {

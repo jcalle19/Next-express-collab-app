@@ -13,7 +13,7 @@ export default function RoomPage() {
   const { id } = params;
   //const { socketReady, socketRefReady, loadRoomState } = useStateContext();
   const { socketRefReady } = useRefContext();
-  const { socketReady, loadRoomState } = useSocketContext();
+  const { validFlag, socketReady, loadRoomState } = useSocketContext();
 
   useEffect(() => {
     if (socketRefReady.current) {
@@ -30,6 +30,7 @@ export default function RoomPage() {
     <div className='window-container'>
       <CursorArea id={id}/>
       <ToolBar/>
+      <div id='loading-cover' style={{ display: `${validFlag ? 'none' : 'block'}`}}>Loading</div>
     </div>
   );
 }
