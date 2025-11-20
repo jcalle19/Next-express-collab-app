@@ -8,25 +8,28 @@ import comps from '../css/homecomps.css'
 
 const RoomForm = () => {
     const { createRoom, joinRoom, leaveRoom } = useSocketContext();
-    const { userObj } = useRefContext();
+    const { userObj, roomButtonsActive } = useRefContext();
     const [nameInput, updateUsername] = useState('');
     const [searchCode, updateSearchCode] = useState('');
-    const router = useRouter();
 
     useEffect(()=>{
+        roomButtonsActive.current = true;
         if (userObj.current.roomId) leaveRoom();
     },[]);
     
     //Add user to room map in socket_handler.js
     const handleJoin = (e) => {
         e.preventDefault();
+        if (!roomButtonsActive.current) return;
+        roomButtonsActive.current = false;
         userObj.current.user = nameInput;
         joinRoom(searchCode);
-        //router.push(`/rooms/${searchCode}`);
     };
 
     const handleCreate = (e) => {
         e.preventDefault();
+        if (!roomButtonsActive.current) return;
+        roomButtonsActive.current = false;
         userObj.current.user = nameInput;
         createRoom();
     }

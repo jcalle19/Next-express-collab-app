@@ -11,7 +11,7 @@ export const useSocketContext = () => useContext(socketContext);
 
 export const SocketProvider = ({children}) => {
     const {userObj, roomOptions, roomUsers, tokenSetRef,
-           socketRef, socketRefReady,incomingLineRef, roomCanvasesRef} = useRefContext();
+           socketRef, socketRefReady,incomingLineRef, roomCanvasesRef, roomButtonsActive} = useRefContext();
     const {updateKeys, updateMessages, updateRoomNotes, triggerRedraw} = useStateContext();
     const [socketReady, updateSocketStatus] = useState(false);
     const [hostFlag, setHostFlag] = useState(false);
@@ -44,6 +44,7 @@ export const SocketProvider = ({children}) => {
                 joinRoom(info.roomId);
             } else {
                 console.log('Error creating room');
+                roomButtonsActive.current = true;
             }
         });
 
@@ -59,6 +60,7 @@ export const SocketProvider = ({children}) => {
                 router.push(`/rooms/${roomId}`);
             } else {
                 console.log('error joining room');
+                roomButtonsActive.current = true;
             }
         });
 
@@ -193,6 +195,7 @@ export const SocketProvider = ({children}) => {
             let hostId = randomId();
             socketRef.current.emit('create-room', roomId, hostId, roomOptions.current);
         }
+
     }
 
     const joinRoom = (newRoom) => {

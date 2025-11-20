@@ -25,9 +25,10 @@ const UserPanel = ({user}) => {
     const handleKick = (user) => {
         if (userObj.current.socketId === user.socketId) return; //can't act on yourself
 
-        if (userObj.current.isAdmin) {
+        if (userObj.current.isAdmin || userObj.current.isHost) {
             socketRef.current.emit('kick-user', user.socketId);
         }
+        console.log('kicking', userObj.current);
     }
 
     return (

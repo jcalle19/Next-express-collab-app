@@ -5,9 +5,7 @@ const ROOM_TIMEOUT = 60 * 60 * 1000; // 1 hour
 const socket_functions = (io) => {
     setInterval(() => {
         const now = Date.now();
-        console.log(roomMap.entries());
         for (const [roomId, roomData] of roomMap.entries()) {
-            console.log(roomId, now - roomMap.get(roomId).createdAt);
             if (now - roomData.createdAt >= ROOM_TIMEOUT) {
 
                 // Perform your action:

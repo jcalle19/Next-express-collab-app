@@ -65,10 +65,8 @@ const createRoom = (socket, roomId, hostId, roomOptions) => {
 
 const userJoined = (io, socket, userObj, roomToken) => {
     if (!roomMap.get(userObj.roomId) || !roomMap.get(userObj.roomId).options.canJoin) {
-        console.log('couldnt join');
         socket.emit('confirm-room-join', false, userObj.roomId, '');
     } else {
-        console.log('could join room');
         socket.join(userObj.roomId);
         roomMap.get(userObj.roomId).members.set(roomToken, userObj);
         socket.emit('confirm-room-join', true, userObj.roomId, roomToken);
@@ -195,11 +193,7 @@ const updateCanvas = (socket, roomId, roomToken, data) => {
         socket.emit('token-valid', false, '');
     } else {
         const canvasAccess = roomMap.get(roomId).canvases;
-        console.log('Before: ');
-        canvasAccess.forEach((value, key) => console.log(key, value.length));
         canvasAccess.set(roomToken, data);
-        console.log('After: ');
-        canvasAccess.forEach((value, key) => console.log(key, value.length));
     }
 }
 

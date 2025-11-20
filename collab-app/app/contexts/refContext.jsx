@@ -13,6 +13,7 @@ export const RefProvider = ({children}) => {
     const roomUsersRef = useRef([]);
     const chatMessagesRef = useRef([]);
     const tokenSetRef = useRef(false);
+    const roomButtonsActive = useRef(true);
 
     //socket things
     const socketRef = useRef(null);
@@ -34,6 +35,7 @@ export const RefProvider = ({children}) => {
         chatMessagesRef,
         roomCanvasesRef,
         tokenSetRef,
+        roomButtonsActive,
         socketRef,
         socketRefReady,
         incomingLineRef,
