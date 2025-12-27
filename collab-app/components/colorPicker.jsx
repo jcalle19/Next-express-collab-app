@@ -1,7 +1,7 @@
 //UNUSED
 import { useState, useEffect, useRef} from 'react'
-import { useStateContext } from '../contexts/userState.jsx';
-import '../css/colorPicker.css'
+import { useStateContext } from '@/contexts/userState.jsx';
+import '@/css/colorPicker.css'
 
 const ColorPicker = ({expanded}) => {
     const [currentColor, updateColor] = useState('white');

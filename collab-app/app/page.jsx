@@ -1,12 +1,11 @@
 "use client";
 
 import React from 'react'
-import RoomForm from './components/roomSearch.jsx'
+import RoomForm from '@/components/roomSearch.jsx'
 
 const home = () => {
   return (
-    <div>
-      <p>Board Room</p>
+    <div style={{maxWidth: '100vw', maxHeight: '100vh'}}>
       <RoomForm/>
     </div>
   )

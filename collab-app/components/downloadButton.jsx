@@ -1,9 +1,8 @@
 'use client'
 import React from 'react'
 import Icon from './icon.jsx'
-import '../css/globals.css'
-import '../css/downloadButton.css'
-import { toPng } from 'html-to-image';
+import '@/css/globals.css'
+import '@/css/downloadButton.css'
 import html2canvas from 'html2canvas';
 
 const DownloadButton = ({left, top, imageRef}) => {

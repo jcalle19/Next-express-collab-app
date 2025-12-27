@@ -1,12 +1,12 @@
-import '../css/globals.css'
-import '../css/roomInfo.css'
+import '@/css/globals.css'
+import '@/css/roomInfo.css'
 import Switch from './switch.jsx'
 import Icon from './icon.jsx'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 //import { useStateContext } from '../contexts/userState.jsx'
-import { useRefContext } from '../contexts/refContext.jsx'
-import { useSocketContext } from '../contexts/socketContext.jsx'
+import { useRefContext } from '@/contexts/refContext.jsx'
+import { useSocketContext } from '@/contexts/socketContext.jsx'
 import { useRouter } from 'next/navigation'
 
 const RoomInfoPanel = () => {

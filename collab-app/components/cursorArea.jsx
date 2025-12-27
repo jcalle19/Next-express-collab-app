@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'next/navigation';
-import { useStateContext } from '../contexts/userState.jsx'
-import { useRefContext } from '../contexts/refContext.jsx'
+import { useRefContext } from '@/contexts/refContext.jsx'
 import UserIcon from './userIcons.jsx';
 import Canvas from './canvas.jsx';
-import '../css/roomPage.css';
+import '@/css/roomPage.css';
 
 const CursorArea = ({id}) => {
   const [coords, setCoords] = useState([0,0]);
@@ -30,16 +28,9 @@ const CursorArea = ({id}) => {
     if (socketRef.current !== null) {
       userObj.current.xCoord = e.clientX;
       userObj.current.yCoord = e.clientY;
-      //socketRef.current.emit('update-room', userObj.current);
     }
   }
 
-  /* not currently working
-  {[...mapSnapshot].map(([user, userInfo]) => 
-          userInfo.id != userObj.current.id ? <UserIcon key={userInfo.id} x={userInfo.xCoord} y={userInfo.yCoord}/> : ''
-        )
-      }
-  */
   return (
     <div onMouseMove={getMouseLocation} className="cursor-window">
       <UserIcon x={coords[0]} y={coords[1]}/>

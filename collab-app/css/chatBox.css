@@ -1,7 +1,3 @@
-:root {
-
-}
-
 .chat-window {
     position: relative;
     width: 100%;
@@ -25,7 +21,7 @@
     max-height: 100%;
     display: flex;
     flex-direction: column-reverse;
-    background: linear-gradient(45deg, var(--raspberry) 1%, black 1%, black 99%, var(--electric-blue) 99%);
+    background-color: black;
     width: 100%;
     height: 40vh;
     z-index: 1;
@@ -42,13 +38,11 @@
 #color-heading {
     font-size: min(1.25vw, 2.75vh);
     text-align: center;
-    /*background: linear-gradient(45deg, var(--electric-blue) 0%, var(--electric-blue) 33.33%, var(--raspberry) 33.33%, var(--raspberry) 66.67%, var(--lime-green) 66.67%);*/
 }
 
 #input-container {
     height: max(50px, 5vh);
-    background-color: var(--menu-color);
-    background: linear-gradient(45deg, var(--raspberry) 0%, var(--raspberry) 26.67%, var(--electric-blue) 26.67%, var(--electric-blue) 52.33%, var(--lime-green) 53.33%);
+    background-color: var(--grey-accent);
 }
 
 #people-container {
@@ -70,6 +64,7 @@
     transform: translate(-50%, -50%);
     width: 95%;
     height: 65%;
+    border-radius: 5px;
     background-color: rgba(45,45,45,1);
     padding-left: 2.5%;
 }
@@ -80,7 +75,7 @@
 }
 
 #msg-submit {
-    background-color: var(--lime-green);
+    background-color: var(--inspecting);
     border-left: 1px solid black;
     transition: background-color .1s;
 }

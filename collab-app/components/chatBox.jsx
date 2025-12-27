@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 //import { useStateContext } from '../contexts/userState.jsx'
-import { useRefContext } from '../contexts/refContext.jsx'
-import { useStateContext } from '../contexts/stateContext.jsx'
-import { useSocketContext } from '../contexts/socketContext.jsx'
+import { useRefContext } from '@/contexts/refContext.jsx'
+import { useStateContext } from '@/contexts/stateContext.jsx'
+import { useSocketContext } from '@/contexts/socketContext.jsx'
 
 import Message from './message.jsx'
 import Icon from './icon.jsx'

@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import '../css/message.css';
+import '@/css/message.css';
 
 const Message = ({user, message, self, showName}) => {
 

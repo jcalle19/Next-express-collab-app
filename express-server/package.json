@@ -2,6 +2,7 @@
   "type": "module",
   "dependencies": {
     "crypto": "^1.0.1",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "lz-string": "^1.5.0",
     "react-aria-components": "^1.12.1",

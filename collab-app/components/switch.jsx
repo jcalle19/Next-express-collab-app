@@ -1,5 +1,5 @@
-import '../css/globals.css'
-import '../css/switch.css'
+import '@/css/globals.css'
+import '@/css/switch.css'
 
 
 const Switch = ({state, target, func, action}) => {

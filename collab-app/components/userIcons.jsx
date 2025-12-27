@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import '../css/userIcons.css'
+import '@/css/userIcons.css'
 
 const UserIcon = ({x, y}) => {
     const [coords, setCoords] = useState([0,0]);

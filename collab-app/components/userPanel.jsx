@@ -1,8 +1,8 @@
 import React from 'react'
 import Icon from './icon.jsx'
-import { useRefContext } from '../contexts/refContext.jsx'
-import '../css/globals.css'
-import '../css/userPanel.css'
+import { useRefContext } from '@/contexts/refContext.jsx'
+import '@/css/globals.css'
+import '@/css/userPanel.css'
 
 const UserPanel = ({user}) => {
     const { userObj, socketRef } = useRefContext();

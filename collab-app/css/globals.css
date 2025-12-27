@@ -12,6 +12,7 @@
   --electric-blue: #9198e5;
   --raspberry: #e66465;
   --menu-color: rgba(15,15,15,1);
+  --grey-accent: rgb(30,30,30);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,11 +25,6 @@
 body {
   color: var(--foreground);
   background: var(--background);
-}
-
-* {
-  font-family: Helvetica, sans-serif;
-  font-weight: 200;
 }
 
 .test-border {

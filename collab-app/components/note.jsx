@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import {useStateContext} from '../contexts/userState.jsx'
-import {useRefContext} from '../contexts/refContext.jsx'
-import {useDrawingContext} from '../contexts/drawingContext.jsx'
-import {useSocketContext} from '../contexts/socketContext.jsx'
+import {useStateContext} from '@/contexts/userState.jsx'
+import {useRefContext} from '@/contexts/refContext.jsx'
+import {useDrawingContext} from '@/contexts/drawingContext.jsx'
+import {useSocketContext} from '@/contexts/socketContext.jsx'
 import Icon from './icon.jsx'
-import '../css/note.css'
+import '@/css/note.css'
 
 const Note = ({id, isPreview, content, boxColor, textColor, fontSize, widthPercent, heightPercent, left, top}) => {
     const {userObj, canvasOffsetRef, canvasSizeRef, socketRef} = useRefContext();

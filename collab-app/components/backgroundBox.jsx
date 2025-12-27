@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 //import { useStateContext } from '../contexts/userState.jsx'
-import { useDrawingContext } from '../contexts/drawingContext.jsx'
-import { useSocketContext } from '../contexts/socketContext.jsx'
+import { useDrawingContext } from '@/contexts/drawingContext.jsx'
+import { useSocketContext } from '@/contexts/socketContext.jsx'
 import Icon from './icon.jsx'
 import '../css/backgroundBox.css'
 

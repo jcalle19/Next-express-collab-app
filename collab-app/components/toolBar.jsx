@@ -1,11 +1,11 @@
 `use client`;
 
 import { useState, useEffect, useRef } from 'react'
-import { useRefContext } from '../contexts/refContext.jsx'
-import { useDrawingContext } from '../contexts/drawingContext.jsx'
-import { useSocketContext } from '../contexts/socketContext.jsx' 
-import '../css/toolMenu.css'
-import '../css/globals.css'
+import { useRefContext } from '@/contexts/refContext.jsx'
+import { useDrawingContext } from '@/contexts/drawingContext.jsx'
+import { useSocketContext } from '@/contexts/socketContext.jsx' 
+import '@/css/toolMenu.css'
+import '@/css/globals.css'
 import ColorSelect from './colorSelect.jsx'
 import Note from './note.jsx'
 import ChatBox from './chatBox.jsx'
@@ -148,7 +148,7 @@ const ToolBar = () => {
                         </div>
                         <div id='comment-window' className='grid col-start-2 col-span-8 grid-cols-1'>
                             <Note isPreview={true} 
-                                content={':D'}
+                                content={'Preview'}
                                 boxColor={`rgba(${boxColor.red},${boxColor.green},${boxColor.blue},${boxColor.alpha})`}
                                 textColor={`rgba(${textColor.red},${textColor.green},${textColor.blue},${textColor.alpha})`}
                                 fontSize={previewFontSize}

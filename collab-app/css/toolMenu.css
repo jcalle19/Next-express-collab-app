@@ -7,7 +7,7 @@
     transform: translateX(-100%);
     width: 1.5%;
     height: 100vh;
-    background: linear-gradient(45deg, var(--raspberry) 0%, var(--raspberry) 33%, var(--electric-blue) 33%, var(--electric-blue) 66%, var(--lime-green) 66%);
+    background: var(--grey-accent);
     z-index: 10000;
 }
 

@@ -2,11 +2,11 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { useRefContext } from '../../contexts/refContext.jsx';
-import { useSocketContext } from '../../contexts/socketContext.jsx';
-import CursorArea from '../../components/cursorArea.jsx';
-import ToolBar from '../../components/toolBar.jsx';
-import '../../css/roomPage.css';
+import { useRefContext } from '@/contexts/refContext.jsx';
+import { useSocketContext } from '@/contexts/socketContext.jsx';
+import CursorArea from '@/components/cursorArea.jsx';
+import ToolBar from '@/components/toolBar.jsx';
+import '@/css/roomPage.css';
 
 export default function RoomPage() {
   const params = useParams();
