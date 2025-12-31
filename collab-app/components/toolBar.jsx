@@ -38,7 +38,7 @@ const ToolBar = () => {
         penInfoRef.current.size = sliderPxRef.current; //multiplying by 2 to account for symmetry of radial gradient to make more accurate
     },[sliderValue, penColor]);
 
-    /*Template Code*/
+    /*Template Code
     useEffect(() => {
         if (!vantaEffect) {
             setVantaEffect(
@@ -62,7 +62,7 @@ const ToolBar = () => {
         if (vantaEffect) vantaEffect.destroy();
         };
     }, [vantaEffect]);
-    /*-------------*/
+    -------------*/
 
     const handleSliderChange = (newVal) => {
         changeSlider(newVal);
