@@ -74,7 +74,7 @@ const ToolBar = () => {
     }
 
     return (
-        <div ref={vantaRef} id='side-bar-container'>
+        <div id='side-bar-container'>
             <div id='side-bar-toggle'></div>
             <div id='side-bar-overlay' className='grid grid-cols-1 grid-rows-2'>
                 <section id='edit-section' className='grid grid-cols-1 grid-rows-4'>

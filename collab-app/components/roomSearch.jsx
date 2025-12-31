@@ -100,7 +100,7 @@ const RoomForm = () => {
     }
 
     return (
-        <div ref={vantaRef} className={`home-form-container`}>
+        <div className={`home-form-container`}>
             <section id='home-title-section'>
                 <div id='site-title'>Rec Room</div>
                 <div id='site-description'>Collaborative canvas and chat application</div>
