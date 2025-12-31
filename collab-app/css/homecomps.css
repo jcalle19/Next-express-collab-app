@@ -1,10 +1,11 @@
 .enter-btn {
     width: 60%;
-    height: 35px;
+    height: 1.8rem;
     border-radius: 5px;
     background-color: rgb(30,30,30);
     box-shadow: 0px 0px 4px black;
     transition: background-color .2s, color .2s, transform .2s;
+    margin-top: .5rem;
 }
 
 .enter-btn:hover {
@@ -23,9 +24,9 @@
 
 #site-title {
     position: relative;
-    font-size: 7vmax;
+    font-size: clamp(40px, 8rem, 90px);
     font-weight: 200;
-    letter-spacing: min(10px, .75vw);
+    letter-spacing: min(10px, .1rem);
 }
 
 #site-description {
@@ -34,29 +35,37 @@
 }
 
 .home-form-container {
+    height: 100%;
     width: 100%;
-    height: 100vh;
+}
+
+.home-form-container canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 #form-container {
     position: absolute;
     top: 2%;
     right: 2%;
-    height: 75vh;
-    min-height: 500px;
-    aspect-ratio: 2 / 3;
-    max-width: 55%;
+    height: 40rem;
+    max-height: 80vh;
+    min-width: 300px;
     border-radius: 10px 10px;
-    background: linear-gradient(180deg, transparent 0%, transparent 50%, var(--grey-accent) 50%);
+    background: linear-gradient(180deg, transparent 0%, transparent 0%, var(--grey-accent) 0%, var(--grey-accent));
     box-shadow: 0px 0px 5px rgb(44, 44, 44);
+    overflow-y: auto;
+    scrollbar-color: white transparent;
 }
 
 #form-container form {
     position: relative;
-    padding: 20px;
-    padding-bottom: 40px;
+    padding: 1rem;
+    padding-bottom: 2rem;
     width: 100%;
     height: 70%;
+    min-height: 400px;
     min-width: 200px;
     background-color: var(--menu-color);
     border-radius: 10px 10px 0px 0px;
@@ -64,25 +73,25 @@
 
 #form-container input {
     width: 100%;
-    height: 20%;
+    height: 3rem;
 }
 
 .input-title {
-    height: max(1vh, 20px);
+    height: max(1rem, 20px);
 }
 
 .section-header {
     height: fit-content;
-    font-size: max(5vh, 30px);
+    font-size: clamp(30px, 2rem, 45px);
 }
 
 #form-container input {
     background-color: rgb(31, 53, 53);
     max-width: 75%;
-    height: 3.5vh;
+    height: auto;
     min-height: 20px;
     border-radius: 5px;
-    padding-left: 5px;
+    padding-left: .5rem;
     transition: background-color .2s, color .2s;
 }
 
@@ -93,7 +102,7 @@
 
 
 #room-create-section {
-    padding-bottom: 10px;
+    padding-bottom: 1rem;
     border-bottom: 1px solid var(--grey-accent);
 }
 
@@ -101,25 +110,27 @@
     position: relative;
     top: 2%;
     left: 50%;
-    width: fit-content;
-    height: fit-content;
-    line-height: 2;
+    width: 90%;
+    height: auto;
+    line-height: 1.5;
     letter-spacing: 1px;
-    font-size: clamp(14px, 1vmax, 17px);
     font-weight: 300;
     transform: translateX(-50%);
 }
 
 #instruction-section p {
-    font-size: clamp(14px, 1.5vmax, 18px) !important;
     font-weight: 600 !important;
+}
+
+#instruction-section ol {
+    font-size: clamp(5px, .9rem, 15px);
 }
 
 #footer {
     position: absolute;
     bottom: 0%;
     width: 100%;
-    height: 10vh;
+    height: 10%;
     background-color: var(--grey-accent);
 }
 
@@ -134,8 +145,9 @@
     position: relative;
     top: 50%;
     left: 50%;
-    height: min(6vw, 7.5vh);
-    border-radius: min(3vw, 3.75vh);
+    height: 3rem;
+    max-height: 8vh;
+    border-radius: 1.5rem;
     aspect-ratio: 1 / 1;
     background-color: var(--menu-color);
     transform: translate(-50%, -50%);

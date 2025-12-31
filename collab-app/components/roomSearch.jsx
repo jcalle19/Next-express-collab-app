@@ -24,38 +24,49 @@ const RoomForm = () => {
     const [joinNameInput, updateJoinUsername] = useState('');
     const [searchCode, updateSearchCode] = useState('');
 
-   useEffect(() => {
-    if (!vantaRef.current || vantaEffectRef.current) return
+    useEffect(() => {
+        if (!vantaRef.current || vantaEffectRef.current) return
 
-    let destroyed = false
+        let destroyed = false
 
-    import('vanta/dist/vanta.halo.min').then((VANTA) => {
-        if (destroyed) return
+        import('vanta/dist/vanta.halo.min').then((VANTA) => {
+            if (destroyed) return
 
-        vantaEffectRef.current = VANTA.default({
-            el: vantaRef.current,
-            THREE,
+            vantaEffectRef.current = VANTA.default({
+                el: vantaRef.current,
+                THREE,
 
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
+                mouseControls: false,
+                touchControls: false,
+                gyroControls: false,
 
-            baseColor: 0x0,
-            backgroundColor: 0x0,
+                baseColor: 0x0,
+                backgroundColor: 0x0,
 
-            amplitudeFactor: 0,
-            size: 1.0,
+                amplitudeFactor: 0,
+                size: 1.0,
+            })
         })
-    })
 
-    return () => {
-        destroyed = true
-        if (vantaEffectRef.current) {
-            vantaEffectRef.current.destroy()
-            vantaEffectRef.current = null
+        return () => {
+            destroyed = true
+            if (vantaEffectRef.current) {
+                vantaEffectRef.current.destroy()
+                vantaEffectRef.current = null
+            }
         }
-    }
-}, [])
+    }, [])
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (vantaEffectRef.current?.resize) {
+                vantaEffectRef.current.resize();
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [])
 
 
     useEffect(()=>{
