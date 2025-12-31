@@ -162,7 +162,6 @@ const Canvas = () => {
     /*-------------------------------*/
     
     const storeCompressedCanvas = (line) => {
-        console.log('called from line', line);
         let currToken = sessionStorage.getItem('roomToken');
         const compressed = compressToUTF16(JSON.stringify(lineStorageRef.current));
         socketRef.current.emit('update-canvas', userObj.current.roomId, currToken, compressed);

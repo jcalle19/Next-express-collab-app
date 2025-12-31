@@ -59,7 +59,6 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(25, 25, 25, 1);
-    transition: background .2s;
     user-select: none;
 }
 

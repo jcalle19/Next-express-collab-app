@@ -13,11 +13,9 @@ const UserPanel = ({user}) => {
         const userToken = sessionStorage.getItem('roomToken');
         const hostToken = sessionStorage.getItem('hostId');
         if (permission === 'toggle-admin' && userObj.current.isHost) { //only hosts can make admins
-            console.log('Toggling admin');
             socketRef.current.emit(`toggle-admin`, !value, user.socketId, userObj.current.roomId, hostToken);
         }
         else if (userObj.current.isAdmin && !user.isHost) {
-            console.log(`Toggling ${permission}`);
             socketRef.current.emit(`${permission}`, !value, user.socketId, userObj.current.roomId, userToken);
         }
     };
@@ -28,7 +26,6 @@ const UserPanel = ({user}) => {
         if (userObj.current.isAdmin || userObj.current.isHost) {
             socketRef.current.emit('kick-user', user.socketId);
         }
-        console.log('kicking', userObj.current);
     }
 
     return (
